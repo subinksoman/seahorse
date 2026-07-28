@@ -91,7 +91,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "assessment",
     "risk": "High",
     "effort_days": 3,
-    "status": "todo"
+    "status": "completed"
   },
   {
     "id": "T02",
