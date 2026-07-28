@@ -74,10 +74,14 @@ object Library {
   val hadoopAWS = hadoop("aws")
   val hadoopClient = hadoop("client")
   val hadoopCommon = hadoop("common")
-  val log4jApi = "org.apache.logging.log4j" % "log4j-api" % "2.17.2"
-  val log4jCore = "org.apache.logging.log4j" % "log4j-core" % "2.17.2"
-  val log4jSlf4jImpl = "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.17.2"
-  val log4j12Api = "org.apache.logging.log4j" % "log4j-1.2-api" % "2.17.2"
+  // Align log4j2 with Spark 3.4.4 (which bundles 2.19.0) and use the slf4j 2.x binding
+  // (log4j-slf4j2-impl, not log4j-slf4j-impl) to match slf4j-api 2.0.7. Mixing the 1.7
+  // binding (log4j-slf4j-impl) with slf4j 2.x caused a runtime NoSuchMethodError in
+  // Log4jLoggerFactory. All 2.19.0 are post-Log4Shell / safe.
+  val log4jApi = "org.apache.logging.log4j" % "log4j-api" % "2.19.0"
+  val log4jCore = "org.apache.logging.log4j" % "log4j-core" % "2.19.0"
+  val log4jSlf4jImpl = "org.apache.logging.log4j" % "log4j-slf4j2-impl" % "2.19.0"
+  val log4j12Api = "org.apache.logging.log4j" % "log4j-1.2-api" % "2.19.0"
   val guava = "com.google.guava" % "guava" % "19.0"
   val nscalaTime = "com.github.nscala-time" %% "nscala-time" % Version.nsscalaTime
   val mockitoCore = "org.mockito" % "mockito-core" % Version.mockito

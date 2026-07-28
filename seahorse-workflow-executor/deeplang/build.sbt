@@ -24,6 +24,18 @@ name := "seahorse-executor-deeplang"
 // Integration tests using Spark Clusters need jar
 test in Test := (test in Test).dependsOn(assembly).value
 
+// JVM options for the forked test JVMs. Spark 3.4.4 needs these --add-opens on
+// JDK 11+ (it accesses java.base internals reflectively); the empty vector that
+// worked on Java 8 fails on JDK 11 with InaccessibleObjectException.
+val sparkTestJvmOptions = Vector(
+  "--add-opens=java.base/java.nio=ALL-UNNAMED",
+  "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
+  "--add-opens=java.base/java.lang=ALL-UNNAMED",
+  "--add-opens=java.base/java.util=ALL-UNNAMED",
+  "--add-opens=java.base/java.io=ALL-UNNAMED",
+  "-Dio.netty.tryReflectionSetAccessible=true"
+)
+
 // Only one spark context per JVM
 def assignTestsToJVMs(testDefs: Seq[TestDefinition]) = {
   val (forJvm1, forJvm2) = testDefs.partition(_.name.contains("ClusterDependentSpecsSuite"))
@@ -34,7 +46,7 @@ def assignTestsToJVMs(testDefs: Seq[TestDefinition]) = {
       tests = forJvm1,
       runPolicy = SubProcess(
         sbt.ForkOptions()
-          .withRunJVMOptions(Vector.empty[String])
+          .withRunJVMOptions(sparkTestJvmOptions)
       )
     ),
     Group(
@@ -42,7 +54,7 @@ def assignTestsToJVMs(testDefs: Seq[TestDefinition]) = {
       tests = forJvm2,
       runPolicy = SubProcess(
         sbt.ForkOptions()
-          .withRunJVMOptions(Vector.empty[String])
+          .withRunJVMOptions(sparkTestJvmOptions)
       )
     )
   )
