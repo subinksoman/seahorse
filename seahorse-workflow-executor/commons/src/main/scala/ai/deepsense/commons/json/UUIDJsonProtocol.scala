@@ -18,7 +18,7 @@ package ai.deepsense.commons.json
 
 import java.util.UUID
 
-import spray.httpx.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json._
 
 trait UUIDJsonProtocol {

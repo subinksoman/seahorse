@@ -20,7 +20,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.FiniteDuration
 import scala.util.{Failure, Success, Try}
 
-import akka.actor.{Actor, ActorRef, Status}
+import org.apache.pekko.actor.{Actor, ActorRef, Status}
 
 class RetryActor[T](
     retryInterval: FiniteDuration,

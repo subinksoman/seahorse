@@ -21,14 +21,14 @@ import java.util.UUID
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import akka.io.IO
-import akka.pattern.ask
-import spray.can.Http
-import spray.can.Http.HostConnectorInfo
-import spray.client.pipelining._
-import spray.http.{HttpCredentials, HttpRequest, HttpResponse}
-import spray.httpx.unmarshalling.FromResponseUnmarshaller
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model.headers.{HttpCredentials, RawHeader}
+import org.apache.pekko.http.scaladsl.model.{HttpRequest, HttpResponse}
+import org.apache.pekko.http.scaladsl.unmarshalling.{FromResponseUnmarshaller, Unmarshal}
 
+// Migrated from Spray's actor-IO client (IO(Http) ? HostConnectorSetup + sendReceive
+// pipeline) to Pekko HTTP's Http().singleRequest. Per-request headers/credentials are
+// added directly to the HttpRequest instead of via the ~> RequestTransformer pipeline.
 trait RestClient extends RestClientImplicits {
   import RestClient._
 
@@ -38,37 +38,22 @@ trait RestClient extends RestClientImplicits {
   def credentials: Option[HttpCredentials]
   implicit override val ctx: ExecutionContext = as.dispatcher
 
-  private def hostConnectorFut(): Future[HostConnectorInfo] = {
-    (IO(Http) ? Http.HostConnectorSetup(apiUrl.getHost, port = apiUrl.getPort)).mapTo[HostConnectorInfo]
-  }
-
-  private def sendReceivePipeline() : Future[HttpRequest => Future[HttpResponse]] = {
-    for {
-      HostConnectorInfo(hostConnector, _) <- hostConnectorFut()
-    } yield {
-      credentials.map(addCredentials).getOrElse[RequestTransformer](identity) ~>
-        userId.map(id => addHeader(UserIdHeader, id.toString)).getOrElse[RequestTransformer](identity) ~>
-        userName.map(addHeader(UserNameHeader, _)).getOrElse[RequestTransformer](identity) ~>
-        sendReceive(hostConnector)
+  private def decorate(req: HttpRequest): HttpRequest = {
+    val withUserId = userId.foldLeft(req) { (r, id) =>
+      r.addHeader(RawHeader(UserIdHeader, id.toString))
     }
-  }
-
-  private def unmarshalPipeline[U: FromResponseUnmarshaller](): Future[HttpRequest => Future[U]] = {
-    for {
-      sr <- sendReceivePipeline()
-    } yield {
-      sr ~> unmarshal[U]
+    val withUserName = userName.foldLeft(withUserId) { (r, name) =>
+      r.addHeader(RawHeader(UserNameHeader, name))
     }
+    credentials.foldLeft(withUserName) { (r, creds) => r.addCredentials(creds) }
   }
 
-  def fetchResponse[U : FromResponseUnmarshaller](
-      req: HttpRequest
-  ): Future[U] = {
-    unmarshalPipeline().flatMap(_(req))
+  def fetchResponse[U : FromResponseUnmarshaller](req: HttpRequest): Future[U] = {
+    fetchHttpResponse(req).flatMap(resp => Unmarshal(resp).to[U])
   }
 
-  def fetchHttpResponse(req: HttpRequest) : Future[HttpResponse] = {
-    sendReceivePipeline().flatMap(_(req))
+  def fetchHttpResponse(req: HttpRequest): Future[HttpResponse] = {
+    Http()(as).singleRequest(decorate(req))
   }
 
   def endpointPath(endpoint: String): String = {

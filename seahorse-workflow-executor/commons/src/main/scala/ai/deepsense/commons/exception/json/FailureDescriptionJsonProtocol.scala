@@ -16,7 +16,7 @@
 
 package ai.deepsense.commons.exception.json
 
-import spray.httpx.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json._
 
 import ai.deepsense.commons.exception.{FailureCode, FailureDescription}

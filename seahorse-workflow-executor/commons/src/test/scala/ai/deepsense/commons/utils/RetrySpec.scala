@@ -20,8 +20,8 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-import akka.actor.ActorSystem
-import akka.util.Timeout
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.util.Timeout
 import org.scalatest.{Matchers, WordSpec}
 
 import ai.deepsense.commons.utils.RetryActor.{RetriableException, RetryLimitReachedException}

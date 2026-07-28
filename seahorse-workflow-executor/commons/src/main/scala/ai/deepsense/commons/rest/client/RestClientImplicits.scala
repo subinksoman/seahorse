@@ -18,8 +18,8 @@ package ai.deepsense.commons.rest.client
 
 import scala.concurrent.ExecutionContext
 
-import akka.actor.ActorSystem
-import akka.util.Timeout
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.util.Timeout
 
 trait RestClientImplicits {
 

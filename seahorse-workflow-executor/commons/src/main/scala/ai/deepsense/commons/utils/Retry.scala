@@ -19,9 +19,9 @@ package ai.deepsense.commons.utils
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-import akka.actor.{ActorSystem, Props}
-import akka.pattern.ask
-import akka.util.Timeout
+import org.apache.pekko.actor.{ActorSystem, Props}
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.util.Timeout
 
 trait Retry[T] {
 

@@ -178,6 +178,10 @@ ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" 
 // Same story for scala-parser-combinators: Spark 3.4.4 (catalyst/mllib) pulls 2.1.1 while
 // scalate 1.9.0 wants 1.1.1. Declare compatible build-wide (surfaced in the docgen module).
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-parser-combinators" % VersionScheme.Always
+// During the Akka->Pekko transition both stacks briefly coexist on the classpath (Akka
+// still comes transitively via the sparkutils shim). Pekko wants scala-java8-compat 1.0.2,
+// Akka 2.4 wants 0.8.0 -- declare compatible so resolution picks 1.0.2.
+ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-java8-compat" % VersionScheme.Always
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.3.0"
 
 libraryDependencies ++= Seq(

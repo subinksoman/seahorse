@@ -42,6 +42,9 @@ object Version {
   // 1.3.6 is the last spray-json line and is cross-published for Scala 2.13 (unlike the
   // EOL Spray HTTP framework). Bumping now is safe on 2.12 and unblocks the 2.13 flip.
   val sprayJson = "1.3.6"
+  // Apache Pekko replaces EOL Akka 2.4 + Spray (Apache-2.0, Scala 2.12/2.13, JDK 8-21).
+  val pekko = "1.1.3"
+  val pekkoHttp = "1.1.0"
   val wireMock = "1.57"
 }
 
@@ -69,6 +72,14 @@ object Library {
 
   val akkaActor = akka("actor")
   val akkaTestkit = akka("testkit")
+  // Apache Pekko (org.apache.pekko) — drop-in for Akka 2.6; used to replace Akka + Spray.
+  val pekko = (name: String) => "org.apache.pekko" %% s"pekko-$name" % Version.pekko
+  val pekkoActor = pekko("actor")
+  val pekkoStream = pekko("stream")   // required by pekko-http
+  val pekkoSlf4j = pekko("slf4j")
+  val pekkoTestkit = pekko("testkit")
+  val pekkoHttp = "org.apache.pekko" %% "pekko-http" % Version.pekkoHttp
+  val pekkoHttpSprayJson = "org.apache.pekko" %% "pekko-http-spray-json" % Version.pekkoHttp
   val amazonS3 = "com.amazonaws" % "aws-java-sdk-s3" % Version.amazonS3 excludeJackson
   val apacheCommonsLang3 = "org.apache.commons" % "commons-lang3" % Version.apacheCommons
   val apacheCommonsCsv = "org.apache.commons" % "commons-csv" % "1.1" // Also used by spark-csv
@@ -190,8 +201,10 @@ object Dependencies {
   )
 
   val commons = usedSpark.onlyInTests ++ Seq(
-    akkaActor,
-    sprayClient,
+    pekkoActor,
+    pekkoStream,
+    pekkoHttp,
+    pekkoHttpSprayJson,
     apacheCommonsLang3,
     config,
     javaMail,
@@ -202,12 +215,10 @@ object Dependencies {
     nscalaTime,
     scalate,
     slf4j,
-    sprayCan,
-    sprayHttpx,
-    sprayJson,
+    sprayJson, // spray-json (serialization) is kept; Spray HTTP replaced by pekko-http
     jacksonDatabind, // Add explicit Jackson dependency
     jacksonModuleScala // Add explicit Jackson Scala module
-  ) ++ Seq(mockitoCore, scalatest, scoverage).map(_ % Test)
+  ) ++ Seq(mockitoCore, scalatest, scoverage, pekkoTestkit).map(_ % Test)
 
   val deeplang = usedSpark.onlyInTests ++ Hadoop.onlyInTests ++ GoogleServicesApi.components ++ Seq(
     akkaActor,

@@ -22,11 +22,11 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-import akka.actor._
-import akka.util.Timeout
-import spray.client.pipelining._
-import spray.http.{HttpResponse, StatusCodes}
-import spray.httpx.SprayJsonSupport
+import org.apache.pekko.actor._
+import org.apache.pekko.util.Timeout
+import org.apache.pekko.http.scaladsl.client.RequestBuilding._
+import org.apache.pekko.http.scaladsl.model.HttpResponse
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 
 import ai.deepsense.commons.json.NotebookRestClientProtocol._
 import ai.deepsense.commons.models.Id
@@ -54,7 +54,7 @@ class NotebookRestClient(
   extends Logging with RestClient with SprayJsonSupport {
 
   def apiUrl: java.net.URL = new URL(notebooksServerAddress, "/jupyter/")
-  def credentials: Option[spray.http.HttpCredentials] = None
+  def credentials: Option[org.apache.pekko.http.scaladsl.model.headers.HttpCredentials] = None
   def userId: Option[java.util.UUID] = None
   def userName: Option[String] = None
 
@@ -71,12 +71,15 @@ class NotebookRestClient(
 
   def generateNotebookData(language: String): Future[HttpResponse] = {
     val req = NotebookClientRequest(workflowId, nodeId, language)
-    fetchHttpResponse(Post(postPath, req)).flatMap { resp => resp.status match {
-      case StatusCodes.Success(_) => Future.successful(resp)
-      case statusCode => Future.failed(NotebookHttpException(resp,
-        s"Notebook server responded with $statusCode when asked to generate notebook data"
-      ))
-    }}
+    fetchHttpResponse(Post(postPath, req)).flatMap { resp =>
+      if (resp.status.isSuccess()) {
+        Future.successful(resp)
+      } else {
+        Future.failed(NotebookHttpException(resp,
+          s"Notebook server responded with ${resp.status} when asked to generate notebook data"
+        ))
+      }
+    }
   }
 
   def generateAndPollNbData(language: String): Future[Array[Byte]] = {

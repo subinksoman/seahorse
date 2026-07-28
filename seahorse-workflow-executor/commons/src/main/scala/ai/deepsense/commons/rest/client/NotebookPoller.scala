@@ -19,10 +19,10 @@ package ai.deepsense.commons.rest.client
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
-import akka.actor.ActorSystem
-import akka.util.Timeout
-import spray.client.pipelining._
-import spray.http.StatusCodes
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.util.Timeout
+import org.apache.pekko.http.scaladsl.client.RequestBuilding._
+import org.apache.pekko.http.scaladsl.model.StatusCodes
 
 import ai.deepsense.commons.models.Id
 import ai.deepsense.commons.utils.Retry
@@ -54,7 +54,8 @@ class NotebookPoller private (
           Future.failed(RetriableException(s"File containing output data for workflow " +
             s"s$workflowId and node s$nodeId not found", None))
         case StatusCodes.OK =>
-          Future.successful(resp.entity.data.toByteArray)
+          // Pekko HTTP entities are streamed; consume it fully into memory before returning.
+          resp.entity.toStrict(timeout.duration).map(_.data.toArray)
         case statusCode =>
           Future.failed(NotebookHttpException(resp, s"Notebook server responded with $statusCode " +
             s"when asked for file for workflow $workflowId and node $nodeId"))
