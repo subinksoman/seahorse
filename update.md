@@ -256,7 +256,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "id": "T30",
     "phase": "3 - Scala 2.13",
     "title": "Replace/upgrade EOL Akka/Spray/Scalatra stack",
-    "description": "Migrate off Akka 2.4.13 + Spray (EOL, no 2.13) to Akka HTTP or Apache Pekko; upgrade Scalatra & Jetty to 2.13/JDK17-capable versions per T01 decision. [Decision B=Pekko. commons fully migrated to Pekko+Pekko HTTP & runtime-verified (8 tests). spray-json kept (2.13-ok). Cascade to workflowexecutor/mqprotocol/backend services + akka-rabbitmq replacement pending.]",
+    "description": "Migrate off Akka 2.4.13 + Spray (EOL, no 2.13) to Akka HTTP or Apache Pekko; upgrade Scalatra & Jetty to 2.13/JDK17-capable versions per T01 decision. [Decision B=Pekko. WHOLE workflow-executor build migrated to Pekko + Pekko-HTTP and compiles green on Spark 3.4.4/JDK11: commons (runtime-verified 8 tests), deeplang, mqprotocol (akka-rabbitmq->Pekko port, FSM unit test + T33 broker test), workflowexecutor (2 HTTP-client rewrites). Remaining: backend services (root build: sessionmanager MqModule + Scalatra), then Scala 2.13 flip + JDK 17.]",
     "area": "project/Dependencies.scala, workflowmanager, sessionmanager, datasourcemanager, libraryservice",
     "depends_on": [
       "T01",
