@@ -1,5 +1,5 @@
 #FROM rabbitmq:3.6
-FROM rabbitmq:3.9
+FROM rabbitmq:4.0-management
 #FROM rabbitmq:3-management
 #FROM rabbitmq:3.6.11
 #FROM rabbitmq:3.6.7-alpine

@@ -83,9 +83,12 @@ case class MQCommunicationFactory(
     val queueName: String = MQCommunication.queueName(topic)
     val queue = channel.queueDeclare(
       queueName,
-      false,
-      false,
-      true,
+      false, // durable
+      true,  // exclusive: RabbitMQ 4.x rejects transient non-exclusive queues
+             // (Feature `transient_nonexcl_queues` deprecated). These per-subscriber
+             // queues are ephemeral (autoDelete) on the single shared connection, so
+             // exclusive matches their intent and is 4.x-compatible.
+      true,  // autoDelete
       new util.HashMap[String, AnyRef]()).getQueue
     channel.queueBind(queue, MQCommunication.Exchange.seahorse, topic)
     val consumer = MQSubscriber(subscriber, mqMessageDeserializer, channel)

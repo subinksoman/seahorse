@@ -271,7 +271,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "id": "T33",
     "phase": "Step B - Delivery",
     "title": "Upgrade RabbitMQ to latest + broker integration test for the Pekko port",
-    "description": "Upgrade the RabbitMQ broker (image + amqp-client if newer) to the latest stable. Add a standalone test docker-compose under deployment/rabbitmq (e.g. rabbitmq:3-management) so the messaging layer can be exercised in isolation. Run a publish/subscribe round-trip + a forced-reconnect scenario against it to verify the new Pekko ConnectionActor/ChannelActor port end-to-end -- the broker gate the ChannelActorSpec FSM unit test cannot cover (see migration/T30-rabbitmq-port.md).",
+    "description": "Upgrade the RabbitMQ broker (image + amqp-client if newer) to the latest stable. Add a standalone test docker-compose under deployment/rabbitmq (e.g. rabbitmq:3-management) so the messaging layer can be exercised in isolation. Run a publish/subscribe round-trip + a forced-reconnect scenario against it to verify the new Pekko ConnectionActor/ChannelActor port end-to-end -- the broker gate the ChannelActorSpec FSM unit test cannot cover (see migration/T30-rabbitmq-port.md). [DONE & VERIFIED: deployment/rabbitmq/docker-compose.test.yml (rabbitmq:4-management); RabbitMQIntegSpec publish/consume round-trip PASSES on RabbitMQ 4.x; found+fixed a real 4.x incompat (transient non-exclusive queues rejected -> subscriber queues made exclusive in MQCommunicationFactory); production Dockerfile bumped 3.9->4.0-management, boots healthy with stomp/web_stomp/management plugins.]",
     "area": "deployment/rabbitmq/ (new docker-compose), workflowexecutormqprotocol integration tests, project/Dependencies.scala (amqp-client)",
     "depends_on": [
       "T30"
@@ -279,7 +279,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "testing",
     "risk": "Med",
     "effort_days": 2,
-    "status": "todo"
+    "status": "completed"
   },
   {
     "id": "T31",

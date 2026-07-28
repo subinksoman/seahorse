@@ -1,0 +1,18 @@
+# Standalone RabbitMQ broker for exercising the Pekko ConnectionActor/ChannelActor port
+# (Step B, task T33). Not part of the app compose — bring it up only for the mqprotocol
+# broker integration test:
+#   docker compose -f deployment/rabbitmq/docker-compose.test.yml up -d
+#   ... run workflowexecutormqprotocol RabbitMQIntegSpec ...
+#   docker compose -f deployment/rabbitmq/docker-compose.test.yml down
+services:
+  rabbitmq-test:
+    image: rabbitmq:4-management
+    container_name: seahorse-rabbitmq-test
+    ports:
+      - "5672:5672"     # AMQP
+      - "15672:15672"   # management UI
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
