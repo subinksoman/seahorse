@@ -33,20 +33,48 @@ RUN cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
 ENV SPARK_PACKAGE=spark-$SPARK_VERSION-bin-hadoop$HADOOP_VERSION
 ENV SPARK_HOME=/opt/spark-$SPARK_VERSION
 ENV PATH=$PATH:$SPARK_HOME/bin
+ENV LOG4J2_VERSION=2.17.2
+# Install Spark, then in the SAME layer strip the vulnerable Log4j 1.x jars that
+# stock Spark 3.0.0 bundles and replace them with Log4j 2 ($LOG4J2_VERSION, to
+# match the JVM services). The log4j-1.2-api bridge routes Spark's Log4j 1.x API
+# calls onto the Log4j 2 backend. Finally write a native log4j2.properties that
+# mirrors Spark 3.0.0's default console logging so output is unchanged after the
+# swap (single-quoted echoes keep the %-conversion pattern literal).
 RUN wget -O - \
   "https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/$SPARK_PACKAGE.tgz" \
   | tar -xz -C /tmp/ \
   && mv /tmp/$SPARK_PACKAGE $SPARK_HOME \
   && rm -rf $SPARK_HOME/examples $SPARK_HOME/ec2 \
-  && rm -rf $SPARK_HOME/lib/spark-examples*.jar
+  && rm -rf $SPARK_HOME/lib/spark-examples*.jar \
+  && rm -f $SPARK_HOME/jars/log4j-1.2*.jar $SPARK_HOME/jars/slf4j-log4j12-*.jar \
+  && for m in log4j-api log4j-core log4j-slf4j-impl log4j-1.2-api; do \
+       wget -q "https://repo1.maven.org/maven2/org/apache/logging/log4j/$m/$LOG4J2_VERSION/$m-$LOG4J2_VERSION.jar" -P $SPARK_HOME/jars/; \
+     done \
+  && { \
+       echo 'rootLogger.level = info'; \
+       echo 'rootLogger.appenderRef.stdout.ref = console'; \
+       echo 'appender.console.type = Console'; \
+       echo 'appender.console.name = console'; \
+       echo 'appender.console.target = SYSTEM_ERR'; \
+       echo 'appender.console.layout.type = PatternLayout'; \
+       echo 'appender.console.layout.pattern = %d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n'; \
+       echo 'logger.repl.name = org.apache.spark.repl.Main'; \
+       echo 'logger.repl.level = warn'; \
+       echo 'logger.jetty1.name = org.sparkproject.jetty'; \
+       echo 'logger.jetty1.level = warn'; \
+       echo 'logger.jetty2.name = org.sparkproject.jetty.util.component.AbstractLifeCycle'; \
+       echo 'logger.jetty2.level = error'; \
+       echo 'logger.parquet1.name = org.apache.parquet'; \
+       echo 'logger.parquet1.level = error'; \
+       echo 'logger.parquet2.name = parquet'; \
+       echo 'logger.parquet2.level = error'; \
+       echo 'logger.hive1.name = org.apache.hadoop.hive.metastore.RetryingHMSHandler'; \
+       echo 'logger.hive1.level = fatal'; \
+       echo 'logger.hive2.name = org.apache.hadoop.hive.ql.exec.FunctionRegistry'; \
+       echo 'logger.hive2.level = error'; \
+     } > $SPARK_HOME/conf/log4j2.properties
 
 #COPY rdd.py /opt/spark-2.1.1/python/pyspark/
-
-# Download and add the latest Log4j2 jars (version 2.24.0)
-#RUN wget https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/2.24.0/log4j-api-2.24.0.jar -P $SPARK_HOME/jars/ \
-#  && wget https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/2.24.0/log4j-core-2.24.0.jar -P $SPARK_HOME/jars/ \
-#  && wget https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl/2.24.0/log4j-slf4j-impl-2.24.0.jar -P $SPARK_HOME/jars/ \
-#  && wget https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-1.2-api/2.24.0/log4j-1.2-api-2.24.0.jar -P $SPARK_HOME/jars/
 
 # Install Miniconda with Python 3.7
 RUN wget -q -O /tmp/Miniconda3-py37_4.9.2-Linux-x86_64.sh \
