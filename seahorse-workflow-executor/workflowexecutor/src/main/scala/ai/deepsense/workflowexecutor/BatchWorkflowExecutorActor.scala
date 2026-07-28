@@ -16,7 +16,7 @@
 
 package ai.deepsense.workflowexecutor
 
-import akka.actor._
+import org.apache.pekko.actor._
 
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang.CommonExecutionContext

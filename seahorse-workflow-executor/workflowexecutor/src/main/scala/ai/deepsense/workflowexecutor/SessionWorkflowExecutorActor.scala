@@ -20,9 +20,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.FiniteDuration
 import scala.language.postfixOps
 
-import akka.actor.Status.Failure
-import akka.actor._
-import akka.pattern.{ask, pipe}
+import org.apache.pekko.actor.Status.Failure
+import org.apache.pekko.actor._
+import org.apache.pekko.pattern.{ask, pipe}
 
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang.CommonExecutionContext

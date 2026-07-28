@@ -18,8 +18,8 @@ package ai.deepsense.workflowexecutor
 
 import scala.concurrent.duration._
 
-import akka.actor.{Actor, ActorRef, ActorSystem}
-import akka.testkit.{TestActorRef, TestKit, TestProbe}
+import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem}
+import org.apache.pekko.testkit.{TestActorRef, TestKit, TestProbe}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock

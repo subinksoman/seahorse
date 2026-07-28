@@ -18,7 +18,7 @@ package ai.deepsense.workflowexecutor
 
 import scala.util.control.NonFatal
 
-import akka.actor.{Actor, PoisonPill}
+import org.apache.pekko.actor.{Actor, PoisonPill}
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang._

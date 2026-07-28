@@ -19,7 +19,7 @@ package ai.deepsense.workflowexecutor.executor
 import java.io._
 import java.net.InetAddress
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import org.apache.spark.SparkContext
 import spray.json._

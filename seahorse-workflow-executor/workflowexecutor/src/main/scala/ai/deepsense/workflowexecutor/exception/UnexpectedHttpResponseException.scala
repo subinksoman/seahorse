@@ -16,7 +16,7 @@
 
 package ai.deepsense.workflowexecutor.exception
 
-import spray.http.StatusCode
+import org.apache.pekko.http.scaladsl.model.StatusCode
 
 case class UnexpectedHttpResponseException(
     val message: String,

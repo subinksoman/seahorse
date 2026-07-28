@@ -18,7 +18,7 @@ package ai.deepsense.workflowexecutor
 
 import scala.concurrent.duration.FiniteDuration
 
-import akka.actor.{ActorContext, ActorRef}
+import org.apache.pekko.actor.{ActorContext, ActorRef}
 
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang.CommonExecutionContext

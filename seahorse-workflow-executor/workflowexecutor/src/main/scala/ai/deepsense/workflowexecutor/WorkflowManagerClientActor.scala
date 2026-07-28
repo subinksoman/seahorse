@@ -18,10 +18,14 @@ package ai.deepsense.workflowexecutor
 
 import scala.concurrent.Future
 
-import akka.actor.{Actor, Props}
-import akka.pattern.pipe
-import spray.client.pipelining._
-import spray.http.{BasicHttpCredentials, HttpRequest, HttpResponse, StatusCodes}
+import org.apache.pekko.actor.{Actor, Props}
+import org.apache.pekko.pattern.pipe
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.client.RequestBuilding.{Get, Put, addCredentials, addHeader}
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.model.headers.BasicHttpCredentials
+import org.apache.pekko.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes}
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshal
 import spray.json._
 
 import ai.deepsense.commons.utils.Logging
@@ -41,9 +45,11 @@ class WorkflowManagerClientActor(
     override val graphReader: GraphReader)
   extends Actor
   with WorkflowWithResultsJsonProtocol
+  with SprayJsonSupport
   with Logging {
 
   import context.dispatcher
+  private implicit val system = context.system
 
   private val SeahorseUserIdHeaderName = "X-Seahorse-UserId"
 
@@ -66,46 +72,50 @@ class WorkflowManagerClientActor(
   private def getWorkflow(workflowId: Workflow.Id): Future[Option[WorkflowWithResults]] = {
     val url: String = downloadWorkflowUrl(workflowId)
     logger.debug("GET workflow URL: {}", url)
-    pipeline(Get(url)).map(handleGetResponse)
+    send(Get(url)).flatMap(handleGetResponse)
   }
 
   private def saveWorkflowWithState(workflow: WorkflowWithResults): Future[Unit] = {
-    pipeline(Put(saveWorkflowWithStateUrl(workflow.id), workflow))
-      .map(handleUploadResponse)
+    send(Put(saveWorkflowWithStateUrl(workflow.id), workflow)).flatMap(handleUploadResponse)
   }
 
   private def saveState(workflowId: Workflow.Id, state: ExecutionReport): Future[Unit] = {
-    pipeline(Put(saveStateUrl(workflowId), state))
-      .map(handleUploadResponse)
+    send(Put(saveStateUrl(workflowId), state)).flatMap(handleUploadResponse)
   }
 
-  private def handleGetResponse(response: HttpResponse): Option[WorkflowWithResults] = {
+  // Pekko HTTP entities are streamed, so responses are unmarshalled/consumed asynchronously.
+  private def handleGetResponse(response: HttpResponse): Future[Option[WorkflowWithResults]] = {
     response.status match {
       case StatusCodes.OK =>
-        Some(response.entity.data.asString.parseJson.convertTo[WorkflowWithResults])
+        Unmarshal(response.entity).to[String].map(body =>
+          Some(body.parseJson.convertTo[WorkflowWithResults]))
       case StatusCodes.NotFound =>
-        None
-      case _ => throw UnexpectedHttpResponseException(
-        "Workflow download failed", response.status, response.entity.data.asString)
+        response.entity.discardBytes()
+        Future.successful(None)
+      case _ =>
+        Unmarshal(response.entity).to[String].flatMap(body => Future.failed(
+          UnexpectedHttpResponseException("Workflow download failed", response.status, body)))
     }
   }
 
-  private def handleUploadResponse(response: HttpResponse): Unit = {
-    response.status match {
-      case success: StatusCodes.Success => ()
-      case _ => throw UnexpectedHttpResponseException(
-        "Upload failed", response.status, response.entity.data.asString)
+  private def handleUploadResponse(response: HttpResponse): Future[Unit] = {
+    if (response.status.isSuccess()) {
+      response.entity.discardBytes()
+      Future.successful(())
+    } else {
+      Unmarshal(response.entity).to[String].flatMap(body => Future.failed(
+        UnexpectedHttpResponseException("Upload failed", response.status, body)))
     }
   }
 
   private val addUserIdHeader: HttpRequest => HttpRequest =
-    _ ~> addHeader(SeahorseUserIdHeaderName, workflowOwnerId)
+    addHeader(SeahorseUserIdHeaderName, workflowOwnerId)
 
   private val addWMCredentials: HttpRequest => HttpRequest =
-    _ ~> addCredentials(BasicHttpCredentials(wmUsername, wmPassword))
+    addCredentials(BasicHttpCredentials(wmUsername, wmPassword))
 
-  private val pipeline: HttpRequest => Future[HttpResponse] =
-    addUserIdHeader andThen addWMCredentials andThen sendReceive
+  private def send(req: HttpRequest): Future[HttpResponse] =
+    Http().singleRequest(addWMCredentials(addUserIdHeader(req)))
 }
 
 object WorkflowManagerClientActor {

@@ -33,3 +33,9 @@ buildInfoPackage := "ai.deepsense.workflowexecutor.buildinfo"
 
 target in assembly := new File("target")
 assemblyJarName in assembly := "workflowexecutor.jar"
+
+// -Xfatal-warnings (set at project scope by CommonSettingsPlugin) must be removed at project
+// scope to take effect. Step B (Akka->Pekko): Pekko inherits Akka 2.6 deprecations (e.g.
+// Scheduler.schedule -> scheduleAtFixedRate); don't fail the build on expected migration
+// deprecations. TODO(Step B follow-up): clean up deprecated scheduler calls.
+scalacOptions --= Seq("-Xfatal-warnings")

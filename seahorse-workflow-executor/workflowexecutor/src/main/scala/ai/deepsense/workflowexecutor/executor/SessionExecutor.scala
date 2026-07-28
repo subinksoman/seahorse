@@ -21,10 +21,10 @@ import java.net.{InetAddress, URL}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
-import akka.actor.{ActorRef, ActorSystem, Props}
-import akka.routing._
+import org.apache.pekko.actor.{ActorRef, ActorSystem, Props}
+import org.apache.pekko.routing._
 import com.rabbitmq.client.ConnectionFactory
-import com.thenewmotion.akka.rabbitmq._
+import ai.deepsense.workflowexecutor.rabbitmq._
 import com.typesafe.config.ConfigFactory
 import org.apache.spark.SparkContext
 

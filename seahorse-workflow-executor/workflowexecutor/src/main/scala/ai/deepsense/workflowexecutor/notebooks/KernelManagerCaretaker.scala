@@ -22,7 +22,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future, Promise, TimeoutException}
 import scala.sys.process._
 
-import akka.actor.{Actor, ActorSystem, Props}
+import org.apache.pekko.actor.{Actor, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 
 import ai.deepsense.commons.utils.Logging

@@ -192,7 +192,7 @@ object Dependencies {
   // slf4j-api is needed on the compile classpath because these shims mix in Spark's
   // Logging trait (Logging.log: org.slf4j.Logger). Spark 3.0.0 brought slf4j transitively;
   // Spark 3.4.4 (slf4j 2.x, provided scope) does not surface it here, so add it explicitly.
-  def sparkutils(sparkVersion: String) = new Spark(sparkVersion).onlyInTests ++ Seq(akkaActor, slf4j)
+  def sparkutils(sparkVersion: String) = new Spark(sparkVersion).onlyInTests ++ Seq(pekkoActor, slf4j)
 
   val usedSpark = new Spark(Version.spark)
 
@@ -236,7 +236,7 @@ object Dependencies {
     jacksonModuleScala // Add explicit Jackson Scala module
   ) ++ Seq(mockitoCore, scalacheck, scalatest, scoverage).map(_ % Test)
 
-  val docgen = usedSpark.components
+  val docgen = usedSpark.components ++ Seq(pekkoHttpSprayJson) // deeplang JSON protocols use SprayJsonSupport
 
   val graph = Seq(nscalaTime) ++ Seq(scalatest, mockitoCore).map(_ % Test)
 
@@ -252,11 +252,13 @@ object Dependencies {
   ) ++ Seq(mockitoCore, scalatest).map(_ % Test)
 
   val workflowexecutor = usedSpark.onlyInTests ++ Seq(
-    akkaActor,
+    pekkoActor,
+    pekkoStream,
+    pekkoHttp,
+    pekkoHttpSprayJson,
     jsonLenses,
     scopt,
-    sprayClient,
-    rabbitmq,
+    amqpClient,
     log4jApi,
     log4jCore,
     log4jSlf4jImpl,
@@ -265,7 +267,7 @@ object Dependencies {
     jacksonDatabind, // Add explicit Jackson dependency
     jacksonModuleScala, // Add explicit Jackson Scala module
     mimepull // Added mimepull dependency
-  ) ++ Seq(akkaTestkit, mockitoCore, scalatest, wireMock).map(_ % s"$Test,it")
+  ) ++ Seq(pekkoTestkit, mockitoCore, scalatest, wireMock).map(_ % s"$Test,it")
 
   val workflowexecutorMqProtocol = usedSpark.onlyInTests ++ Seq(
     pekkoActor,

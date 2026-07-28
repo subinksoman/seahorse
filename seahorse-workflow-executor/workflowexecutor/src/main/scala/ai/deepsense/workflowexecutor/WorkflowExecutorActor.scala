@@ -16,7 +16,7 @@
 
 package ai.deepsense.workflowexecutor
 
-import akka.actor._
+import org.apache.pekko.actor._
 
 import ai.deepsense.commons.exception.{DeepSenseFailure, FailureCode, FailureDescription}
 import ai.deepsense.commons.models.Entity

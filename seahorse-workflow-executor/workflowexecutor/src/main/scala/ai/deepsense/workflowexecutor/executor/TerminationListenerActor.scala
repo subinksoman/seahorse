@@ -18,7 +18,7 @@ package ai.deepsense.workflowexecutor.executor
 
 import scala.concurrent.Promise
 
-import akka.actor.{Actor, Props}
+import org.apache.pekko.actor.{Actor, Props}
 
 import ai.deepsense.sparkutils.AkkaUtils
 import ai.deepsense.models.workflows.ExecutionReport

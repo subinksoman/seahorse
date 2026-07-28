@@ -17,19 +17,14 @@
 package ai.deepsense.workflowexecutor
 
 import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.util.Try
 
-import akka.actor.ActorSystem
-import akka.io.IO
-import akka.pattern.ask
-import spray.can.Http
-import spray.client.pipelining._
-import spray.http._
-import spray.util._
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.client.RequestBuilding.Get
+import org.apache.pekko.http.scaladsl.model.{HttpResponse, StatusCodes}
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshal
 
 import ai.deepsense.commons.utils.Logging
-import ai.deepsense.sparkutils
 import ai.deepsense.workflowexecutor.exception.UnexpectedHttpResponseException
 
 class WorkflowDownloadClient(
@@ -47,24 +42,26 @@ class WorkflowDownloadClient(
 
     implicit val system = ActorSystem()
     import system.dispatcher
-    implicit val timeoutSeconds = timeout.seconds
 
-    val pipeline: HttpRequest => Future[HttpResponse] = sendReceive
-    val futureResponse = pipeline(Get(downloadUrl(workflowId)))
+    // Pekko HTTP replaces Spray's IO(Http) + sendReceive pipeline. The response entity is
+    // streamed, so it must be consumed (Unmarshal to String) before the result completes.
+    val result = Http()(system)
+      .singleRequest(Get(downloadUrl(workflowId)))
+      .flatMap(handleResponse)
 
-    futureResponse.onComplete { _ =>
-      Try(IO(Http).ask(Http.CloseAll)(1.second).await)
-      sparkutils.AkkaUtils.terminate(system)
-    }
-    futureResponse.map(handleResponse)
+    result.onComplete { _ => system.terminate() }
+    result
   }
 
-  private def handleResponse(response: HttpResponse): String = {
-    response.status match {
-      case StatusCodes.OK =>
-        response.entity.data.asString
-      case _ => throw UnexpectedHttpResponseException(
-        "Workflow download failed", response.status, response.entity.data.asString)
+  private def handleResponse(response: HttpResponse)(
+      implicit ec: scala.concurrent.ExecutionContext,
+      mat: org.apache.pekko.stream.Materializer): Future[String] = {
+    Unmarshal(response.entity).to[String].flatMap { body =>
+      response.status match {
+        case StatusCodes.OK => Future.successful(body)
+        case _ => Future.failed(
+          UnexpectedHttpResponseException("Workflow download failed", response.status, body))
+      }
     }
   }
 }
