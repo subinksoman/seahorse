@@ -34,6 +34,23 @@
 | Python | **3.12** | Spark 4.0 supports 3.9–3.12 (not yet 3.13) |
 | Jupyter | **JupyterLab 4.x / Notebook 7.x**, current `ipykernel`/`jupyter-client` | Base image `jupyter/pyspark-notebook` or `base-notebook` (latest) |
 
+## 2.1 Decision log & verified corrections (2026-07-28)
+
+**Target chosen:** **Spark 3.4.4 + Scala 2.13 + JDK 17** in one coordinated jump (matches the
+already-staged `spark-3.4.4-bin-hadoop3-scala2.13` / `scala-2.13.1` binaries). This collapses the
+original Phase 2 (3.5) and Phase 4 (4.0) into a single Spark+Scala+JDK migration.
+
+**Verified corrections to the assumptions in §1–§3 (from execution):**
+1. Current build JDK is **Java 8**, not 11 (T02) — `javax.annotation.Generated` breaks compile on
+   JDK 11+. The real jump is **Java 8 → 17**.
+2. **JDK 17 cannot precede Spark 3.3+** — Spark 3.0.0 does not run on JDK 17, so JDK 17 lands
+   *together with* the Spark 3.4.4 upgrade (original T11 ordering corrected).
+3. The repo is **two separate sbt builds**, each with its own `project/Dependencies.scala` and
+   Spark-version `match` block: **root** (backend services) and **seahorse-workflow-executor**
+   (api, deeplang, …). Every version arm (Spark, Scala, Hadoop, Akka) must be added in **both**.
+
+**Verified progress:** T11a (`javax.annotation-api`) done — `api/compile` now green on JDK 11.
+
 ## 3. Strategy — staged, not a single leap
 
 Spark **3.0 → 4.0 crosses 3.1, 3.2, 3.3, 3.4, 3.5, 4.0** — each with breaking MLlib / SQL / DataSourceV2 changes. Attempting a single jump makes failures impossible to localize. Recommended order:
@@ -128,6 +145,18 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "risk": "High",
     "effort_days": 5,
     "status": "todo"
+  },
+  {
+    "id": "T11a",
+    "phase": "1 - Toolchain",
+    "title": "Add javax.annotation-api so codegen sources compile on JDK 11+",
+    "description": "JDK 11 removed javax.annotation.*; the Swagger-generated api model classes reference javax.annotation.Generated. Added javax.annotation:javax.annotation-api:1.3.2 to Dependencies.api in the workflow-executor build. VERIFIED: api/compile green on JDK 11 (was failing).",
+    "area": "seahorse-workflow-executor/project/Dependencies.scala",
+    "depends_on": ["T02"],
+    "category": "build",
+    "risk": "Low",
+    "effort_days": 1,
+    "status": "completed"
   },
   {
     "id": "T20",

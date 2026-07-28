@@ -112,6 +112,9 @@ object Library {
   val oauth2Client = "org.apache.oltu.oauth2" % "org.apache.oltu.oauth2.client" % "1.0.1"
   val swaggerAnnotations = "io.swagger" % "swagger-annotations" % "1.5.8"
   val jodaTime = "joda-time" % "joda-time" % "2.9.3"
+  // JDK 11+ removed javax.annotation.* from the JDK; the Swagger-generated
+  // api model classes reference javax.annotation.Generated, so provide it.
+  val javaxAnnotation = "javax.annotation" % "javax.annotation-api" % "1.3.2"
   // Added mimepull dependency
   val mimepull = "org.jvnet.mimepull" % "mimepull" % "1.9.13"
 }
@@ -168,7 +171,8 @@ object Dependencies {
   val api = retrofit ++ Seq(
     oauth2Client,
     swaggerAnnotations,
-    jodaTime
+    jodaTime,
+    javaxAnnotation
   )
 
   val commons = usedSpark.onlyInTests ++ Seq(
