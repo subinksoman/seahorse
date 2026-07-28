@@ -28,3 +28,6 @@ kmodes==0.12.2
 flask
 matplotlib
 pyarrow==1.0.1
+oracledb==2.3.0
+PyHive==0.7.0
+lightgbm==3.3.5

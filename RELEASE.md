@@ -1,3 +1,35 @@
+# Seahorse Release 3.0.0.7
+
+| | |
+|---|---|
+| **Tag** | `v3.0.0.7` |
+| **Release date** | 2026-07-28 |
+| **Previous tag** | `v3.0.0.6` |
+| **Type** | Dependency additions |
+| **Spark** | 3.0.0 (bin-hadoop2.7) on JDK 11 |
+
+## Summary
+Adds three Python packages to the `seahorse-spark` runtime image (installed into the conda Python 3.7 environment via [deployment/spark-docker/requirements.txt](deployment/spark-docker/requirements.txt)).
+
+## Changes
+
+### Added Python dependencies
+| Package | Version | Purpose |
+|---|---|---|
+| `oracledb` | 2.3.0 | Oracle Database connectivity (thin-mode Python driver) |
+| `PyHive` | 0.7.0 | Apache Hive access over Thrift |
+| `lightgbm` | 3.3.5 | Gradient-boosting ML models |
+
+## Upgrade notes
+- **Rebuild required:** rebuild and redeploy the `seahorse-spark` image to pick up the new packages.
+- `PyHive` connections may additionally require `thrift`, `sasl`, and `thrift-sasl` depending on the Hive auth mechanism — add them if needed.
+- `lightgbm` requires OpenMP at runtime; if it fails to import, add `libgomp1` to the image's `apt-get install` list.
+
+## Files changed
+- [deployment/spark-docker/requirements.txt](deployment/spark-docker/requirements.txt) — added `oracledb==2.3.0`, `PyHive==0.7.0`, `lightgbm==3.3.5`.
+
+---
+
 # Seahorse Release 3.0.0.6
 
 | | |
