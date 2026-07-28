@@ -175,6 +175,9 @@ evictionErrorLevel := Level.Warn
 // scalate 1.9.0 wants 1.1.0. Declare scala-xml versions compatible build-wide so all
 // sub-modules (commons, deeplang, ...) resolve, not just the root project.
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
+// Same story for scala-parser-combinators: Spark 3.4.4 (catalyst/mllib) pulls 2.1.1 while
+// scalate 1.9.0 wants 1.1.1. Declare compatible build-wide (surfaced in the docgen module).
+ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-parser-combinators" % VersionScheme.Always
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.3.0"
 
 libraryDependencies ++= Seq(

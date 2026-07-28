@@ -268,7 +268,9 @@ class NotifyingChannelActor[T <: AnyRef](
 
 
 object NotifyingChannelActor {
-  def props[T](
+  // T <: AnyRef to match class NotifyingChannelActor[T <: AnyRef]; Scala 2.12.17
+  // enforces the bound at the classOf[...] use site (2.12.10 did not flag it).
+  def props[T <: AnyRef](
       channelConnected: Promise[ChannelSetupResult[T]],
       setupChannel: (Channel, ActorRef) => T
   ): Props = {
