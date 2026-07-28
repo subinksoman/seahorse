@@ -12,7 +12,7 @@
 |---|---|---|
 | Spark | **3.0.0** (bin-hadoop2.7) | `project/Dependencies.scala:39`, `build/manage-docker.py:38` |
 | Scala | **2.12.16** (Spark pinned 2.12.10) | `project/CommonSettingsPlugin.scala:32`, `Dependencies.scala:41` |
-| Java / JDK | **11** | `deployment/spark-docker/Dockerfile`, `--add-opens` flags |
+| Java / JDK | **8** (compile) — verified; `openjdk-11-jre` is runtime-only | T02: `javax.annotation.Generated` breaks compile on JDK 11+ |
 | Hadoop | **2.7** | `Dependencies.scala:41`, `manage-docker.py:39` |
 | sbt | **1.8.2** | `project/build.properties` |
 | Python (executor image) | **3.7** (Miniconda `py37_4.9.2`) | `deployment/spark-docker/Dockerfile`, `requirements.txt` |
@@ -103,7 +103,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "testing",
     "risk": "Med",
     "effort_days": 3,
-    "status": "todo"
+    "status": "partial"
   },
   {
     "id": "T10",
