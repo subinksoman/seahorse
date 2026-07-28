@@ -47,7 +47,7 @@ object Version {
   }
 
   val spray = "1.3.3"
-  val sprayJson = "1.3.3"
+  val sprayJson = "1.3.6" // last spray-json line; cross-published for Scala 2.13
   val wiremock = "1.57"
   val flyway = "4.0"
   val jetty = "9.3.8.v20160314"

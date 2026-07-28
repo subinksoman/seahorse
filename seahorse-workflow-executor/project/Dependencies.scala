@@ -39,7 +39,9 @@ object Version {
   val scalatest = "3.0.0"
   val scoverage = "1.4.5"
   val spray = "1.3.3"
-  val sprayJson = "1.3.2"
+  // 1.3.6 is the last spray-json line and is cross-published for Scala 2.13 (unlike the
+  // EOL Spray HTTP framework). Bumping now is safe on 2.12 and unblocks the 2.13 flip.
+  val sprayJson = "1.3.6"
   val wireMock = "1.57"
 }
 
