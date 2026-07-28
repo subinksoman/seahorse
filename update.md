@@ -268,6 +268,20 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "status": "partial"
   },
   {
+    "id": "T33",
+    "phase": "Step B - Delivery",
+    "title": "Upgrade RabbitMQ to latest + broker integration test for the Pekko port",
+    "description": "Upgrade the RabbitMQ broker (image + amqp-client if newer) to the latest stable. Add a standalone test docker-compose under deployment/rabbitmq (e.g. rabbitmq:3-management) so the messaging layer can be exercised in isolation. Run a publish/subscribe round-trip + a forced-reconnect scenario against it to verify the new Pekko ConnectionActor/ChannelActor port end-to-end -- the broker gate the ChannelActorSpec FSM unit test cannot cover (see migration/T30-rabbitmq-port.md).",
+    "area": "deployment/rabbitmq/ (new docker-compose), workflowexecutormqprotocol integration tests, project/Dependencies.scala (amqp-client)",
+    "depends_on": [
+      "T30"
+    ],
+    "category": "testing",
+    "risk": "Med",
+    "effort_days": 2,
+    "status": "todo"
+  },
+  {
     "id": "T31",
     "phase": "3 - Scala 2.13",
     "title": "Cross-compile / switch to Scala 2.13.x",
