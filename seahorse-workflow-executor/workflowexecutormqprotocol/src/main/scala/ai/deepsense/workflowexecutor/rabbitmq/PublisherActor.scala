@@ -16,7 +16,7 @@
 
 package ai.deepsense.workflowexecutor.rabbitmq
 
-import akka.actor.{Actor, Props}
+import org.apache.pekko.actor.{Actor, Props}
 
 import ai.deepsense.commons.utils.Logging
 

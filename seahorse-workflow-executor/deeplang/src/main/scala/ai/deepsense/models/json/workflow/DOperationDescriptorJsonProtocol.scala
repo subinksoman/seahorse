@@ -18,7 +18,7 @@ package ai.deepsense.models.json.workflow
 
 import scala.reflect.runtime.universe.Type
 
-import spray.httpx.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json._
 
 import ai.deepsense.commons.json.{EnumerationSerializer, IdJsonProtocol}

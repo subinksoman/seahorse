@@ -22,9 +22,8 @@ import java.util.concurrent.TimeoutException
 import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
 
-import akka.actor.{ActorRef, ActorSystem, PoisonPill, Props}
-import com.thenewmotion.akka.rabbitmq.ChannelActor.{Connected, Disconnected}
-import com.thenewmotion.akka.rabbitmq._
+import org.apache.pekko.actor.{ActorRef, ActorSystem, PoisonPill, Props}
+import ai.deepsense.workflowexecutor.rabbitmq.ChannelActor.{Connected, Disconnected}
 
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.workflowexecutor.communication.mq.{MQCommunication, MQDeserializer, MQSerializer}

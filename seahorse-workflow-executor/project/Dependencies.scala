@@ -100,6 +100,9 @@ object Library {
   val mockitoCore = "org.mockito" % "mockito-core" % Version.mockito
   //val rabbitmq = "com.thenewmotion" % "akka-rabbitmq_2.11" % "3.0.0" excludeAkkaActor
   val rabbitmq = "com.thenewmotion" % "akka-rabbitmq_2.12" % "3.0.0" excludeAkkaActor
+  // akka-rabbitmq has no Pekko/2.13 build; replaced by the RabbitMQ Java client directly
+  // (auto-recovery) + a thin Pekko ConnectionActor/ChannelActor port in mqprotocol.
+  val amqpClient = "com.rabbitmq" % "amqp-client" % "5.20.0"
   val reflections = "org.reflections" % "reflections" % "0.9.11"
   val scalacheck = "org.scalacheck" %% "scalacheck" % Version.scalacheck
   val scalate = "org.scalatra.scalate" %% "scalate-core" % "1.9.0"
@@ -221,8 +224,8 @@ object Dependencies {
   ) ++ Seq(mockitoCore, scalatest, scoverage, pekkoTestkit).map(_ % Test)
 
   val deeplang = usedSpark.onlyInTests ++ Hadoop.onlyInTests ++ GoogleServicesApi.components ++ Seq(
-    akkaActor,
-    sprayClient,
+    pekkoActor,
+    pekkoHttpSprayJson, // SprayJsonSupport for the graph/operation JSON protocols
     apacheCommonsLang3,
     amazonS3,
     nscalaTime,
@@ -265,11 +268,11 @@ object Dependencies {
   ) ++ Seq(akkaTestkit, mockitoCore, scalatest, wireMock).map(_ % s"$Test,it")
 
   val workflowexecutorMqProtocol = usedSpark.onlyInTests ++ Seq(
-    akkaActor,
-    rabbitmq,
-    sprayJson,
-    sprayHttpx
-  )
+    pekkoActor,
+    amqpClient,
+    pekkoHttpSprayJson, // SprayJsonSupport marshalling (replaces spray.httpx)
+    sprayJson
+  ) ++ Seq(pekkoTestkit, mockitoCore, scalatest).map(_ % Test)
 
   val sdk = Seq()
 }

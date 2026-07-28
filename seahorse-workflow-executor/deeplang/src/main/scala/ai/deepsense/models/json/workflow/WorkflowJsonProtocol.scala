@@ -16,7 +16,7 @@
 
 package ai.deepsense.models.json.workflow
 
-import spray.httpx.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json.DefaultJsonProtocol
 
 import ai.deepsense.commons.exception.json.FailureDescriptionJsonProtocol

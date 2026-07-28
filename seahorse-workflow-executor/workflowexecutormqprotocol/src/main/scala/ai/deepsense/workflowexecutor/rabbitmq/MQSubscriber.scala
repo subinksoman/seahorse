@@ -16,8 +16,7 @@
 
 package ai.deepsense.workflowexecutor.rabbitmq
 
-import akka.actor.ActorRef
-import com.thenewmotion.akka.rabbitmq.{BasicProperties, Channel, DefaultConsumer, Envelope}
+import org.apache.pekko.actor.ActorRef
 
 import ai.deepsense.commons.serialization.Serialization
 import ai.deepsense.commons.utils.Logging

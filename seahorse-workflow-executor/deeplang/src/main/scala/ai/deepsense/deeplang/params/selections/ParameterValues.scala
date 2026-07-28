@@ -16,7 +16,7 @@
 
 package ai.deepsense.deeplang.params.selections
 
-import spray.httpx.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json.DefaultJsonProtocol.{IntJsonFormat, StringJsonFormat}
 import spray.json._
 
