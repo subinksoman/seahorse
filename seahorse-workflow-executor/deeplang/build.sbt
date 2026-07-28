@@ -53,8 +53,12 @@ testGrouping in Test := {
   assignTestsToJVMs(testDefinitions)
 }
 
-//scalacOptions --= Seq("-Xfatal-warnings")
-ThisBuild / scalacOptions --= Seq("-Xfatal-warnings")
+// -Xfatal-warnings is set at project scope by CommonSettingsPlugin (scalacOptions :=),
+// so it must be removed at PROJECT scope here to take effect; ThisBuild scope does not
+// override the plugin's setting. Step A: Spark 3.4.4 deprecates ChiSqSelector (still
+// functional in 3.4.4) -- don't fail the build on expected migration deprecations.
+// TODO(Step A follow-up): migrate ChiSqSelector -> UnivariateFeatureSelector (semantic change).
+scalacOptions --= Seq("-Xfatal-warnings")
 
 Compile / doc / sources := Seq()
 

@@ -21,6 +21,9 @@ object Version {
   val spark = sys.props.getOrElse("SPARK_VERSION", "3.0.0")
   println(s"SPARK_VERSION: $spark")
   val (scala, java, hadoop, akka, apacheCommons) = spark match {
+    // Step A target: Spark 3.4.4 on Scala 2.12 / Hadoop 3.3.4 (bytecode still 1.8;
+    // JDK 17 comes in Step B with Scala 2.13). Spark 3.4.4 is built with Scala 2.12.17.
+    case "3.4.4" => ("2.12.17", "1.8", "3.3.4", "2.4.12", "3.17.0")
     case "3.0.0" => ("2.12.10", "1.8", "2.7.3", "2.4.12", "3.17.0")
     case "2.2.0" | "2.4.8" => ("2.12.6", "1.8", "2.7.3", "2.4.12", "3.17.0")
     case "2.1.0" | "2.1.1"  => ("2.12.6", "1.8", "2.7.3", "2.4.12", "3.5")
@@ -83,7 +86,9 @@ object Library {
   val reflections = "org.reflections" % "reflections" % "0.9.11"
   val scalacheck = "org.scalacheck" %% "scalacheck" % Version.scalacheck
   val scalate = "org.scalatra.scalate" %% "scalate-core" % "1.9.0"
-  val slf4j = "org.slf4j" % "slf4j-api" % "1.7.36"
+  // Spark 3.4.4 uses the slf4j 2.x line (and log4j-slf4j2-impl); keep slf4j-api on the
+  // same major to avoid a 1.7-vs-2.0 conflict that resolves away the slf4j-api jar.
+  val slf4j = "org.slf4j" % "slf4j-api" % "2.0.7"
 
   val sprayCan = spray("can")
   val sprayClient = spray("client")
@@ -164,7 +169,10 @@ object Dependencies {
     ).map(_.excludeJackson.exclude("com.google.guava", "guava-jdk5"))
   }
 
-  def sparkutils(sparkVersion: String) = new Spark(sparkVersion).onlyInTests ++ Seq(akkaActor)
+  // slf4j-api is needed on the compile classpath because these shims mix in Spark's
+  // Logging trait (Logging.log: org.slf4j.Logger). Spark 3.0.0 brought slf4j transitively;
+  // Spark 3.4.4 (slf4j 2.x, provided scope) does not surface it here, so add it explicitly.
+  def sparkutils(sparkVersion: String) = new Spark(sparkVersion).onlyInTests ++ Seq(akkaActor, slf4j)
 
   val usedSpark = new Spark(Version.spark)
 

@@ -39,7 +39,12 @@ lazy val sparkUtils = sparkVersion match {
     sparkUtils2_4_8
   case "3.0.0" =>
     val sparkUtils3_0_0 = project in file("sparkutils3.0.x") settings settingsForPublished
-    sparkUtils3_0_0 
+    sparkUtils3_0_0
+  case "3.4.4" =>
+    // Step A: reuse the 3.0.x shim (public-API CSV; SparkR backend stable across 3.0->3.4).
+    // Fork sparkutils3.4.x only if a 3.4.4 compile reveals version-specific breakage.
+    val sparkUtils3_4_4 = project in file("sparkutils3.0.x") settings settingsForPublished
+    sparkUtils3_4_4
 }
 
 //lazy val sparkUtils2_x = project in file(s"sparkutils2.x") dependsOn (csvlib, sparkUtils) settings settingsForPublished
@@ -63,6 +68,8 @@ lazy val csvlib = sparkVersion match {
     csv2_4
   case "3.0.0" =>
     csv3_0
+  case "3.4.4" =>
+    csv3_0
 }
 
 lazy val readjsondataset = project in file(s"sparkutilsfeatures/readjsondataset") dependsOn sparkUtils2_x settings settingsForPublished
@@ -74,6 +81,7 @@ lazy val readjson = sparkVersion match {
   case "2.2.0" => readjsondataset
   case "2.4.8" => readjsondataset
   case "3.0.0" => readjsondataset
+  case "3.4.4" => readjsondataset
 }
 
 lazy val rootProject = project
@@ -163,6 +171,10 @@ addCommandAlias(
 //ThisBuild / versionScheme := Some("early-semver")
 
 evictionErrorLevel := Level.Warn
+// Step A (Scala 2.12.10 -> 2.12.17): scala-compiler 2.12.17 pulls scala-xml 2.1.0 while
+// scalate 1.9.0 wants 1.1.0. Declare scala-xml versions compatible build-wide so all
+// sub-modules (commons, deeplang, ...) resolve, not just the root project.
+ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.3.0"
 
 libraryDependencies ++= Seq(

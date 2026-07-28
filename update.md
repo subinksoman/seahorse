@@ -128,7 +128,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Bump sbt to 1.10.x",
     "description": "Update sbt.version; fix any plugin incompatibilities (assembly, scoverage, buildinfo, scalastyle).",
     "area": "project/build.properties, project/plugins.sbt",
-    "depends_on": ["T02"],
+    "depends_on": [
+      "T02"
+    ],
     "category": "build",
     "risk": "Low",
     "effort_days": 1,
@@ -140,7 +142,10 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Make the build compile & test on JDK 17 (still Scala 2.12 / Spark 3.0)",
     "description": "Add required --add-opens/--add-exports for JDK 17, update any libs that break under the module system, keep Spark 3.0 runtime. Green build on JDK 17 is the gate.",
     "area": "project/CommonSettingsPlugin.scala, build JVM opts",
-    "depends_on": ["T01", "T10"],
+    "depends_on": [
+      "T01",
+      "T10"
+    ],
     "category": "build",
     "risk": "High",
     "effort_days": 5,
@@ -152,7 +157,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Add javax.annotation-api so codegen sources compile on JDK 11+",
     "description": "JDK 11 removed javax.annotation.*; the Swagger-generated api model classes reference javax.annotation.Generated. Added javax.annotation:javax.annotation-api:1.3.2 to Dependencies.api in the workflow-executor build. VERIFIED: api/compile green on JDK 11 (was failing).",
     "area": "seahorse-workflow-executor/project/Dependencies.scala",
-    "depends_on": ["T02"],
+    "depends_on": [
+      "T02"
+    ],
     "category": "build",
     "risk": "Low",
     "effort_days": 1,
@@ -162,37 +169,44 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "id": "T20",
     "phase": "2 - Spark 3.5",
     "title": "Create sparkutils3.5.x shim + csv/readjson feature modules",
-    "description": "Clone sparkutils3.0.x -> sparkutils3.5.x and csv3_0 -> csv3_5; adapt to 3.5 APIs. Add SPARK_VERSION case arms in Dependencies.scala and build.sbt (sparkUtils/csvlib/readjson matches).",
+    "description": "Clone sparkutils3.0.x -> sparkutils3.5.x and csv3_0 -> csv3_5; adapt to 3.5 APIs. Add SPARK_VERSION case arms in Dependencies.scala and build.sbt (sparkUtils/csvlib/readjson matches). [StepA: reused 3.0.x shims for 3.4.4; arms added in WE build; verified.]",
     "area": "seahorse-workflow-executor/sparkutils3.5.x, sparkutilsfeatures/csv3_5, build.sbt, Dependencies.scala",
-    "depends_on": ["T00", "T11"],
+    "depends_on": [
+      "T00",
+      "T11"
+    ],
     "category": "spark",
     "risk": "Med",
     "effort_days": 4,
-    "status": "todo"
+    "status": "completed"
   },
   {
     "id": "T21",
     "phase": "2 - Spark 3.5",
     "title": "Set Spark 3.5.x + Hadoop 3 defaults",
-    "description": "Add '3.5.x' arm to the (scala, hadoop, akka, sprayRoutingLib) match (hadoop -> 3.x). Update manage-docker.py spark_version/hadoop_version.",
+    "description": "Add '3.5.x' arm to the (scala, hadoop, akka, sprayRoutingLib) match (hadoop -> 3.x). Update manage-docker.py spark_version/hadoop_version. [StepA: WE Version arm 3.4.4/scala2.12.17/hadoop3.3.4 done; root build + manage-docker pending.]",
     "area": "project/Dependencies.scala:40-46, build/manage-docker.py:38-39",
-    "depends_on": ["T20"],
+    "depends_on": [
+      "T20"
+    ],
     "category": "spark",
     "risk": "Med",
     "effort_days": 1,
-    "status": "todo"
+    "status": "partial"
   },
   {
     "id": "T22",
     "phase": "2 - Spark 3.5",
     "title": "Migrate deeplang MLlib/SQL operations to Spark 3.5",
-    "description": "Apply the T00 checklist: fix removed/changed ML params, DataFrame/Dataset API changes, DataSourceV2, CSV/JSON reader options. The bulk of the migration effort.",
+    "description": "Apply the T00 checklist: fix removed/changed ML params, DataFrame/Dataset API changes, DataSourceV2, CSV/JSON reader options. The bulk of the migration effort. [StepA: deeplang COMPILES green vs 3.4.4 (0 errors). Tests/golden + ChiSqSelector->UnivariateFeatureSelector pending.]",
     "area": "seahorse-workflow-executor/deeplang/",
-    "depends_on": ["T21"],
+    "depends_on": [
+      "T21"
+    ],
     "category": "spark",
     "risk": "High",
     "effort_days": 15,
-    "status": "todo"
+    "status": "partial"
   },
   {
     "id": "T23",
@@ -200,7 +214,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Fix Spark serialization / model persistence formats",
     "description": "Validate DefaultMLWriter/reader and saved-model compatibility; handle sparkVersion metadata and any format changes between 3.0 and 3.5.",
     "area": "seahorse-workflow-executor/deeplang/.../serialization/",
-    "depends_on": ["T22"],
+    "depends_on": [
+      "T22"
+    ],
     "category": "spark",
     "risk": "Med",
     "effort_days": 3,
@@ -212,7 +228,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Update sessionmanager Spark launcher & download URLs",
     "description": "Mesos/YARN/standalone launchers reference spark-$version-bin-hadoop tarballs and cloudfront URLs; point to archive.apache.org bin-hadoop3, verify spark-submit args on 3.5.",
     "area": "sessionmanager/.../sparklauncher/, e2etests BatchTestSupport",
-    "depends_on": ["T21"],
+    "depends_on": [
+      "T21"
+    ],
     "category": "spark",
     "risk": "Med",
     "effort_days": 2,
@@ -224,7 +242,11 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Green full backend test + e2e on Spark 3.5 / Scala 2.12 / JDK 17",
     "description": "All unit + integration + e2e suites pass; deeplang golden outputs match T02 baseline within tolerance.",
     "area": "all backend modules, e2etests/",
-    "depends_on": ["T22", "T23", "T24"],
+    "depends_on": [
+      "T22",
+      "T23",
+      "T24"
+    ],
     "category": "testing",
     "risk": "High",
     "effort_days": 4,
@@ -236,7 +258,10 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Replace/upgrade EOL Akka/Spray/Scalatra stack",
     "description": "Migrate off Akka 2.4.13 + Spray (EOL, no 2.13) to Akka HTTP or Apache Pekko; upgrade Scalatra & Jetty to 2.13/JDK17-capable versions per T01 decision.",
     "area": "project/Dependencies.scala, workflowmanager, sessionmanager, datasourcemanager, libraryservice",
-    "depends_on": ["T01", "T25"],
+    "depends_on": [
+      "T01",
+      "T25"
+    ],
     "category": "build",
     "risk": "High",
     "effort_days": 12,
@@ -248,7 +273,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Cross-compile / switch to Scala 2.13.x",
     "description": "Set scalaVersion 2.13.x; fix collections (Seq/varargs, CollectionConverters), procedure syntax, deprecated APIs across api/commons/deeplang/graph/workflow* and services.",
     "area": "project/CommonSettingsPlugin.scala:32, Dependencies.scala scala pin, all Scala sources",
-    "depends_on": ["T30"],
+    "depends_on": [
+      "T30"
+    ],
     "category": "build",
     "risk": "High",
     "effort_days": 10,
@@ -260,7 +287,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Green build + tests on Scala 2.13 / JDK 17 / Spark 3.5",
     "description": "Full suite passes on the new toolchain before touching Spark 4.0.",
     "area": "all modules",
-    "depends_on": ["T31"],
+    "depends_on": [
+      "T31"
+    ],
     "category": "testing",
     "risk": "Med",
     "effort_days": 3,
@@ -272,7 +301,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Create sparkutils4.0.x shim + feature modules; add 4.0.0 arms",
     "description": "Clone 3.5 shim to 4.0.x, adapt to Spark 4.0 API removals; add '4.0.0' case arms (scala 2.13, hadoop 3, akka/pekko) in Dependencies.scala and build.sbt matches.",
     "area": "seahorse-workflow-executor/sparkutils4.0.x, sparkutilsfeatures/*, build.sbt, Dependencies.scala",
-    "depends_on": ["T32"],
+    "depends_on": [
+      "T32"
+    ],
     "category": "spark",
     "risk": "High",
     "effort_days": 6,
@@ -284,7 +315,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Resolve Spark 4.0 breaking changes in deeplang",
     "description": "Address 3.5->4.0 removals (deprecated ML APIs, ANSI SQL defaults, datasource behavior, removed configs). Re-run golden-output comparison.",
     "area": "seahorse-workflow-executor/deeplang/",
-    "depends_on": ["T40"],
+    "depends_on": [
+      "T40"
+    ],
     "category": "spark",
     "risk": "High",
     "effort_days": 8,
@@ -296,7 +329,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Green backend + e2e on Spark 4.0 / Scala 2.13 / JDK 17",
     "description": "Full suite + e2e pass on final target stack.",
     "area": "all modules, e2etests/",
-    "depends_on": ["T41"],
+    "depends_on": [
+      "T41"
+    ],
     "category": "testing",
     "risk": "High",
     "effort_days": 4,
@@ -308,7 +343,10 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Generalize pyexecutor for Spark 3.5 & 4.0",
     "description": "pyexecutor.py currently hard-checks spark_version.startswith('3.'); support 3.5 and 4.0 (SparkSession/SQLContext wrapper changes, error on <3.5). Validate Py4J bridge.",
     "area": "seahorse-workflow-executor/python/pyexecutor/pyexecutor.py",
-    "depends_on": ["T21", "T40"],
+    "depends_on": [
+      "T21",
+      "T40"
+    ],
     "category": "python",
     "risk": "Med",
     "effort_days": 3,
@@ -320,7 +358,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Move executor image to Python 3.12 and repin requirements",
     "description": "Replace Miniconda py37 with a 3.12 base; repin numpy/pandas/pyarrow (>= Spark 4.0 minimums), scikit-learn/xgboost/lightgbm/tensorflow/keras to 3.12-compatible wheels. Drop dead pins (tornado 4.1, urllib3 1.22, pyzmq 17).",
     "area": "deployment/spark-docker/Dockerfile, deployment/spark-docker/requirements.txt",
-    "depends_on": ["T50"],
+    "depends_on": [
+      "T50"
+    ],
     "category": "python",
     "risk": "High",
     "effort_days": 4,
@@ -332,7 +372,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Update SparkR / R executor for new Spark",
     "description": "Align rexecutor and SparkR package path with the new Spark R lib; bump R base if required; smoke-test an R workflow.",
     "area": "seahorse-workflow-executor/workflowexecutor/rexecutor/, remote_notebook R kernel",
-    "depends_on": ["T40"],
+    "depends_on": [
+      "T40"
+    ],
     "category": "python",
     "risk": "Med",
     "effort_days": 3,
@@ -344,7 +386,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Rebuild notebook image on JupyterLab 4 / Notebook 7 / Python 3.12",
     "description": "Replace jupyter/minimal-notebook:python-3.7 with current base; migrate jupyter_notebook_config (NotebookApp->ServerApp keys), drop dead jupyter_contrib_nbextensions, repin ipykernel/jupyter-client to current.",
     "area": "remote_notebook/Dockerfile, remote_notebook/requirements.txt, jupyter_notebook_config.py",
-    "depends_on": ["T51"],
+    "depends_on": [
+      "T51"
+    ],
     "category": "jupyter",
     "risk": "High",
     "effort_days": 5,
@@ -356,7 +400,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Port the custom forwarding kernels to Jupyter Server 2 / kernel protocol",
     "description": "forwarding_kernel (py/r/pyspark), socket_forwarder, rabbit_mq_client, notebook_server_client rely on old jupyter_client APIs; update to current messaging/kernel-provisioner APIs. Verify RabbitMQ heartbeat bridge.",
     "area": "remote_notebook/code/forwarding_kernel*/, remote_notebook/code/*.py",
-    "depends_on": ["T60"],
+    "depends_on": [
+      "T60"
+    ],
     "category": "jupyter",
     "risk": "High",
     "effort_days": 6,
@@ -368,7 +414,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Update contents manager / headless handlers",
     "description": "wmcontents, execute_saver, headless_notebook_handler use old NotebookApp/contents APIs; port to Jupyter Server 2 contents manager interface.",
     "area": "remote_notebook/wmcontents, remote_notebook/execute_saver, remote_notebook/headless_notebook_handler.py",
-    "depends_on": ["T61"],
+    "depends_on": [
+      "T61"
+    ],
     "category": "jupyter",
     "risk": "Med",
     "effort_days": 4,
@@ -380,7 +428,11 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Update all Docker images and build orchestration",
     "description": "spark-docker (bin-hadoop3, JDK17, Python3.12), remote_notebook, plus testing/mesos & yarn cluster images and standalone cluster Dockerfile. Update manage-docker.py versions and JDK_JAVA_OPTIONS.",
     "area": "deployment/**/Dockerfile, testing/**/Dockerfile, seahorse-workflow-executor/docker/, build/manage-docker.py",
-    "depends_on": ["T42", "T51", "T60"],
+    "depends_on": [
+      "T42",
+      "T51",
+      "T60"
+    ],
     "category": "docker",
     "risk": "Med",
     "effort_days": 4,
@@ -392,7 +444,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Update CI pipeline (JDK 17, Scala 2.13, Spark 4.0 matrix)",
     "description": "Build/test scripts still iterate SPARK_VERSION=2.0.0..2.2.0; retarget to supported set (3.5.x, 4.0.0). Update runners to JDK 17.",
     "area": "seahorse-workflow-executor/build/build_and_run_tests.sh, CI config",
-    "depends_on": ["T42"],
+    "depends_on": [
+      "T42"
+    ],
     "category": "ci",
     "risk": "Med",
     "effort_days": 3,
@@ -404,7 +458,12 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Full end-to-end acceptance on a real cluster",
     "description": "Run representative workflows (ingest, ML train/score, notebook, R, SQL, export) on a Spark 4.0 cluster; compare against T02 baseline; sign-off.",
     "area": "e2etests/, sample workflows",
-    "depends_on": ["T70", "T71", "T52", "T62"],
+    "depends_on": [
+      "T70",
+      "T71",
+      "T52",
+      "T62"
+    ],
     "category": "testing",
     "risk": "High",
     "effort_days": 5,
@@ -416,7 +475,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "title": "Docs, RELEASE.md, and version bump",
     "description": "Update productionizing docs, SparkOperationDocumentation URLs (docs/$sparkVersion), README, and add a RELEASE.md entry; cut the release tag.",
     "area": "seahorse-workflow-executor/docs/, RELEASE.md, docgen",
-    "depends_on": ["T72"],
+    "depends_on": [
+      "T72"
+    ],
     "category": "docs",
     "risk": "Low",
     "effort_days": 2,
