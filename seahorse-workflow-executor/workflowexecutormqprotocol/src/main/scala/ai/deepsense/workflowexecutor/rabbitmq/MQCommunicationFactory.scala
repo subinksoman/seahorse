@@ -249,7 +249,11 @@ class NotifyingChannelActor[T <: AnyRef](
 
 
 
-class NotifyingChannelActor[T <: AnyRef](
+// T is unbounded: callers use both AnyRef (QueueName) and AnyVal (Unit, from
+// sessionmanager's broadcast subscriber). classOf erases the type param, so no
+// bound is needed. (Scala 2.12.17 enforces bounds at the classOf use site, which
+// is why the earlier T <: AnyRef here clashed with the Unit caller.)
+class NotifyingChannelActor[T](
     channelConnected: Promise[ChannelSetupResult[T]],
     setupPromise: Promise[ChannelSetupResult[T]], // Pass this in!
     setupChannel: (Channel, ActorRef) => T
@@ -268,9 +272,8 @@ class NotifyingChannelActor[T <: AnyRef](
 
 
 object NotifyingChannelActor {
-  // T <: AnyRef to match class NotifyingChannelActor[T <: AnyRef]; Scala 2.12.17
-  // enforces the bound at the classOf[...] use site (2.12.10 did not flag it).
-  def props[T <: AnyRef](
+  // Unbounded T, matching class NotifyingChannelActor[T] (supports QueueName and Unit callers).
+  def props[T](
       channelConnected: Promise[ChannelSetupResult[T]],
       setupChannel: (Channel, ActorRef) => T
   ): Props = {

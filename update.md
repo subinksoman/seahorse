@@ -192,13 +192,13 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "spark",
     "risk": "Med",
     "effort_days": 1,
-    "status": "partial"
+    "status": "completed"
   },
   {
     "id": "T22",
     "phase": "2 - Spark 3.5",
     "title": "Migrate deeplang MLlib/SQL operations to Spark 3.5",
-    "description": "Apply the T00 checklist: fix removed/changed ML params, DataFrame/Dataset API changes, DataSourceV2, CSV/JSON reader options. The bulk of the migration effort. [StepA: deeplang COMPILES green vs 3.4.4 (0 errors). Tests/golden + ChiSqSelector->UnivariateFeatureSelector pending.]",
+    "description": "Apply the T00 checklist: fix removed/changed ML params, DataFrame/Dataset API changes, DataSourceV2, CSV/JSON reader options. The bulk of the migration effort. [StepA: full WE build + all backend services COMPILE green vs 3.4.4 (2 JDK-11 source fixes, 0 Spark API rewrites). Tests + ChiSqSelector->UnivariateFeatureSelector pending.]",
     "area": "seahorse-workflow-executor/deeplang/",
     "depends_on": [
       "T21"

@@ -31,7 +31,9 @@ object ConfigToPropsLossy {
       entry.getKey -> entry.getValue.unwrapped().toString
     } (collection.breakOut)
 
-    properties.putAll(map)
+    // JDK 9+ makes Properties.putAll(Map) ambiguous (Hashtable added a covariant
+    // override); set each property explicitly to avoid the overload resolution error.
+    map.foreach { case (k, v) => properties.setProperty(k, v) }
     properties
   }
 }

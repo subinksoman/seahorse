@@ -38,6 +38,8 @@ object Version {
 
   val spark = sys.props.getOrElse("SPARK_VERSION", "3.0.0")
   val (scala, hadoop, akka, sprayRoutingLib) = spark match {
+    // Step A: Spark 3.4.4 on Scala 2.12 (2.12.17, matching the workflow-executor build) / Hadoop 3.
+    case "3.4.4"  => ("2.12.17", "3.3", "2.4.13", "routing")
     case "3.0.0"  => ("2.12.10", "2.7", "2.4.13", "routing")
     case "2.2.0"  => ("2.12.16", "2.7", "2.4.9", "routing-shapeless2")
     case "2.1.0" | "2.1.1" | "2.4.8" => ("2.12.16", "2.7", "2.4.9", "routing-shapeless2")

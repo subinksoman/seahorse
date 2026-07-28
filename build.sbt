@@ -95,6 +95,11 @@ addCommandAlias("scalastylebackend", scalastyleCmd) // override default scalasty
 
 
 evictionErrorLevel := Level.Warn
+// Step A (Scala 2.12.17 for Spark 3.4.4): declare scala-xml / scala-parser-combinators
+// compatible build-wide so every backend module resolves (scala-compiler 2.12.17 pulls
+// newer versions than scalate/scalatra/json4s expect). Mirrors the workflow-executor build.
+ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
+ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-parser-combinators" % VersionScheme.Always
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.3.0"
 
 
