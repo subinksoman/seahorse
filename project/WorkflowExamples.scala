@@ -31,14 +31,10 @@ object WorkflowExamples {
     val scriptFile = "generate_workflow_examples_sql.py"
     val outFileDir = outFile.getParentFile
     outFileDir.mkdirs()
-/*
+    // Ported to Python 3 (the script now uses print(...) and dict.items()); python2 is gone.
     val exitCode = Seq("/bin/bash", "-c",
       s"cd '${scriptDir.getCanonicalPath}'; " +
-        s"python '$scriptFile' > '${outFile.getCanonicalPath}'") !
-*/
-    val exitCode = Seq("/bin/bash", "-c",
-      s"cd '${scriptDir.getCanonicalPath}'; " +
-        s"python2 '$scriptFile' > '${outFile.getCanonicalPath}'") !
+        s"python3 '$scriptFile' > '${outFile.getCanonicalPath}'") !
 
     if (exitCode != 0) {
       throw new RuntimeException(s"Unable to generate workflow examples sql file, script exited with code: $exitCode")

@@ -44,8 +44,8 @@ def jsonFiles(dir):
 if __name__ == "__main__":
     examplesDir = "examples" if len(sys.argv) < 2 else sys.argv[1]
 
-    print DELETE_NOTEBOOK
-    print DELETE_WF
+    print(DELETE_NOTEBOOK)
+    print(DELETE_WF)
 
     created = 0
     for file in jsonFiles(examplesDir):
@@ -54,11 +54,11 @@ if __name__ == "__main__":
             id = uuid.uuid5(EXAMPLES_NAMESPACE_UUID, file)
             content = json.load(f)
             compact = compact_json(content)
-            print INSERT_WF_FORMAT.format(id, created, created, USER_ID, USER_NAME, compact)
+            print(INSERT_WF_FORMAT.format(id, created, created, USER_ID, USER_NAME, compact))
             notebooks = content['thirdPartyData']['notebooks']
-            for node_id, notebook_json in notebooks.iteritems():
+            for node_id, notebook_json in notebooks.items():
                 compact_notebook = compact_json(notebook_json)
-                print INSERT_NOTEBOOK_FORMAT.format(id, uuid.UUID(node_id), compact_notebook)
+                print(INSERT_NOTEBOOK_FORMAT.format(id, uuid.UUID(node_id), compact_notebook))
 
         # We increment 'created' to retain the sorted ordering in the
         # frontend.  The frontend displays workflows with newest on
