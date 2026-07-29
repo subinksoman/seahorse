@@ -42,7 +42,7 @@ class ReportContentJsonSpec
       "name" -> JsString(reportName),
       "reportType" -> JsString(reportType.toString),
       "tables" -> JsArray(report.tables.map(_.toJson): _*),
-      "distributions" -> JsObject(report.distributions.mapValues(_.toJson))
+      "distributions" -> JsObject(report.distributions.view.mapValues(_.toJson).toMap)
     )
 
     "serialize" when {

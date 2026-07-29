@@ -27,8 +27,8 @@ class TransformerSpec extends UnitSpec with DeeplangTestSupport {
 
   private def transformer = {
     val t = mock[Transformer]
-    when(t.transform) thenCallRealMethod()
-    when(t._transformSchema(any(), any())) thenCallRealMethod()
+    when(t.transform).thenCallRealMethod()
+    when(t._transformSchema(any(), any())).thenCallRealMethod()
     t
   }
 

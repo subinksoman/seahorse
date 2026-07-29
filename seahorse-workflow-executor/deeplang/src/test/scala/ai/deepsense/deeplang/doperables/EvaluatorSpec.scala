@@ -26,7 +26,7 @@ class EvaluatorSpec extends UnitSpec {
 
   private def evaluator = {
     val e = mock[Evaluator]
-    when(e.evaluate) thenCallRealMethod()
+    when(e.evaluate).thenCallRealMethod()
     e
   }
 

@@ -116,7 +116,7 @@ object Library {
   val sprayJson = "io.spray" %% "spray-json" % Version.sprayJson
   val scalaReflect = "org.scala-lang" % "scala-reflect" % Version.scala
   val scalatest = "org.scalatest" %% "scalatest" % Version.scalatest
-  val scopt = "com.github.scopt" %% "scopt" % "3.5.0"
+  val scopt = "com.github.scopt" %% "scopt" % "3.7.1"  // 3.5.0 has no Scala 2.13 artifact
   val scoverage = "org.scoverage" %% "scalac-scoverage-runtime" % "2.3.0"
   val sparkCore = spark("core")
   val sparkMLLib = spark("mllib")

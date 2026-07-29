@@ -82,11 +82,11 @@ class NodeStatusJsonProtocolSpec extends GraphJsonTestSupport {
       NodeStatusJsonProtocol.Results,
       NodeStatusJsonProtocol.Error).map(key => key -> None).toMap[String, Option[JsValue]]
 
-    val jsFields = (emptyMap ++ fields.toMap.mapValues(Some(_)) +
-        (NodeStatusJsonProtocol.Status -> Some(JsString(state)))).mapValues {
+    val jsFields = (emptyMap ++ fields.toMap.view.mapValues(Some(_)) +
+        (NodeStatusJsonProtocol.Status -> Some(JsString(state)))).view.mapValues {
       case None => JsNull
       case Some(v) => v
-    }
+    }.toMap
     JsObject(jsFields)
   }
 

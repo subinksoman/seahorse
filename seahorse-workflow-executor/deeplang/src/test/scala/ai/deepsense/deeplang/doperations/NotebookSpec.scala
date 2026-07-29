@@ -22,7 +22,7 @@ import javax.mail.Message
 import scala.concurrent.Future
 import scala.util.Try
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import org.mockito.Matchers.{eq => eqMatcher, _}
 import org.mockito.Mockito._
 import org.mockito.{ArgumentCaptor, Mockito}
