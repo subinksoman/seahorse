@@ -40,7 +40,9 @@ class NotebookServerClient(Logging):
                 return self.seahorse_notebook_path
             else:
                 session = self._get_my_session()
-                return str(session['notebook']['path'])
+                # Jupyter Server 2 session model: the nested 'notebook' dict was removed;
+                # the path lives at the top level (session['path']).
+                return str(session['path'])
         except Exception as e:
             self.logger.error("Error getting path: {}".format(e))
             raise

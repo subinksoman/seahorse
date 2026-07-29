@@ -13,7 +13,9 @@
 # limitations under the License.
 
 
-from notebook.services.contents.manager import Checkpoints
+# Jupyter Server 2: Checkpoints moved to jupyter_server.services.contents.checkpoints
+# (was notebook.services.contents.manager).
+from jupyter_server.services.contents.checkpoints import Checkpoints
 import datetime
 
 

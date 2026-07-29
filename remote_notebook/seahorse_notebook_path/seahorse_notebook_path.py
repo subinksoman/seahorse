@@ -40,7 +40,8 @@ class SeahorseNotebookPath(object):
             seahorse_notebook_path = seahorse_notebook_path[1:]
         try:
             workflow_id, node_id, params = seahorse_notebook_path.split('/')
-            deserialized_params = json.loads(base64.decodestring(params.encode()).decode('utf-8'))
+            # base64.decodestring was removed in Python 3.9; decodebytes is the replacement.
+            deserialized_params = json.loads(base64.decodebytes(params.encode()).decode('utf-8'))
             # If nothing is connected to the Notebook node, we don't expect a source
             if 'dataframeSource' in deserialized_params and len(deserialized_params['dataframeSource']) > 0:
                 dataframe_owner_node_id = deserialized_params['dataframeSource']['nodeId']

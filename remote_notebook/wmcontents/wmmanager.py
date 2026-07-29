@@ -17,19 +17,16 @@ import base64
 from datetime import datetime
 
 from nbformat import reads, writes, from_dict
-from notebook.services.contents.manager import ContentsManager
+# Jupyter Server 2: the ContentsManager base moved out of the notebook package.
+from jupyter_server.services.contents.manager import ContentsManager
 from tornado import web
-from traitlets import Unicode
+from traitlets import Unicode, Type
 
 from seahorse_notebook_path import SeahorseNotebookPath
 from .wmcheckpoints import WMCheckpoints
 
-try:
-    from urllib.request import urlopen, Request
-    from urllib.error import HTTPError
-except ImportError:
-    from urllib2 import urlopen, Request
-    from urllib2 import HTTPError
+from urllib.request import urlopen, Request
+from urllib.error import HTTPError
 
 NBFORMAT_VERSION = 4
 DUMMY_CREATED_DATE = datetime.fromtimestamp(0)
@@ -71,8 +68,8 @@ class WMContentsManager(ContentsManager):
         help="Workflow Manager auth pass",
     )
 
-    def _checkpoints_class_default(self):
-        return WMCheckpoints
+    # The classic `_<name>_class_default` magic method is gone; declare the trait directly.
+    checkpoints_class = Type(WMCheckpoints, config=True)
 
     def _get_wm_notebook_url(self, path):
         return "{}/v1/workflows/{}/notebook/{}".format(
@@ -83,7 +80,8 @@ class WMContentsManager(ContentsManager):
         username = self.workflow_manager_user
         password = self.workflow_manager_pass
         credentials = '%s:%s' % (username, password)
-        base64string = base64.encodestring(credentials.encode()).decode('utf-8').replace('\n', '')
+        # base64.encodestring was removed in Python 3.9; encodebytes is the replacement.
+        base64string = base64.encodebytes(credentials.encode()).decode('utf-8').replace('\n', '')
         req.add_header("Authorization", "Basic %s" % base64string)
         req.add_header("X-Seahorse-UserId", "notebook")
         req.add_header("X-Seahorse-UserName", "notebook")

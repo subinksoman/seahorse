@@ -16,24 +16,27 @@
 
 import os
 import copy
-from nbconvert.exporters.export import exporter_map
+# nbconvert 6+ removed nbconvert.exporters.export.exporter_map; use get_exporter(name).
+from nbconvert.exporters import get_exporter
 from nbconvert.writers.files import FilesWriter
 from nbconvert.preprocessors import ExecutePreprocessor
-from notebook.base.handlers import IPythonHandler
-from notebook.utils import url_path_join
+# Jupyter Server 2: notebook.base.handlers.IPythonHandler -> jupyter_server.base.handlers
+# .JupyterHandler (the IPythonHandler alias was removed); notebook.utils -> jupyter_server.utils.
+from jupyter_server.base.handlers import JupyterHandler
+from jupyter_server.utils import url_path_join
 from tornado import web, escape
 from tornado.concurrent import run_on_executor
-from concurrent.futures import ThreadPoolExecutor   # `pip install futures` for python2
+from concurrent.futures import ThreadPoolExecutor
 
 from seahorse_notebook_path import SeahorseNotebookPath
 
 
-class HeadlessNotebookHandler(IPythonHandler):
+class HeadlessNotebookHandler(JupyterHandler):
     executor = ThreadPoolExecutor(max_workers=10)
 
     @run_on_executor
     def process_notebook(self, path):
-        Exporter = exporter_map["html"]
+        Exporter = get_exporter("html")
         exporter = Exporter(config=self.config, log=self.log)
         serialized_path = path.serialize()
 
@@ -59,7 +62,7 @@ class HeadlessNotebookHandler(IPythonHandler):
 
     # get HTML-ized un-editable notebook
     def get(self, seahorse_notebook_path):
-        Exporter = exporter_map["html"]
+        Exporter = get_exporter("html")
         updated_config = self.no_execution_config(self.config)
         exporter = Exporter(config=updated_config, log=self.log)
         model = self.contents_manager.get(path=seahorse_notebook_path)
@@ -99,14 +102,20 @@ class HeadlessNotebookHandler(IPythonHandler):
         new_config.ExecutePreprocessor.enabled = False
         return new_config
 
-def load_jupyter_server_extension(nb_server_app):
+def _jupyter_server_extension_points():
+    """Jupyter Server 2 extension discovery hook."""
+    return [{"module": "headless_notebook_handler.headless_notebook_handler"}]
+
+
+def _load_jupyter_server_extension(serverapp):
     """
-    Called when the extension is loaded.
+    Called when the extension is loaded (Jupyter Server 2 entrypoint; was
+    load_jupyter_server_extension in the classic NotebookApp).
 
     Args:
-        nb_server_app (NotebookWebApplication): handle to the Notebook webserver instance.
+        serverapp (ServerApp): handle to the Jupyter Server instance.
     """
-    web_app = nb_server_app.web_app
+    web_app = serverapp.web_app
     host_pattern = '.*$'
     base_url = web_app.settings['base_url']
     route_pattern = url_path_join(base_url, '/HeadlessNotebook')
@@ -120,3 +129,7 @@ def load_jupyter_server_extension(nb_server_app):
     route_pattern_with_workflow_id = url_path_join(base_url, '/HeadlessNotebook/([^/]+)')
     web_app.add_handlers(host_pattern,
                          [(route_pattern_with_workflow_id, web.StaticFileHandler, {"path": "/home/jovyan/work/"})])
+
+
+# Back-compat alias: Jupyter Server 2 still calls the old name if the new one is absent.
+load_jupyter_server_extension = _load_jupyter_server_extension
