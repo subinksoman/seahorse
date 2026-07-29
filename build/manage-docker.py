@@ -35,8 +35,8 @@ sbt_type = 'sbt'
 #hadoop_version = "2.7"
 
 
-spark_version = "3.0.0"
-hadoop_version = "2.7"
+spark_version = "3.4.4"
+hadoop_version = "3"
 
 # This is added here since sbt clean doesn't clean everything; in particular, it doesn't clean
 # project/target, so we delete all "target". For discussion, see
@@ -72,24 +72,26 @@ def sbt_docker(docker_image_name, project_name):
 
 def git_sha():
     sha_output_with_endline = subprocess.check_output("git rev-parse HEAD", shell=True, cwd=cwd)
-    return sha_output_with_endline.strip()
+    # Python 3: check_output returns bytes; decode so the image tag is a clean sha string
+    # (not b'...') and matches sbt's SbtGit gitHeadCommit tag used by dependent images.
+    return sha_output_with_endline.decode("utf-8").strip()
 
 
 image_confs = [
-    #simple_docker("seahorse-proxy", "proxy"),
-    #simple_docker("seahorse-rabbitmq", "deployment/rabbitmq"),
-    #simple_docker("seahorse-h2", "deployment/h2-docker"),
+    simple_docker("seahorse-proxy", "proxy"),
+    simple_docker("seahorse-rabbitmq", "deployment/rabbitmq"),
+    simple_docker("seahorse-h2", "deployment/h2-docker"),
     simple_docker_with_spark_version("seahorse-spark", "deployment/spark-docker"),
-    #sbt_docker("seahorse-schedulingmanager", "schedulingmanager"),
+    sbt_docker("seahorse-schedulingmanager", "schedulingmanager"),
     sbt_docker('seahorse-sessionmanager', "sessionmanager"),
-    #sbt_docker("seahorse-workflowmanager", "workflowmanager"),
-    #sbt_docker("seahorse-datasourcemanager", "datasourcemanager"),
-    #sbt_docker("seahorse-libraryservice", "libraryservice"),
-    #simple_docker("seahorse-notebooks", "remote_notebook"),
-    #simple_docker("seahorse-authorization", "deployment/authorization-docker"),
-    #simple_docker("seahorse-mail", "deployment/exim"),
-    #simple_command_docker("seahorse-frontend", "frontend/docker/build-frontend.sh"),
-    #simple_command_docker("seahorse-documentation", "./build/build_documentation_docker.sh")
+    sbt_docker("seahorse-workflowmanager", "workflowmanager"),
+    sbt_docker("seahorse-datasourcemanager", "datasourcemanager"),
+    sbt_docker("seahorse-libraryservice", "libraryservice"),
+    simple_docker("seahorse-notebooks", "remote_notebook"),
+    simple_docker("seahorse-authorization", "deployment/authorization-docker"),
+    simple_docker("seahorse-mail", "deployment/exim"),
+    simple_command_docker("seahorse-frontend", "frontend/docker/build-frontend.sh"),
+    simple_command_docker("seahorse-documentation", "./build/build_documentation_docker.sh")
 ]
 image_conf_by_name = {conf.docker_image_name: conf for conf in image_confs}
 
