@@ -250,10 +250,12 @@ class CodeExecutor(object):
         spark_version = self.spark_context.version
         log_debug(f"{workflow_id}_{node_id}-Spark version: {spark_version}")
         
-        # For Spark 3.x, we don't need SQLContext anymore
-        if not spark_version.startswith("3."):
+        # Spark 3.x/4.x use SparkSession (no SQLContext). Accept both so the executor
+        # generalizes across Spark 3.4+ and a future 4.0.
+        if not (spark_version.startswith("3.") or spark_version.startswith("4.")):
             log_debug("Spark version {} is not supported".format(spark_version))
-            raise ValueError("Spark version {} is not supported. This code is for Spark 3.x".format(spark_version))
+            raise ValueError(
+                "Spark version {} is not supported. This code is for Spark 3.x/4.x".format(spark_version))
 
         log_debug(f"{workflow_id}_{node_id}-Retrieving input DataFrame from Java")
         raw_input_data_frame = DataFrame(

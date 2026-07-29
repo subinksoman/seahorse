@@ -1,33 +1,50 @@
-ipykernel==4.5.0
-ipython==5.1.0
-ipython-genutils==0.2.0
-jupyter-client==4.4.0
-jupyter-core==4.2.0
-numpy
-pandas
-python-dateutil==2.7.2
-pytz==2018.3
-pyzmq==17.0.0
+# Executor image Python deps — Python 3.12 (Miniconda py312) + Spark 3.4.4 (pyspark from $SPARK_HOME).
+# The Python-3.7-era pins below were unpinned/bumped so wheels exist for cp312; C-extension
+# libraries are pinned to their first Python-3.12-compatible line.
+
+# Jupyter / IPython kernel stack (the notebook pyspark kernel connects to this image)
+ipykernel
+ipython
+jupyter-client
+jupyter-core
+pyzmq
+tornado
+traitlets
+
+# Core numerics — keep numpy < 2: Spark 3.4's Arrow<->pandas bridge and the ML libs below
+# are not validated against the numpy 2.0 ABI break.
+numpy<2
+# pyspark 3.4's Arrow/pandas API is validated against pandas 1.x/2.x, not the pandas 3.0
+# rewrite; pin to the 2.1 line (cp312 wheels, numpy<2 compatible).
+pandas>=1.5,<2.2
+python-dateutil
+pytz
 requests
-tornado==4.1
-traitlets==4.3.2
-urllib3==1.22
-wcwidth==0.1.7
-scikit-learn   
-scipy          
-seaborn        
-shap           
-reportlab      
-#requests       
-#python-dateutil
-SQLAlchemy==1.4.45
+urllib3
+wcwidth
+
+# ML / analytics
+scikit-learn
+scipy
+seaborn
+shap
+reportlab
+# SQLAlchemy 1.4.45 has no cp312 wheel; 1.4.54 is the last 1.4 line and keeps PyHive 0.7 working.
+SQLAlchemy==1.4.54
 xgboost
 tensorflow
 keras
 kmodes==0.12.2
 flask
 matplotlib
-pyarrow==1.0.1
+
+# Arrow: pyspark 3.4 <-> pandas conversion. 1.0.1 predates cp312; 15.x has cp312 wheels and
+# works with Spark 3.4's Arrow protocol.
+pyarrow==15.0.2
+
+# DB / connectors
 oracledb==2.3.0
 PyHive==0.7.0
-lightgbm==3.3.5
+# lightgbm 3.3.5 has no cp312 wheel and its source build relies on distutils (removed in 3.12).
+# 4.x ships cp312 wheels and reads 3.x models; train/predict API is unchanged.
+lightgbm==4.3.0

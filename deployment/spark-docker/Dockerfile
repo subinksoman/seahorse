@@ -7,7 +7,7 @@ ARG HADOOP_VERSION
 RUN sed -i 's/archive.ubuntu.com/kr.archive.ubuntu.com/g' /etc/apt/sources.list
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     build-essential \
-    openjdk-11-jre \
+    openjdk-17-jre \
     wget \
     curl \
     bzip2 \
@@ -76,11 +76,11 @@ RUN wget -O - \
 
 #COPY rdd.py /opt/spark-2.1.1/python/pyspark/
 
-# Install Miniconda with Python 3.7
-RUN wget -q -O /tmp/Miniconda3-py37_4.9.2-Linux-x86_64.sh \
-    https://repo.anaconda.com/miniconda/Miniconda3-py37_4.9.2-Linux-x86_64.sh && \
-    bash /tmp/Miniconda3-py37_4.9.2-Linux-x86_64.sh -f -b -p /opt/conda && \
-    rm /tmp/Miniconda3-py37_4.9.2-Linux-x86_64.sh
+# Install Miniconda with Python 3.12
+RUN wget -q -O /tmp/Miniconda3-py312-Linux-x86_64.sh \
+    https://repo.anaconda.com/miniconda/Miniconda3-py312_24.9.2-0-Linux-x86_64.sh && \
+    bash /tmp/Miniconda3-py312-Linux-x86_64.sh -f -b -p /opt/conda && \
+    rm /tmp/Miniconda3-py312-Linux-x86_64.sh
 
 # Configure conda channels
 RUN /opt/conda/bin/conda config --add channels conda-forge
@@ -104,7 +104,9 @@ RUN /opt/conda/bin/pip install -r /tmp/requirements.txt && \
 #COPY paths.py /opt/conda/lib/python3.7/site-packages/jupyter_core/
 ENV PATH=$PATH:/opt/conda/bin
 
-ENV JDK_JAVA_OPTIONS="--add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED"
+# JDK 17: Spark reflects into JDK internals blocked by the module system; mirror Spark 3.4's
+# JavaModuleOptions so spark-submit/executors run on the openjdk-17 runtime.
+ENV JDK_JAVA_OPTIONS="--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/sun.nio.cs=ALL-UNNAMED --add-opens=java.base/sun.security.action=ALL-UNNAMED --add-opens=java.base/sun.util.calendar=ALL-UNNAMED --add-opens=java.security.jgss/sun.security.krb5=ALL-UNNAMED -Dio.netty.tryReflectionSetAccessible=true"
 
 COPY startup.sh /opt/
 RUN chown root.root /opt/startup.sh && chmod 700 /opt/startup.sh

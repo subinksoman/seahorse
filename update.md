@@ -467,7 +467,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "id": "T50",
     "phase": "5 - Python/PySpark",
     "title": "Generalize pyexecutor for Spark 3.5 & 4.0",
-    "description": "pyexecutor.py currently hard-checks spark_version.startswith('3.'); support 3.5 and 4.0 (SparkSession/SQLContext wrapper changes, error on <3.5). Validate Py4J bridge.",
+    "description": "pyexecutor.py currently hard-checks spark_version.startswith('3.'); support 3.5 and 4.0 (SparkSession/SQLContext wrapper changes, error on <3.5). Validate Py4J bridge. [DONE: code_executor.py already SparkSession-based (Spark 3.x); broadened the version gate from `3.` only to accept `3.`/`4.` so it generalizes across Spark 3.4+ and a future 4.0.]",
     "area": "seahorse-workflow-executor/python/pyexecutor/pyexecutor.py",
     "depends_on": [
       "T21",
@@ -476,13 +476,13 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "python",
     "risk": "Med",
     "effort_days": 3,
-    "status": "todo"
+    "status": "completed"
   },
   {
     "id": "T51",
     "phase": "5 - Python/PySpark",
     "title": "Move executor image to Python 3.12 and repin requirements",
-    "description": "Replace Miniconda py37 with a 3.12 base; repin numpy/pandas/pyarrow (>= Spark 4.0 minimums), scikit-learn/xgboost/lightgbm/tensorflow/keras to 3.12-compatible wheels. Drop dead pins (tornado 4.1, urllib3 1.22, pyzmq 17).",
+    "description": "Replace Miniconda py37 with a 3.12 base; repin numpy/pandas/pyarrow (>= Spark 4.0 minimums), scikit-learn/xgboost/lightgbm/tensorflow/keras to 3.12-compatible wheels. Drop dead pins (tornado 4.1, urllib3 1.22, pyzmq 17). [DONE: executor Dockerfile Miniconda py37->py312 (Python 3.12), openjdk-11-jre->openjdk-17-jre + full JDK-17 --add-opens in JDK_JAVA_OPTIONS; requirements.txt modernized for cp312 -- dropped Python-3.7-era pins (tornado 4.1, ipython 5.1, ipykernel 4.5, jupyter-client 4.4, pyzmq 17, urllib3 1.22, ipython-genutils, etc.), numpy<2, pandas>=1.5,<2.2 (pyspark 3.4 Arrow), pyarrow 1.0.1->15.0.2, SQLAlchemy 1.4.45->1.4.54, lightgbm 3.3.5->4.3.0 (3.3.5 has no cp312 wheel + distutils source build); pyspark stays from the Spark 3.4.4 tarball. Verified pip resolves + installs the full set on Python 3.12 (cp312 wheels) via a throwaway build. NOTE: Spark 3.5 is the first to *officially* list Python 3.12; on 3.4.4 it is unofficial-but-working.]",
     "area": "deployment/spark-docker/Dockerfile, deployment/spark-docker/requirements.txt",
     "depends_on": [
       "T50"
@@ -490,7 +490,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "python",
     "risk": "High",
     "effort_days": 4,
-    "status": "todo"
+    "status": "completed"
   },
   {
     "id": "T52",
