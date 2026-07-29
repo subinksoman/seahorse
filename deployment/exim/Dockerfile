@@ -1,9 +1,9 @@
-FROM alpine:3.4
-RUN echo -en 'http://dl-cdn.alpinelinux.org/alpine/edge/main\n\
-http://dl-cdn.alpinelinux.org/alpine/edge/testing\n\
-http://dl-cdn.alpinelinux.org/alpine/edge/community\n' >> /etc/apk/repositories
+# Was alpine:3.4 with the alpine *edge* repos bolted on; alpine 3.4 is EOL and the edge
+# signing keys now fail apk with "UNTRUSTED signature". Use a current alpine, whose own
+# main/community repos carry both exim and tini — no edge-repo hack needed.
+FROM alpine:3.20
 
-RUN apk update && apk --update add exim tini && rm -rf /var/cache/apk/*
+RUN apk update && apk --no-cache add exim tini && rm -rf /var/cache/apk/*
 RUN mkdir -p /var/log/exim && \
 touch /var/log/exim/mainlog /var/log/exim/paniclog /var/log/exim/rejectlog && \
 chown exim:exim /var/log/exim/*log

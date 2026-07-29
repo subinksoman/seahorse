@@ -12,28 +12,25 @@ ENV H2_VERSION 1.4.192
 #RUN sed -i '/deb http:\/\/\(deb\|httpredir\).debian.org\/debian jessie.* main/d' /etc/apt/sources.list
 
 # --- use the real archive for everything ---
-RUN echo "deb http://archive.debian.org/debian/ jessie main" \
+# Debian jessie is EOL: its Release/InRelease signing keys have expired (apt reports
+# KEYEXPIRED and, with -y, aborts with "problems ... without --force-yes"). Mark the archive
+# sources [trusted=yes] and pass --force-yes so apt proceeds against the frozen archive.
+RUN echo "deb [trusted=yes] http://archive.debian.org/debian/ jessie main" \
       > /etc/apt/sources.list.d/jessie.list && \
-    echo "deb http://archive.debian.org/debian/ jessie-backports main" \
+    echo "deb [trusted=yes] http://archive.debian.org/debian/ jessie-backports main" \
       > /etc/apt/sources.list.d/jessie-backports.list
 
 # Remove any other jessie lines that might still be present
 RUN sed -i '/jessie.*main/d' /etc/apt/sources.list
 
-
-#RUN apt-get -o Acquire::Check-Valid-Until=false update && \
-#    DEBIAN_FRONTEND=noninteractive apt-get install -y ruby ruby-dev rubygems mailutils build-essential openssl zip
-
-RUN apt-get -o Acquire::Check-Valid-Until=false -o Debug::pkgAcquire=1 update && \
+RUN apt-get -o Acquire::Check-Valid-Until=false update && \
     DEBIAN_FRONTEND=noninteractive \
-    apt-get -o Debug::pkgAcquire=1 \
-            -o Debug::pkgProblemResolver=1 \
-            -y install ruby ruby-dev rubygems mailutils build-essential openssl zip
+    apt-get -y --force-yes install ruby ruby-dev rubygems mailutils build-essential openssl zip
 
 RUN gem install public_suffix -v '<3.0' && \
     gem install cf-uaac -v 4.0.0
 
-RUN apt-get install -y moreutils && \
+RUN apt-get install -y --force-yes moreutils && \
     apt-get clean && \
     apt-get autoremove && \
     rm -rf /var/lib/apt/lists/*
@@ -46,9 +43,10 @@ ADD uaa.yml /opt/uaa/
 # Add h2 driver to cloudfoundry identity uaa
 # Add messages.properties with new information for activation email
 # H2 is needed in /opt/ since SQL script use it.
+# The h2 jar is vendored into the build context (repo2.maven.org is retired and the old base's
+# TLS can't reach repo1); COPY it rather than wget from inside the container.
+COPY h2-${H2_VERSION}.jar /opt/WEB-INF/lib/h2-${H2_VERSION}.jar
 RUN mkdir -p /opt/WEB-INF/lib/ && \
-    wget http://repo2.maven.org/maven2/com/h2database/h2/${H2_VERSION}/h2-${H2_VERSION}.jar \
-        -O /opt/WEB-INF/lib/h2-${H2_VERSION}.jar && \
     cp /opt/WEB-INF/lib/h2-${H2_VERSION}.jar /opt/ && \
     cd /opt/ && zip -r /tomcat/webapps/ROOT.war WEB-INF/ && \
     rm -Rf /opt/WEB-INF && \
