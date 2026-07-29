@@ -17,19 +17,20 @@
 package ai.deepsense.workflowmanager.rest
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import org.apache.commons.lang3.StringUtils
-import org.apache.pekko.http.scaladsl.model.headers.{RawHeader, `Content-Disposition`}
+import org.apache.pekko.http.scaladsl.model.headers.{ContentDispositionTypes, RawHeader, `Content-Disposition`}
 import org.apache.pekko.http.scaladsl.model.MediaTypes._
 import org.apache.pekko.http.scaladsl.model._
-import org.apache.pekko.http.scaladsl.marshalling.Marshaller
-import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
+import org.apache.pekko.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
+import org.apache.pekko.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshal, Unmarshaller}
 import spray.json._
 import org.apache.pekko.http.scaladsl.server._
-import spray.routing.authentication.{BasicAuth, UserPass}
+import org.apache.pekko.http.scaladsl.server.directives.Credentials
 
 import ai.deepsense.commons.auth.directives._
 import ai.deepsense.commons.auth.usercontext.TokenTranslator
@@ -81,36 +82,39 @@ abstract class WorkflowApi @Inject() (
   private val workflowFileMultipartId = "workflowFile"
   private val workflowDownloadName = "workflow.json"
 
-  private val WorkflowWithResultsUploadUnmarshaller: Unmarshaller[WorkflowWithResults] =
-    Unmarshaller.delegate[MultipartFormData, WorkflowWithResults](`multipart/form-data`) {
-      case multipartFormData =>
-        val stringData = selectFormPart(multipartFormData, workflowFileMultipartId)
-        versionedWorkflowWithResultsReader.read(JsonParser(ParserInput(stringData)))
+  // Pekko HTTP multipart is streamed; unmarshal the entity to Multipart.FormData, strictify it,
+  // pick the named part and feed its text to the json reader (replaces Spray's
+  // Unmarshaller.delegate[MultipartFormData, T] + selectFormPart).
+  private def multipartUnmarshaller[T](read: String => T): FromEntityUnmarshaller[T] =
+    Unmarshaller.withMaterializer[HttpEntity, T] { implicit ec => implicit mat => entity =>
+      Unmarshal(entity).to[Multipart.FormData].flatMap { formData =>
+        formData.toStrict(5.seconds).map { strict =>
+          val stringData = strict.strictParts
+            .filter(_.name == workflowFileMultipartId)
+            .map(_.entity.data.utf8String)
+            .mkString
+          read(stringData)
+        }
+      }
     }
 
-  private val WorkflowUploadUnmarshaller: Unmarshaller[Workflow] =
-    Unmarshaller.delegate[MultipartFormData, Workflow](`multipart/form-data`) {
-      case multipartFormData =>
-        val stringData = selectFormPart(multipartFormData, workflowFileMultipartId)
-        versionedWorkflowReader.read(JsonParser(ParserInput(stringData)))
-    }
+  private val WorkflowWithResultsUploadUnmarshaller: FromEntityUnmarshaller[WorkflowWithResults] =
+    multipartUnmarshaller(s => versionedWorkflowWithResultsReader.read(JsonParser(s)))
 
-  private val JsObjectUnmarshaller: Unmarshaller[JsObject] =
-    Unmarshaller.delegate[MultipartFormData, JsObject](`multipart/form-data`) {
-      case multipartFormData =>
-        val stringData = selectFormPart(multipartFormData, workflowFileMultipartId)
-        JsonParser(ParserInput(stringData)).asJsObject
-    }
+  private val WorkflowUploadUnmarshaller: FromEntityUnmarshaller[Workflow] =
+    multipartUnmarshaller(s => versionedWorkflowReader.read(JsonParser(s)))
 
-  private val versionedWorkflowUnmarashaler: Unmarshaller[Workflow] =
-    sprayJsonUnmarshallerConverter[Workflow](versionedWorkflowReader)
+  private val JsObjectUnmarshaller: FromEntityUnmarshaller[JsObject] =
+    multipartUnmarshaller(s => JsonParser(s).asJsObject)
 
-  private val versionedWorkflowWithResultsUnmarashaler: Unmarshaller[WorkflowWithResults] =
-    sprayJsonUnmarshallerConverter[WorkflowWithResults](versionedWorkflowWithResultsReader)
+  private val versionedWorkflowUnmarashaler: FromEntityUnmarshaller[Workflow] =
+    sprayJsonUnmarshaller(versionedWorkflowReader)
 
-  private val workflowDescriptionUnmarashaler: Unmarshaller[WorkflowDescription] =
-    sprayJsonUnmarshallerConverter[WorkflowDescription](
-      WorkflowDescriptionJsonProtocol.workflowDescriptionJsonFormat)
+  private val versionedWorkflowWithResultsUnmarashaler: FromEntityUnmarshaller[WorkflowWithResults] =
+    sprayJsonUnmarshaller(versionedWorkflowWithResultsReader)
+
+  private val workflowDescriptionUnmarashaler: FromEntityUnmarshaller[WorkflowDescription] =
+    sprayJsonUnmarshaller(WorkflowDescriptionJsonProtocol.workflowDescriptionJsonFormat)
 
   implicit private val envelopeWorkflowIdJsonFormat =
     new EnvelopeJsonFormat[Workflow.Id]("workflowId")
@@ -227,16 +231,16 @@ abstract class WorkflowApi @Inject() (
                     val futureWorkflow =
                       workflowManagerProvider.forContext(userContext).download(workflowId, exportDatasources)
                     onSuccess(futureWorkflow) { w =>
+                      // SprayJsonSupport already marshals as application/json, so the Spray
+                      // respondWithMediaType wrapper is dropped; headers go into the complete tuple.
                       w.map(workflowWithVariables =>
-                        respondWithMediaType(`application/json`) {
-                          complete(
-                            StatusCodes.OK,
-                            Seq(
-                              `Content-Disposition`(
-                                "attachment",
-                                Map("filename" -> workflowFileName(workflowWithVariables)))),
-                            workflowWithVariables)
-                        }
+                        complete((
+                          StatusCodes.OK,
+                          scala.collection.immutable.Seq(
+                            `Content-Disposition`(
+                              ContentDispositionTypes.attachment,
+                              Map("filename" -> workflowFileName(workflowWithVariables)))),
+                          workflowWithVariables))
                       ).getOrElse(complete(StatusCodes.NotFound))
                     }
                   }
@@ -321,7 +325,8 @@ abstract class WorkflowApi @Inject() (
                   withUserContext { userContext =>
                     entity(as[String]) { notebook =>
                       onSuccess(workflowManagerProvider.forContext(userContext)
-                        .saveNotebook(workflowId, nodeId, notebook)) { _ =>
+                        .saveNotebook(workflowId, nodeId, notebook)) {
+                        // Future[Unit] => Directive0 in Pekko HTTP, so the inner block takes no arg.
                         complete(StatusCodes.Created)
                       }
                     }
@@ -333,7 +338,8 @@ abstract class WorkflowApi @Inject() (
                   post {
                     withUserContext { userContext =>
                       onSuccess(workflowManagerProvider.forContext(userContext)
-                        .copyNotebook(workflowId, nodeId, destinationNodeId)) { _ =>
+                        .copyNotebook(workflowId, nodeId, destinationNodeId)) {
+                        // Future[Unit] => Directive0 in Pekko HTTP, so the inner block takes no arg.
                         complete(StatusCodes.Created)
                       }
                     }
@@ -388,7 +394,7 @@ abstract class WorkflowApi @Inject() (
     }
   }
 
-  implicit def checkEither[T : Marshaller](x: Future[Option[Either[String, T]]]): Route = {
+  implicit def checkEither[T : ToEntityMarshaller](x: Future[Option[Either[String, T]]]): Route = {
     onSuccess(x) {
       case Some(Left(s)) => complete(StatusCodes.Conflict, s)
       case Some(Right(r)) => complete(StatusCodes.OK, r)
@@ -396,7 +402,9 @@ abstract class WorkflowApi @Inject() (
     }
   }
 
-  override def exceptionHandler(implicit log: LoggingContext): ExceptionHandler = {
+  // Pekko HTTP: exceptionHandler takes no implicit LoggingContext, and handlers compose via
+  // withFallback (Spray used PartialFunction.orElse).
+  override def exceptionHandler: ExceptionHandler = {
     ExceptionHandler {
         case e: WorkflowNotFoundException =>
           complete(StatusCodes.NotFound, e.failureDescription)
@@ -410,25 +418,20 @@ abstract class WorkflowApi @Inject() (
           complete(StatusCodes.BadRequest, e.failureDescription)
         case e: WorkflowOwnerMismatchException =>
           complete(StatusCodes.Unauthorized, e.failureDescription)
-    } orElse super.exceptionHandler(log)
+    }.withFallback(super.exceptionHandler)
   }
 
+  // Pekko HTTP: authenticateBasic takes a synchronous Credentials => Option[T] authenticator
+  // (replaces Spray's BasicAuth(userPassAuthenticator, realm)). Credentials.Provided.verify
+  // does the constant-time password comparison.
   private def basicAuth: Directive1[Unit] =
-    authenticate(BasicAuth(userPassAuthenticator _, realm = "Workflow Manager"))
+    authenticateBasic(realm = "Workflow Manager", authenticator = userPassAuthenticator)
 
-  private def userPassAuthenticator(userPass: Option[UserPass]): Future[Option[Unit]] =
-    Future {
-      userPass match {
-        case Some(UserPass(user, pass)) if user == authUser && pass == authPass => Some(())
-        case _ => None
-      }
+  private def userPassAuthenticator(credentials: Credentials): Option[Unit] =
+    credentials match {
+      case p @ Credentials.Provided(user) if user == authUser && p.verify(authPass) => Some(())
+      case _ => None
     }
-
-  private def selectFormPart(multipartFormData: MultipartFormData, partName: String): String =
-    multipartFormData.fields
-      .filter(_.name.get == partName)
-      .map(_.entity.asString(HttpCharsets.`UTF-8`))
-      .mkString
 
   private def workflowFileName(workflow: WorkflowWithVariables): String = {
     val thirdPartyData = workflow.thirdPartyData

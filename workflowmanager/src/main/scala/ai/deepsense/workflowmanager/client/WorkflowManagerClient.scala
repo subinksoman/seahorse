@@ -26,6 +26,7 @@ import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.util.Timeout
 import org.apache.pekko.http.scaladsl.client.RequestBuilding._
 import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.model.headers.HttpCredentials
 import spray.json.RootJsonFormat
 
 import ai.deepsense.commons.json.envelope.{Envelope, EnvelopeJsonFormat}
@@ -92,6 +93,9 @@ class WorkflowManagerClient(
   def uploadWorkflow(workflow: String): Future[Workflow.Id] = {
     fetchResponse[Envelope[Workflow.Id]](Post(
       endpointPath(s"upload"),
-      MultipartFormData(Seq(BodyPart(HttpEntity(workflow), "workflowFile"))))).map(_.content)
+      Multipart.FormData(
+        Multipart.FormData.BodyPart.Strict(
+          "workflowFile",
+          HttpEntity(workflow))))).map(_.content)
   }
 }

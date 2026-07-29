@@ -16,11 +16,16 @@
 
 package ai.deepsense.commons.akka
 
-import akka.actor.{Address, ExtensionKey, Extension, ExtendedActorSystem}
+import org.apache.pekko.actor.{Address, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
 
 
 class RemoteAddressExtensionImpl(system: ExtendedActorSystem) extends Extension {
   def address: Address = system.provider.getDefaultAddress
 }
 
-object RemoteAddressExtension extends ExtensionKey[RemoteAddressExtensionImpl]
+// ExtensionKey was removed in Akka 2.6 / Pekko; use the ExtensionId + ExtensionIdProvider pattern.
+object RemoteAddressExtension extends ExtensionId[RemoteAddressExtensionImpl] with ExtensionIdProvider {
+  override def lookup: ExtensionId[RemoteAddressExtensionImpl] = RemoteAddressExtension
+  override def createExtension(system: ExtendedActorSystem): RemoteAddressExtensionImpl =
+    new RemoteAddressExtensionImpl(system)
+}

@@ -23,7 +23,6 @@ import scala.language.postfixOps
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.util.Timeout
 import org.apache.pekko.http.scaladsl.client.RequestBuilding._
-import spray.http.StatusCodes.Success
 
 import ai.deepsense.commons.rest.client.RestClient
 import ai.deepsense.commons.utils.Retry
@@ -38,9 +37,10 @@ class DatasourceManagerPoller(
 
   override def work: Future[Unit] = {
     datasourceClient.fetchHttpResponse(Get(datasourceClient.endpointPath(""))).flatMap { resp =>
-      resp.status match {
-        case Success(_) => Future.successful(())
-        case _ => Future.failed(RetriableException(s"received ${resp.status} from datasource manager server", None))
+      if (resp.status.isSuccess()) {
+        Future.successful(())
+      } else {
+        Future.failed(RetriableException(s"received ${resp.status} from datasource manager server", None))
       }
     }
   }

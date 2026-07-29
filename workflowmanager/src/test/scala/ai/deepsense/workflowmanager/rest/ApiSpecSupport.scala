@@ -23,6 +23,7 @@ import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.mockito.MockitoSugar
+import org.apache.pekko.http.scaladsl.model.{HttpHeader, HttpRequest}
 import org.apache.pekko.http.scaladsl.server.Route
 
 import ai.deepsense.commons.auth.usercontext.{CannotGetUserException, Role, TokenTranslator, UserContext}
@@ -51,6 +52,11 @@ trait ApiSpecSupport extends MockitoSugar {
     })
     createRestComponent(tokenTranslator)
   }
+
+  // Pekko HTTP's addHeaders is (first, more*) and cannot take a List; fold each header onto the
+  // request instead (Spray's addHeaders accepted a List directly).
+  protected def addRawHeaders(headers: Seq[HttpHeader]): HttpRequest => HttpRequest =
+    req => headers.foldLeft(req)((r, h) => r.addHeader(h))
 
   private def mockUserContext(tenantId: String): UserContext = {
     val userContext = mock[UserContext]

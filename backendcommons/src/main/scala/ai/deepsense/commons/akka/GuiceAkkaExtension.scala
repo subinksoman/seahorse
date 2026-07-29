@@ -18,7 +18,7 @@ package ai.deepsense.commons.akka
 
 import scala.reflect.{ClassTag, classTag}
 
-import akka.actor.{Actor, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider, Props}
+import org.apache.pekko.actor.{Actor, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider, Props}
 import com.google.inject.Injector
 
 /**

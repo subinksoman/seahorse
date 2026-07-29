@@ -21,7 +21,6 @@ import scalaz.std.scalaFuture._
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import shapeless.HNil
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server._
 
@@ -114,20 +113,19 @@ class SessionsApi @Inject()(
     }
   }
 
-  private def withUserId: Directive1[String] = {
-    optionalHeaderValueByName(SeahorseUserIdHeaderName).flatMap {
-      case Some(value) => provide(value)
-      case None => complete(StatusCodes.BadRequest)
-    }
-  }
+  // Pekko HTTP: a required header rejects (MissingHeaderRejection) when absent rather than the
+  // Spray optional+complete(BadRequest) pattern (which cannot short-circuit inside a Directive).
+  private def withUserId: Directive1[String] = headerValueByName(SeahorseUserIdHeaderName)
 
-  val rejectionHandler: RejectionHandler = RejectionHandler {
-    case NotSubscribedToHeartbeatsRejection :: _ =>
-      complete {
-        logger.warn("Rejected a request because not yet subscribed to Heartbeats!")
-        (StatusCodes.ServiceUnavailable, "Session Manager is starting!")
-      }
-  }
+  val rejectionHandler: RejectionHandler = RejectionHandler.newBuilder()
+    .handle {
+      case NotSubscribedToHeartbeatsRejection =>
+        complete {
+          logger.warn("Rejected a request because not yet subscribed to Heartbeats!")
+          (StatusCodes.ServiceUnavailable, "Session Manager is starting!")
+        }
+    }
+    .result()
 
   val exceptionHandler: ExceptionHandler = ExceptionHandler {
     case t: IllegalArgumentException =>
@@ -141,8 +139,9 @@ class SessionsApi @Inject()(
   }
 
   private def waitForHeartbeat: Directive0 = {
+    // Pekko HTTP: require(predicate, rejection) replaces the Spray flatMap(pass/reject) over HNil.
     extract(_ => heartbeatSubscribed.isCompleted)
-      .flatMap[HNil](if (_) pass else reject(NotSubscribedToHeartbeatsRejection)) &
+      .require(identity[Boolean], NotSubscribedToHeartbeatsRejection) &
       cancelRejection(NotSubscribedToHeartbeatsRejection)
   }
 

@@ -19,7 +19,7 @@ package ai.deepsense.commons.akka
 import scala.concurrent.ExecutionContext
 import scala.util.Try
 
-import akka.actor.{ActorRefFactory, ActorSystem}
+import org.apache.pekko.actor.{ActorRefFactory, ActorSystem}
 import com.google.inject
 import com.google.inject.{AbstractModule, Injector, Provider, Provides}
 import com.typesafe.config.{Config, ConfigException}

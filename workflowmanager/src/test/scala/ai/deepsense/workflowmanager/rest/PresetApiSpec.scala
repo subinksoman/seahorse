@@ -23,8 +23,8 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import org.apache.pekko.http.scaladsl.model.headers.RawHeader
-import spray.http.{BasicHttpCredentials, HttpChallenge, HttpHeaders, StatusCodes}
+import org.apache.pekko.http.scaladsl.model.headers.{BasicHttpCredentials, HttpChallenge, RawHeader, `WWW-Authenticate`}
+import org.apache.pekko.http.scaladsl.model.StatusCodes
 import spray.json._
 import org.apache.pekko.http.scaladsl.server._
 
@@ -46,7 +46,6 @@ class PresetApiSpec
   extends StandardSpec
     with UnitTestSupport
     with ApiSpecSupport
-    with HttpServiceBase
     with WorkflowJsonProtocol
     with InferredStateJsonProtocol
     with WorkflowWithVariablesJsonProtocol
@@ -134,7 +133,7 @@ class PresetApiSpec
   s"GET /presets/:id" should {
     "return Unauthorized when no auth headers were sent" in {
       Get(s"/$presetPrefix/1") ~>
-        sealRoute(testRoute) ~> check {
+        Route.seal(testRoute) ~> check {
         status should be(StatusCodes.Unauthorized)
       }
     }
@@ -196,7 +195,7 @@ class PresetApiSpec
   s"DELETE /presets/:id" should {
     "return Unauthorized when no auth headers were sent" in {
       Delete(s"/$presetPrefix/1") ~>
-        sealRoute(testRoute) ~> check {
+        Route.seal(testRoute) ~> check {
         status should be(StatusCodes.Unauthorized)
       }
     }
@@ -214,7 +213,7 @@ class PresetApiSpec
   s"GET /presets" should {
     "return Unauthorized when no auth headers were sent" in {
       Get(s"/$presetPrefix") ~>
-        sealRoute(testRoute) ~> check {
+        Route.seal(testRoute) ~> check {
         status should be(StatusCodes.Unauthorized)
       }
     }
@@ -235,7 +234,7 @@ class PresetApiSpec
   s"POST /presets" should {
     "return Unauthorized when no auth headers were sent" in {
       val invalidContent = JsObject()
-      Post(s"/$presetPrefix", invalidContent) ~> sealRoute(testRoute) ~> check {
+      Post(s"/$presetPrefix", invalidContent) ~> Route.seal(testRoute) ~> check {
         status should be(StatusCodes.Unauthorized)
       }
     }
@@ -266,7 +265,7 @@ class PresetApiSpec
         thenReturn(Future.successful(Some(clusterDetails)))
       Get(s"/$apiPrefix/$workflowAId/preset") ~>
         addCredentials(credentials) ~>
-        addHeaders(validHeaders()) ~> testRoute ~> check {
+        addRawHeaders(validHeaders()) ~> testRoute ~> check {
         status should be(StatusCodes.OK)
         val returnedClusterDetails = responseAs[ClusterDetails]
         returnedClusterDetails.id shouldBe(Some(2L))
@@ -276,7 +275,7 @@ class PresetApiSpec
 
     "return Unauthorized when no auth headers were sent" in {
       Get(s"/$apiPrefix/$workflowAId/preset") ~>
-        sealRoute(testRoute) ~> check {
+        Route.seal(testRoute) ~> check {
         status should be(StatusCodes.Unauthorized)
       }
     }
@@ -285,7 +284,7 @@ class PresetApiSpec
 
       when(presetsServiceMock.getWorkflowsPreset(workflowAId)).thenReturn(Future.successful(None))
       Get(s"/$apiPrefix/$workflowAId/preset") ~>
-        addCredentials(credentials) ~> addHeaders(validHeaders()) ~> testRoute ~> check {
+        addCredentials(credentials) ~> addRawHeaders(validHeaders()) ~> testRoute ~> check {
         status should be(StatusCodes.NotFound)
       }
     }
@@ -310,7 +309,7 @@ class PresetApiSpec
         thenReturn(Future.successful(()))
       Post(s"/$apiPrefix/$workflowAId/preset", workflowPreset) ~>
         addCredentials(credentials) ~>
-        addHeaders(validHeaders()) ~> testRoute ~> check {
+        addRawHeaders(validHeaders()) ~> testRoute ~> check {
         status should be(StatusCodes.OK)
       }
     }
@@ -320,14 +319,14 @@ class PresetApiSpec
       val workflowPreset = WorkflowPreset(workflowBId, 2L)
       Post(s"/$apiPrefix/$workflowAId/preset", workflowPreset) ~>
         addCredentials(credentials) ~>
-        addHeaders(validHeaders()) ~> testRoute ~> check {
+        addRawHeaders(validHeaders()) ~> testRoute ~> check {
         status should be(StatusCodes.BadRequest)
       }
     }
     "return Unauthorized when no auth headers were sent" in {
       val workflowPreset = WorkflowPreset(workflowAId, 2L)
       Post(s"/$apiPrefix/$workflowAId/preset", workflowPreset) ~>
-        sealRoute(testRoute) ~> check {
+        Route.seal(testRoute) ~> check {
         status should be(StatusCodes.Unauthorized)
       }
     }
@@ -352,9 +351,9 @@ class PresetApiSpec
         thenReturn(Future.successful(()))
       Post(s"/$apiPrefix/$workflowAId/preset", workflowPreset) ~>
         addCredentials(invalidCredentials) ~>
-        addHeaders(validHeaders()) ~> sealRoute(testRoute) ~> check {
+        addRawHeaders(validHeaders()) ~> Route.seal(testRoute) ~> check {
         status should be(StatusCodes.Unauthorized)
-        header[HttpHeaders.`WWW-Authenticate`].get.challenges.head shouldBe a[HttpChallenge]
+        header[`WWW-Authenticate`].get.challenges.head shouldBe a[HttpChallenge]
       }
     }
 

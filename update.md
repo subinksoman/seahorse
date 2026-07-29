@@ -341,7 +341,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "id": "T30f",
     "phase": "3 - Pekko",
     "title": "Cascade Pekko HTTP to service REST APIs",
-    "description": "workflowmanager (10), sessionmanager (4 + MqModule ConnectionActor), schedulingmanager (2), datasourcemanager (1) extend the migrated framework; migrate their routing DSL + JSON support. [WIP: imports+deps migrated across all 4 services; datasourcemanager green; HTTP clients import-only (extend migrated RestClient). Remaining established-pattern fixes: WorkflowApi BasicAuth->authenticateBasic + multipart; sessionmanager ConnectionActor Timeout + ServiceModule + SessionsApi RejectionHandler; service test specs.]",
+    "description": "workflowmanager (10), sessionmanager (4 + MqModule ConnectionActor), schedulingmanager (2), datasourcemanager (1) extend the migrated framework; migrate their routing DSL + JSON support. [DONE & VERIFIED (build gate): whole-backend `sbt Compile/compile` AND `sbt Test/compile` both green on Pekko + Spark 3.4.4 / JDK 11. workflowmanager: WorkflowApi BasicAuth->authenticateBasic (Credentials), 3 multipart unmarshallers -> Multipart.FormData+toStrict, Content-Disposition typed, respondWithMediaType dropped, exceptionHandler withFallback + no LoggingContext, checkEither[ToEntityMarshaller], onSuccess(Future[Unit])->Directive0; PresetsClient/WorkflowManagerClient HttpCredentials import + Multipart.FormData upload; DatasourceManagerPoller StatusCodes.isSuccess. sessionmanager + schedulingmanager + datasourcemanager + commons/akka (Guice akka->pekko) green. Test specs migrated (WorkflowsApiSpec/PresetApiSpec: HttpServiceBase dropped, sealRoute->Route.seal, WWW-Authenticate, addRawHeaders fold helper, responseAs[String], Multipart.FormData). RUNTIME: 45/60 workflowmanager REST tests PASS. Remaining 15 are behavioral Pekko-vs-Spray semantics -> carved into T30g.]",
     "area": "workflowmanager, sessionmanager, schedulingmanager, datasourcemanager",
     "depends_on": [
       "T30d"
@@ -349,7 +349,35 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "build",
     "risk": "High",
     "effort_days": 6,
-    "status": "partial"
+    "status": "completed"
+  },
+  {
+    "id": "T30g",
+    "phase": "3 - Pekko",
+    "title": "Fix service REST-test Pekko-vs-Spray behavioral semantics",
+    "description": "After T30f (whole backend compiles + 45/60 workflowmanager REST tests pass), 15 workflowmanager REST tests fail on genuine Pekko HTTP semantic differences from Spray (not test-only): (A) complete(Option[T]) no longer maps None->404 (returns 200+null) -- routes that returned Option must go through the checkEither None->NotFound path or reject; (B) rejection precedence/handling: missing X-Seahorse-UserId (MissingHeaderRejection) vs missing Authorization (AuthenticationFailedRejection) ordering + sealing to 401 vs 400; (C) auth-before-content-unmarshal ordering. Compare each failing route against the Spray original (git HEAD) and adjust WorkflowApi/PresetApi route + rejectionHandler. Then run workflowmanager + sessionmanager REST specs to green.",
+    "area": "workflowmanager/.../rest/WorkflowApi.scala, PresetApiSpec/WorkflowsApiSpec expectations, rejectionHandler",
+    "depends_on": [
+      "T30f"
+    ],
+    "category": "testing",
+    "risk": "Med",
+    "effort_days": 3,
+    "status": "in_progress"
+  },
+  {
+    "id": "T34",
+    "phase": "Step B - Delivery",
+    "title": "Port workflow-examples SQL codegen to Python 3",
+    "description": "The workflowmanager resource generator (generateWorkflowExamplesSql) shelled out to python2, absent from modern images/this env, failing the full build at codegen time (exit 127) despite clean Scala compilation. [DONE & VERIFIED: generate_workflow_examples_sql.py ported 2->3 (print(), dict.items()); WorkflowExamples.scala invokes python3; script emits valid SQL standalone; root Compile/compile reaches success.]",
+    "area": "deployment/generate_examples/generate_workflow_examples_sql.py, project/WorkflowExamples.scala",
+    "depends_on": [
+      "T30f"
+    ],
+    "category": "build",
+    "risk": "Low",
+    "effort_days": 1,
+    "status": "completed"
   },
   {
     "id": "T33",

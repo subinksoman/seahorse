@@ -18,9 +18,11 @@ package ai.deepsense.sessionmanager.mq
 
 import java.util
 
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
 import org.apache.pekko.actor.{ActorRef, Props}
+import org.apache.pekko.util.Timeout
 import ai.deepsense.workflowexecutor.rabbitmq._
 
 import ai.deepsense.workflowexecutor.communication.mq.MQCommunication
@@ -38,6 +40,7 @@ object MQCommunicationFactoryEnrichments {
       val subscriberName = MQCommunication.subscriberName(exchange)
       val actorProps: Props = NotifyingChannelActor
         .props(channelConnected, setupBroadcastSubscriber(exchange, subscriber))
+      implicit val timeout: Timeout = 10.seconds
       factory.connection.createChannel(actorProps, Some(subscriberName))
       channelConnected.future
     }

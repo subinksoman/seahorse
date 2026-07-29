@@ -23,6 +23,7 @@ import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.util.Timeout
 import org.apache.pekko.http.scaladsl.client.RequestBuilding._
 import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.model.headers.HttpCredentials
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps

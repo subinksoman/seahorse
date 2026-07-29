@@ -16,7 +16,7 @@
 
 package ai.deepsense.commons.akka
 
-import akka.actor.{Actor, IndirectActorProducer}
+import org.apache.pekko.actor.{Actor, IndirectActorProducer}
 import com.google.inject.Injector
 
 /**
