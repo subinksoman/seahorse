@@ -48,6 +48,9 @@ object Version {
 
   val spray = "1.3.3"
   val sprayJson = "1.3.6" // last spray-json line; cross-published for Scala 2.13
+  // Apache Pekko replaces EOL Akka 2.4 + Spray (Apache-2.0, Scala 2.12/2.13, JDK 8-21).
+  val pekko = "1.1.3"
+  val pekkoHttp = "1.1.0"
   val wiremock = "1.57"
   val flyway = "4.0"
   val jetty = "9.3.8.v20160314"
@@ -84,6 +87,15 @@ object Library {
   val akkaActor = akka("actor")
   val akkaAgent = akka("agent")
   val akkaTestkit = akka("testkit")
+  // Apache Pekko (org.apache.pekko) + Pekko HTTP — replace Akka + Spray in the backend REST layer.
+  val pekko = (name: String) => "org.apache.pekko" %% s"pekko-$name" % Version.pekko
+  val pekkoActor = pekko("actor")
+  val pekkoStream = pekko("stream")
+  val pekkoSlf4j = pekko("slf4j")
+  val pekkoTestkit = pekko("testkit")
+  val pekkoHttp = "org.apache.pekko" %% "pekko-http" % Version.pekkoHttp
+  val pekkoHttpSprayJson = "org.apache.pekko" %% "pekko-http-spray-json" % Version.pekkoHttp
+  val pekkoHttpTestkit = "org.apache.pekko" %% "pekko-http-testkit" % Version.pekkoHttp
   val apacheCommons = "org.apache.commons" % "commons-lang3" % Version.apacheCommons
   val apacheCommonsExec = "org.apache.commons" % "commons-exec" % "1.3"
   val cronUtils = "com.cronutils" % "cron-utils" % "5.0.4"
