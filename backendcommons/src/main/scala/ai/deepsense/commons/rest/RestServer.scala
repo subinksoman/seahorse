@@ -16,21 +16,23 @@
 
 package ai.deepsense.commons.rest
 
-import akka.actor.{ActorRef, ActorSystem}
-import akka.io.IO
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import spray.can.Http
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.server.Route
 
 /**
- * RestServer binds an actor to Http messages.
+ * RestServer binds the combined API Route to the HTTP server.
+ * Migrated from Spray's actor-bound model (IO(Http) ! Http.Bind(actor)) to Pekko HTTP's
+ * route-bound model (Http().newServerAt(host, port).bind(route)).
  */
 class RestServer @Inject()(
   @Named("server.host") host: String,
   @Named("server.port") port: Int,
-  @Named("ApiRouterActorRef") routerRef: ActorRef
+  @Named("ApiRoute") route: Route
 ) (implicit actorSystem: ActorSystem) {
   def start(): Unit = {
-    IO(Http) ! Http.Bind(routerRef, host, port)
+    Http().newServerAt(host, port).bind(route)
   }
 }

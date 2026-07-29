@@ -16,7 +16,7 @@
 
 package ai.deepsense.commons.rest
 
-import spray.routing.Route
+import org.apache.pekko.http.scaladsl.server.Route
 
 /**
  * RestComponent allows to expose a REST API.

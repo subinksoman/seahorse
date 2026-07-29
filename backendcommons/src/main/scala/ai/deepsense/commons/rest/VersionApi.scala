@@ -18,7 +18,7 @@ package ai.deepsense.commons.rest
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import spray.routing.Route
+import org.apache.pekko.http.scaladsl.server.Route
 
 import ai.deepsense.commons.auth.usercontext.TokenTranslator
 import ai.deepsense.commons.buildinfo.BuildInfo

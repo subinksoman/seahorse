@@ -17,12 +17,11 @@
 package ai.deepsense.commons.rest
 
 import org.jclouds.http.HttpResponseException
-import spray.http._
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.model.{StatusCode, StatusCodes}
+import org.apache.pekko.http.scaladsl.server.{Directives, ExceptionHandler, MalformedRequestContentRejection, MissingHeaderRejection, RejectionHandler, Route, ValidationRejection}
 import spray.json.DeserializationException
 import spray.json.JsonParser.ParsingException
-import spray.routing
-import spray.routing._
-import spray.util.LoggingContext
 
 import ai.deepsense.commons.auth.directives.{AbstractAuthDirectives, AuthDirectives}
 import ai.deepsense.commons.auth.exceptions.{NoRoleException, ResourceAccessDeniedException}
@@ -34,10 +33,11 @@ import ai.deepsense.commons.utils.Logging
 trait RestApiAbstractAuth
   extends Directives
   with Logging
-  with FailureDescriptionJsonProtocol {
+  with FailureDescriptionJsonProtocol
+  with SprayJsonSupport {
   suite: AbstractAuthDirectives =>
 
-  def exceptionHandler(implicit log: LoggingContext): ExceptionHandler = {
+  def exceptionHandler: ExceptionHandler = {
     ExceptionHandler {
       case e: HttpResponseException =>
         logger.error("Could not contact Keystone!", e)
@@ -57,15 +57,15 @@ trait RestApiAbstractAuth
   val rejectionHandler: RejectionHandler = {
     def jsonFailureDescription(
         statusCode: StatusCode,
-        description: FailureDescription): routing.Route = {
-      respondWithMediaType(MediaTypes.`application/json`) {
-        complete(statusCode, description)
-      }
+        description: FailureDescription): Route = {
+      // SprayJsonSupport marshals FailureDescription as application/json (replaces the
+      // Spray respondWithMediaType wrapper, which Pekko HTTP does not have).
+      complete((statusCode, description))
     }
 
     def handleMalformedRequestContentRejection(
         message: String,
-        cause: Option[Throwable]): routing.Route = {
+        cause: Option[Throwable]): Route = {
 
       val code = cause match {
         case Some(_: DeepSenseException)
@@ -115,22 +115,25 @@ trait RestApiAbstractAuth
       jsonFailureDescription(code, description)
     }
 
-    RejectionHandler {
-      case MalformedRequestContentRejection(message, cause) :: _ =>
-        handleMalformedRequestContentRejection(message, cause)
+    RejectionHandler.newBuilder()
+      .handle {
+        case MalformedRequestContentRejection(message, cause) =>
+          // Pekko HTTP's MalformedRequestContentRejection carries a Throwable (not Option).
+          handleMalformedRequestContentRejection(message, Option(cause))
 
-      case MissingHeaderRejection(param) :: _ if param == TokenHeader =>
-        logger.info(s"A request was rejected because did not contain '$TokenHeader' header")
-        complete(StatusCodes.Unauthorized, s"Request is missing required header '$param'")
+        case MissingHeaderRejection(param) if param == TokenHeader =>
+          logger.info(s"A request was rejected because did not contain '$TokenHeader' header")
+          complete((StatusCodes.Unauthorized, s"Request is missing required header '$param'"))
 
-      case ValidationRejection(rejectionMessage, cause) :: _ =>
-        val message = s"A request was rejected because it was invalid: '$rejectionMessage'."
-        cause match {
-          case Some(throwable) => logger.info(message, throwable)
-          case None => logger.info(message)
-        }
-        complete(StatusCodes.BadRequest)
-    }
+        case ValidationRejection(rejectionMessage, cause) =>
+          val message = s"A request was rejected because it was invalid: '$rejectionMessage'."
+          cause match {
+            case Some(throwable) => logger.info(message, throwable)
+            case None => logger.info(message)
+          }
+          complete(StatusCodes.BadRequest)
+      }
+      .result()
   }
 }
 

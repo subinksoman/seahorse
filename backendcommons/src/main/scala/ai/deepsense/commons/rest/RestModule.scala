@@ -16,19 +16,18 @@
 
 package ai.deepsense.commons.rest
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.collection.JavaConverters._
 
-import akka.actor.{ActorRef, ActorSystem}
-import akka.pattern.ask
-import akka.util.Timeout
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Provides, Singleton}
-
-import ai.deepsense.commons.akka.GuiceAkkaExtension
+import org.apache.pekko.http.scaladsl.server.Route
 
 /**
  * Configures RestServer internals.
+ *
+ * Pekko HTTP is route-bound, so instead of creating a RestServiceActor via a supervisor and
+ * exposing an ActorRef, this provides the combined API Route built from the registered
+ * RestComponents. RestServer binds that Route.
  */
 class RestModule extends AbstractModule {
   override def configure(): Unit = {
@@ -37,15 +36,10 @@ class RestModule extends AbstractModule {
 
   @Provides
   @Singleton
-  @Named("ApiRouterActorRef")
-  def provideApiRouterActorRef(
-      @Named("server.startup.timeout") startupTimeout: Long,
-      system: ActorSystem): ActorRef = {
-    val supervisor =
-      system.actorOf(GuiceAkkaExtension(system).props[RestServiceSupervisor], "RestSupervisor")
-    val restServiceActorProps = GuiceAkkaExtension(system).props[RestServiceActor]
-    implicit val timeout: Timeout = startupTimeout.seconds
-    val actorRef = supervisor.ask((restServiceActorProps, "RestServiceActor")).mapTo[ActorRef]
-    Await.result(actorRef, timeout.duration)
+  @Named("ApiRoute")
+  def provideApiRoute(apiSet: java.util.Set[RestComponent]): Route = {
+    new RestService {
+      protected[this] def apis: Seq[RestComponent] = apiSet.asScala.toSeq
+    }.standardRoute
   }
 }

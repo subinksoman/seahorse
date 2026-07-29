@@ -16,32 +16,18 @@
 
 package ai.deepsense.commons.rest
 
-import scala.collection.JavaConversions.asScalaSet
-
-import akka.actor.{Actor, ActorContext}
-import com.google.inject.Inject
-import spray.http.StatusCodes
-import spray.routing._
-import spray.util.LoggingContext
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.server.{ExceptionHandler, MissingQueryParamRejection, RejectionHandler, Route}
 
 /**
- * Akka actor responsible for handling REST API requests.
+ * Builds the combined API route from the registered RestComponents.
+ *
+ * Pekko HTTP is route-bound (no HttpService actor / runRoute), so this trait just exposes a
+ * `standardRoute`; RestModule provides it and RestServer binds it. Request-timeout responses are
+ * configured via pekko.http.server.request-timeout rather than a timeoutRoute.
  */
-class RestServiceActor @Inject()(apiSet: java.util.Set[RestComponent])
-  extends Actor
-  with RestService {
-  def actorRefFactory: ActorContext = {
-    context
-  }
-
-  def receive: Receive = {
-    runRoute(standardRoute)
-  }
-
-  protected[this] def apis = asScalaSet(apiSet).toSeq
-}
-
-trait RestService extends HttpService {
+trait RestService {
   /**
    * @return List of apis to include in route
    */
@@ -56,27 +42,19 @@ trait RestService extends HttpService {
       }
     }
 
-  /**
-   * Override default to respond with 503 rather than 500
-   */
-  override def timeoutRoute: Route = {
-    complete(
-      StatusCodes.ServiceUnavailable,
-      "The server could not provide a timely response."
-    )
-  }
-
-  private def exceptionHandler(implicit log: LoggingContext): ExceptionHandler = {
+  private val exceptionHandler: ExceptionHandler = {
     ExceptionHandler {
       case e: ExceptionWithStatus =>
-        complete(e.statusCode, e.msg)
+        complete((e.statusCode, e.msg))
     }
   }
 
   private val rejectionHandler: RejectionHandler = {
-    RejectionHandler {
-      case MissingQueryParamRejection(param) :: _ =>
-        complete(StatusCodes.BadRequest, s"Request is missing required query parameter '$param'")
-    }
+    RejectionHandler.newBuilder()
+      .handle {
+        case MissingQueryParamRejection(param) =>
+          complete((StatusCodes.BadRequest, s"Request is missing required query parameter '$param'"))
+      }
+      .result()
   }
 }

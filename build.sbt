@@ -100,6 +100,9 @@ evictionErrorLevel := Level.Warn
 // newer versions than scalate/scalatra/json4s expect). Mirrors the workflow-executor build.
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-parser-combinators" % VersionScheme.Always
+// Akka/Pekko coexist during the backend REST migration; Pekko wants scala-java8-compat 1.0.2,
+// Akka 2.4 (still transitive) wants 0.8.0 -- declare compatible so resolution picks 1.0.2.
+ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-java8-compat" % VersionScheme.Always
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.3.0"
 
 

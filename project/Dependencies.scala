@@ -195,7 +195,10 @@ object Dependencies {
   val scalacheckShapeless = "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.3"
 
   val commons = Seq(
-    akkaActor,
+    pekkoActor,
+    pekkoStream,
+    pekkoHttp,
+    pekkoHttpSprayJson,
     apacheCommons,
     findBugs,
     guava,
@@ -206,17 +209,14 @@ object Dependencies {
     metricsScala,
     nscalaTime,
     slick,
-    sprayCan,
-    sprayClient,
     sprayJson,
-    sprayRouting,
     shapeless,
 
     slf4j,
     log4jApi,
     log4jCore,
     log4jSlf4jImpl
-  ) ++ scalatraAndJetty ++ Seq(akkaTestkit, mockitoCore, scalatest, sprayTestkit).map(_ % Test)
+  ) ++ scalatraAndJetty ++ Seq(pekkoTestkit, pekkoHttpTestkit, mockitoCore, scalatest).map(_ % Test)
 
   val workflowmanager = Spark.components ++ Seq(
     akkaActor,

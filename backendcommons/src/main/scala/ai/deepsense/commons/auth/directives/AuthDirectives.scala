@@ -18,10 +18,8 @@ package ai.deepsense.commons.auth.directives
 
 import scala.concurrent.Future
 
-import shapeless._
-import spray.http.StatusCodes
-import spray.routing.Directive1
-import spray.routing.Directives._
+import org.apache.pekko.http.scaladsl.server.Directive1
+import org.apache.pekko.http.scaladsl.server.Directives._
 
 import ai.deepsense.commons.auth.usercontext._
 import ai.deepsense.commons.models.Id
@@ -43,8 +41,8 @@ trait AuthDirectives extends AbstractAuthDirectives {
    * the request is rejected with a [[spray.routing.MissingHeaderRejection]].
    */
   def withUserContext: Directive1[Future[UserContext]] = {
-    headerValueByName(TokenHeader).hmap {
-      case rawToken :: HNil => tokenTranslator.translate(rawToken)
+    headerValueByName(TokenHeader).map { rawToken =>
+      tokenTranslator.translate(rawToken)
     }
   }
 
@@ -91,25 +89,22 @@ trait InsecureAuthDirectives extends AbstractAuthDirectives  {
       ))
   }
 
+  // In Pekko HTTP a Directive cannot short-circuit with `complete` inside flatMap, so a missing
+  // required header rejects (MissingHeaderRejection) via headerValueByName instead of the Spray
+  // `complete(BadRequest)`. The rejection is surfaced by the REST rejection handler.
   def withUserId: Directive1[Future[UserContext]] = {
-    optionalHeaderValueByName(UserIdHeader).flatMap {
-      case Some(userId) =>
-        optionalHeaderValueByName(UserNameHeader).flatMap {
-          case userName =>
-            provide(context(userId, userName.getOrElse("?")))
-        }
-      case None => complete(StatusCodes.BadRequest)
+    headerValueByName(UserIdHeader).flatMap { userId =>
+      optionalHeaderValueByName(UserNameHeader).flatMap { userName =>
+        provide(context(userId, userName.getOrElse("?")))
+      }
     }
   }
 
   def withUserContext: Directive1[Future[UserContext]] = {
-    optionalHeaderValueByName(UserIdHeader).flatMap {
-      case Some(userId) => optionalHeaderValueByName(UserNameHeader).flatMap {
-        case Some(userName) =>
-          provide(context(userId, userName))
-        case None => complete(StatusCodes.BadRequest)
+    headerValueByName(UserIdHeader).flatMap { userId =>
+      headerValueByName(UserNameHeader).flatMap { userName =>
+        provide(context(userId, userName))
       }
-      case None => complete(StatusCodes.BadRequest)
     }
   }
 }

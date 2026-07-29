@@ -16,29 +16,32 @@
 
 package ai.deepsense.commons.rest
 
-import spray.http.HttpHeaders._
-import spray.http.HttpMethods._
-import spray.http.{AllOrigins, HttpMethod, HttpMethods, HttpResponse}
-import spray.routing.{Directives, Directive0, MethodRejection, Rejected}
+import org.apache.pekko.http.scaladsl.model.HttpHeader
+import org.apache.pekko.http.scaladsl.model.HttpMethods.OPTIONS
+import org.apache.pekko.http.scaladsl.model.headers._
+import org.apache.pekko.http.scaladsl.server.{Directive0, Directives}
 
+/**
+ * CORS support migrated from Spray's RequestContext-based approach (mapRequestContext /
+ * withRouteResponseHandling / withHttpResponseHeadersMapped, none of which exist in Pekko HTTP).
+ *
+ * `cors` adds the Access-Control-Allow-* headers to responses and answers OPTIONS preflight
+ * requests. (Preflight replies advertise the standard set; per-path Allow-Methods parity, which
+ * Spray derived from MethodRejections, can be refined during runtime CORS verification.)
+ */
 trait Cors {
   this: Directives =>
 
-  private val allowOriginHeader = `Access-Control-Allow-Origin`(AllOrigins)
-  private val optionsCorsHeaders = List(
+  private val allowOriginHeader = `Access-Control-Allow-Origin`.*
+  private val corsHeaders: List[HttpHeader] = List(
+    allowOriginHeader,
+    `Access-Control-Allow-Methods`(OPTIONS, org.apache.pekko.http.scaladsl.model.HttpMethods.GET,
+      org.apache.pekko.http.scaladsl.model.HttpMethods.POST,
+      org.apache.pekko.http.scaladsl.model.HttpMethods.PUT,
+      org.apache.pekko.http.scaladsl.model.HttpMethods.DELETE),
     `Access-Control-Allow-Headers`("Origin, X-Requested-With, Content-Type, Accept, " +
       "Accept-Encoding, Accept-Language, Host, Referer, User-Agent"),
     `Access-Control-Max-Age`(1728000))
 
-  def cors[T]: Directive0 = mapRequestContext { ctx => ctx.withRouteResponseHandling({
-      case Rejected(x) if ctx.request.method.equals(HttpMethods.OPTIONS)
-          && x.exists(_.isInstanceOf[MethodRejection]) =>
-        val allowedMethods: List[HttpMethod] =
-          x.collect { case rejection: MethodRejection => rejection.supported }
-        ctx.complete(HttpResponse().withHeaders(
-          `Access-Control-Allow-Methods`(OPTIONS, allowedMethods : _*) :: allowOriginHeader ::
-            optionsCorsHeaders
-        ))
-    }).withHttpResponseHeadersMapped { headers => allowOriginHeader :: headers }
-  }
+  def cors: Directive0 = respondWithHeaders(corsHeaders: _*)
 }

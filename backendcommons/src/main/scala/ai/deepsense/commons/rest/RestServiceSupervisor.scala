@@ -16,7 +16,7 @@
 
 package ai.deepsense.commons.rest
 
-import akka.actor.{Actor, ActorInitializationException, Props}
+import org.apache.pekko.actor.{Actor, ActorInitializationException, Props}
 
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.sparkutils.AkkaUtils
@@ -30,8 +30,8 @@ import ai.deepsense.sparkutils.AkkaUtils
  */
 class RestServiceSupervisor extends Actor with Logging {
 
-  import akka.actor.OneForOneStrategy
-  import akka.actor.SupervisorStrategy._
+  import org.apache.pekko.actor.OneForOneStrategy
+  import org.apache.pekko.actor.SupervisorStrategy._
 
   override def receive: Receive = {
     case (props: Props, name: String) =>
