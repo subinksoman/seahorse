@@ -255,8 +255,8 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
   {
     "id": "T30",
     "phase": "3 - Scala 2.13",
-    "title": "Replace/upgrade EOL Akka/Spray/Scalatra stack",
-    "description": "Migrate off Akka 2.4.13 + Spray (EOL, no 2.13) to Akka HTTP or Apache Pekko; upgrade Scalatra & Jetty to 2.13/JDK17-capable versions per T01 decision. [Decision B=Pekko. WHOLE workflow-executor build migrated to Pekko + Pekko-HTTP and compiles green on Spark 3.4.4/JDK11: commons (runtime-verified 8 tests), deeplang, mqprotocol (akka-rabbitmq->Pekko port, FSM unit test + T33 broker test), workflowexecutor (2 HTTP-client rewrites). Remaining: backend services (root build: sessionmanager MqModule + Scalatra), then Scala 2.13 flip + JDK 17.]",
+    "title": "Replace EOL Akka/Spray with Apache Pekko (umbrella)",
+    "description": "Decision B = Apache Pekko (Apache-2.0). Migrate the actor + HTTP stack off EOL Akka 2.4 / Spray to Pekko + Pekko HTTP across the whole codebase. Broken into T30a-T30f.",
     "area": "project/Dependencies.scala, workflowmanager, sessionmanager, datasourcemanager, libraryservice",
     "depends_on": [
       "T01",
@@ -266,6 +266,90 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "risk": "High",
     "effort_days": 12,
     "status": "partial"
+  },
+  {
+    "id": "T30a",
+    "phase": "3 - Pekko",
+    "title": "spray-json 1.3.6 + Pekko deps groundwork",
+    "description": "Bump spray-json to 1.3.6 (2.13-capable, kept for serialization); add Pekko + Pekko HTTP dep helpers to both sbt builds.",
+    "area": "project/Dependencies.scala (both builds)",
+    "depends_on": [
+      "T01"
+    ],
+    "category": "build",
+    "risk": "Low",
+    "effort_days": 1,
+    "status": "completed"
+  },
+  {
+    "id": "T30b",
+    "phase": "3 - Pekko",
+    "title": "Migrate workflow-executor build to Pekko + Pekko HTTP",
+    "description": "commons (RestClient/NotebookRestClient/NotebookPoller -> Pekko HTTP client), deeplang, mqprotocol, workflowexecutor (2 HTTP-client rewrites), AkkaUtils. VERIFIED: full WE compile green; commons NotebookRestClientSpec 8 tests pass.",
+    "area": "seahorse-workflow-executor/**",
+    "depends_on": [
+      "T30a"
+    ],
+    "category": "build",
+    "risk": "High",
+    "effort_days": 10,
+    "status": "completed"
+  },
+  {
+    "id": "T30c",
+    "phase": "3 - Pekko",
+    "title": "Port akka-rabbitmq to Pekko (ConnectionActor/ChannelActor)",
+    "description": "Replace com.thenewmotion:akka-rabbitmq (no Pekko/2.13) with amqp-client + a thin Pekko ConnectionActor/ChannelActor FSM. VERIFIED: ChannelActorSpec FSM 2 tests + T33 broker round-trip on RabbitMQ 4.x.",
+    "area": "workflowexecutormqprotocol/.../rabbitmq/",
+    "depends_on": [
+      "T30b"
+    ],
+    "category": "build",
+    "risk": "High",
+    "effort_days": 4,
+    "status": "completed"
+  },
+  {
+    "id": "T30d",
+    "phase": "3 - Pekko",
+    "title": "Migrate backendcommons REST framework (Spray server -> Pekko HTTP)",
+    "description": "Architectural: actor-bound Spray HttpService -> route-bound Pekko HTTP. RestServer/RestService/RestModule/RestApi/Cors/AuthDirectives. VERIFIED: backendcommons/Compile/compile green.",
+    "area": "backendcommons/.../rest, auth/directives",
+    "depends_on": [
+      "T30b"
+    ],
+    "category": "build",
+    "risk": "High",
+    "effort_days": 6,
+    "status": "completed"
+  },
+  {
+    "id": "T30e",
+    "phase": "3 - Pekko",
+    "title": "Migrate backendcommons test-side + in-process HTTP smoke test",
+    "description": "Spray ScalatestRouteTest -> Pekko HTTP ScalatestRouteTest; MultipartFormData/HttpEntity API differences. Run RestServerSmokeSpec (in-process bind/serve) as the framework runtime gate.",
+    "area": "backendcommons/src/test/.../rest, auth",
+    "depends_on": [
+      "T30d"
+    ],
+    "category": "testing",
+    "risk": "Med",
+    "effort_days": 3,
+    "status": "in_progress"
+  },
+  {
+    "id": "T30f",
+    "phase": "3 - Pekko",
+    "title": "Cascade Pekko HTTP to service REST APIs",
+    "description": "workflowmanager (10), sessionmanager (4 + MqModule ConnectionActor), schedulingmanager (2), datasourcemanager (1) extend the migrated framework; migrate their routing DSL + JSON support.",
+    "area": "workflowmanager, sessionmanager, schedulingmanager, datasourcemanager",
+    "depends_on": [
+      "T30d"
+    ],
+    "category": "build",
+    "risk": "High",
+    "effort_days": 6,
+    "status": "todo"
   },
   {
     "id": "T33",
