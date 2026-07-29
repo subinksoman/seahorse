@@ -54,12 +54,17 @@ class InMemoryWorkflowStorage extends WorkflowStorage {
         ownerId orElse old.map(_.ownerId) get,
         ownerName orElse old.map(_.ownerName) get)
 
-    var oldEntry = workflows.get(id)
-    var newEntry = withNewWorkflow(oldEntry)
-
-    while (!workflows.replace(id, oldEntry.orNull, newEntry)) {
-      oldEntry = workflows.get(id)
-      newEntry = withNewWorkflow(oldEntry)
+    // Scala 2.13's TrieMap.replace(id, null, newEntry) returns false for an absent key (2.12
+    // treated it as "insert if absent"), so the original replace-only loop spun forever on
+    // create. Use putIfAbsent for a new key and replace for an existing one.
+    var done = false
+    while (!done) {
+      val oldEntry = workflows.get(id)
+      val newEntry = withNewWorkflow(oldEntry)
+      done = oldEntry match {
+        case None => workflows.putIfAbsent(id, newEntry).isEmpty
+        case Some(old) => workflows.replace(id, old, newEntry)
+      }
     }
     Future.successful(())
   }
