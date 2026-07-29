@@ -341,7 +341,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "id": "T30f",
     "phase": "3 - Pekko",
     "title": "Cascade Pekko HTTP to service REST APIs",
-    "description": "workflowmanager (10), sessionmanager (4 + MqModule ConnectionActor), schedulingmanager (2), datasourcemanager (1) extend the migrated framework; migrate their routing DSL + JSON support.",
+    "description": "workflowmanager (10), sessionmanager (4 + MqModule ConnectionActor), schedulingmanager (2), datasourcemanager (1) extend the migrated framework; migrate their routing DSL + JSON support. [WIP: imports+deps migrated across all 4 services; datasourcemanager green; HTTP clients import-only (extend migrated RestClient). Remaining established-pattern fixes: WorkflowApi BasicAuth->authenticateBasic + multipart; sessionmanager ConnectionActor Timeout + ServiceModule + SessionsApi RejectionHandler; service test specs.]",
     "area": "workflowmanager, sessionmanager, schedulingmanager, datasourcemanager",
     "depends_on": [
       "T30d"
@@ -349,7 +349,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "build",
     "risk": "High",
     "effort_days": 6,
-    "status": "todo"
+    "status": "partial"
   },
   {
     "id": "T33",
