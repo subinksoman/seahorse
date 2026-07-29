@@ -27,14 +27,8 @@ test in Test := (test in Test).dependsOn(assembly).value
 // JVM options for the forked test JVMs. Spark 3.4.4 needs these --add-opens on
 // JDK 11+ (it accesses java.base internals reflectively); the empty vector that
 // worked on Java 8 fails on JDK 11 with InaccessibleObjectException.
-val sparkTestJvmOptions = Vector(
-  "--add-opens=java.base/java.nio=ALL-UNNAMED",
-  "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
-  "--add-opens=java.base/java.lang=ALL-UNNAMED",
-  "--add-opens=java.base/java.util=ALL-UNNAMED",
-  "--add-opens=java.base/java.io=ALL-UNNAMED",
-  "-Dio.netty.tryReflectionSetAccessible=true"
-)
+// Full Spark 3.4 JDK-17 module-opens set (JDK 17 needs more than the JDK 11 subset).
+val sparkTestJvmOptions = CommonSettingsPlugin.jdk17ModuleOpts.toVector
 
 // Only one spark context per JVM
 def assignTestsToJVMs(testDefs: Seq[TestDefinition]) = {

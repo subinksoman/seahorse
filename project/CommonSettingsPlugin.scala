@@ -39,8 +39,9 @@ object CommonSettingsPlugin extends AutoPlugin {
       "-language:existentials", "-language:implicitConversions"
     ),
     javacOptions ++= Seq(
-      "-source", "1.7",
-      "-target", "1.7"
+      // Java 8 bytecode; `-source/-target 7` is obsolete on JDK 17 and removed in JDK 20+.
+      "-source", "1.8",
+      "-target", "1.8"
     ),
     //resolvers ++= Dependencies.resolvers,
     resolvers ++= Seq(
@@ -63,11 +64,33 @@ object CommonSettingsPlugin extends AutoPlugin {
         // Show full stacktraces (F), Put results in target/test-reports
         Tests.Argument(TestFrameworks.ScalaTest, "-oF", "-u", "target/test-reports")
       ),
-      javaOptions := Seq(s"-DlogFile=${name.value}"),
+      javaOptions := Seq(s"-DlogFile=${name.value}") ++ jdk17ModuleOpts,
       fork := true,
       unmanagedClasspath += baseDirectory.value / "conf"
     )
   }
+
+  // JDK 17: Spark reflects into JDK internals, which the module system blocks by default
+  // (InaccessibleObjectException). Mirror Spark 3.4's JavaModuleOptions so forked test JVMs
+  // can run Spark on JDK 17 (harmless on JDK 8/11).
+  lazy val jdk17ModuleOpts = Seq(
+    "--add-opens=java.base/java.lang=ALL-UNNAMED",
+    "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
+    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+    "--add-opens=java.base/java.io=ALL-UNNAMED",
+    "--add-opens=java.base/java.net=ALL-UNNAMED",
+    "--add-opens=java.base/java.nio=ALL-UNNAMED",
+    "--add-opens=java.base/java.util=ALL-UNNAMED",
+    "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
+    "--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED",
+    "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
+    "--add-opens=java.base/sun.nio.cs=ALL-UNNAMED",
+    "--add-opens=java.base/sun.security.ssl=ALL-UNNAMED",
+    "--add-opens=java.base/sun.security.action=ALL-UNNAMED",
+    "--add-opens=java.base/sun.util.calendar=ALL-UNNAMED",
+    "--add-opens=java.security.jgss/sun.security.krb5=ALL-UNNAMED",
+    "-Dio.netty.tryReflectionSetAccessible=true"
+  )
 
   lazy val testSettings = inConfig(Test) {
     Seq(
@@ -80,7 +103,7 @@ object CommonSettingsPlugin extends AutoPlugin {
         )
       ),
       fork := true,
-      javaOptions := Seq(s"-DlogFile=${name.value}"),
+      javaOptions := Seq(s"-DlogFile=${name.value}") ++ jdk17ModuleOpts,
       unmanagedClasspath += baseDirectory.value / "conf"
     )
   }

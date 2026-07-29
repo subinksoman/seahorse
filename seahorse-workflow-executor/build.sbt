@@ -138,13 +138,8 @@ sdk,
 workflowexecutormqprotocol,
 workflowexecutormqprotocol % "test -> test") settings settingsForNotPublished settings (
     fork := true,
-    javaOptions ++= Seq(
-      "--add-opens=java.base/java.nio=ALL-UNNAMED",
-      "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
-      "--add-opens=java.base/java.lang=ALL-UNNAMED",
-      "--add-opens=java.base/java.util=ALL-UNNAMED",
-      "-Dio.netty.tryReflectionSetAccessible=true"
-    )
+    // Full Spark 3.4 JDK-17 module-opens set (JDK 17 needs more than the JDK 11 subset).
+    javaOptions ++= CommonSettingsPlugin.jdk17ModuleOpts
   )
 
 // Sequentially perform integration tests

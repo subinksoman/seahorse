@@ -20,7 +20,7 @@ Test / testOptions := Seq(
   Tests.Argument(TestFrameworks.ScalaTest, "-o", "-u", "target/test-reports")
 )
 Test / fork := true
-Test / javaOptions := Seq("-Denv=test", s"-DlogFile=${name.value}")
+Test / javaOptions := Seq("-Denv=test", s"-DlogFile=${name.value}") ++ CommonSettingsPlugin.jdk17ModuleOpts
 Test / unmanagedClasspath += baseDirectory.value / "conf"
 Test / scalacOptions := Seq(
   "-unchecked", "-deprecation", "-encoding", "utf8",
@@ -37,7 +37,7 @@ IntegTest / testOptions := Seq(
   // Show full stacktraces (F), Put results in target/test-reports
   Tests.Argument(TestFrameworks.ScalaTest, "-oF", "-u", "target/test-reports")
 )
-IntegTest / javaOptions := Seq("-Denv=integtest", s"-DlogFile=${name.value}")
+IntegTest / javaOptions := Seq("-Denv=integtest", s"-DlogFile=${name.value}") ++ CommonSettingsPlugin.jdk17ModuleOpts
 IntegTest / fork := true
 
 def integFilter(name: String) = name.endsWith("IntegSpec")

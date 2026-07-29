@@ -34,7 +34,7 @@ inConfig(Test) {
       Tests.Argument(TestFrameworks.ScalaTest, "-o", "-u", "target/test-reports")
     ),
     fork := true,
-    javaOptions := Seq("-Denv=test", s"-DlogFile=${name.value}"),
+    javaOptions := Seq("-Denv=test", s"-DlogFile=${name.value}") ++ CommonSettingsPlugin.jdk17ModuleOpts,
     unmanagedClasspath += baseDirectory.value / "conf",
     scalacOptions := Seq(
       "-unchecked", "-deprecation", "-encoding", "utf8",
@@ -55,7 +55,7 @@ inConfig(IntegTest) {
       // Show full stacktraces (F), Put results in target/test-reports
       Tests.Argument(TestFrameworks.ScalaTest, "-oF", "-u", "target/test-reports")
     ),
-    javaOptions := Seq("-Denv=integtest", s"-DlogFile=${name.value}"),
+    javaOptions := Seq("-Denv=integtest", s"-DlogFile=${name.value}") ++ CommonSettingsPlugin.jdk17ModuleOpts,
     fork := true
   )
 }

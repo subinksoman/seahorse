@@ -139,9 +139,9 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
   {
     "id": "T11",
     "phase": "1 - Toolchain",
-    "title": "Make the build compile & test on JDK 17 (still Scala 2.12 / Spark 3.0)",
-    "description": "Add required --add-opens/--add-exports for JDK 17, update any libs that break under the module system, keep Spark 3.0 runtime. Green build on JDK 17 is the gate.",
-    "area": "project/CommonSettingsPlugin.scala, build JVM opts",
+    "title": "Make the build compile & test on JDK 17 (with Scala 2.13 / Spark 3.4.4)",
+    "description": "JDK 17 landed together with Scala 2.13 + Spark 3.4.4 (the coordinated jump), not on 2.12/Spark 3.0. [DONE & VERIFIED on JDK 17.0.12: whole codebase compiles and the WHOLE test suite passes -- WE reportlib 25, graph 50, workflowjson 31, deeplang 345, workflowexecutor 88; backend backendcommons 31, workflowmanager REST 60, sessionmanager 38, datasourcemanager 8, schedulingmanager 3. Changes: added Spark 3.4's full JDK-17 --add-opens set (jdk17ModuleOpts) to both builds' CommonSettingsPlugin test/it javaOptions + the per-module overrides (backendcommons, WE commons) + deeplang testGrouping + workflowexecutor; needed sun.security.ssl on top of Spark's default set for the HTTPS download tests. GatewayServerFactory: replaced the py4j private-final-field reflection (which used the Field.modifiers hack removed in JDK 12+ -> NoSuchFieldException: modifiers) with py4j 0.10.9.7's full GatewayServer constructor. Root javacOptions -source/-target 1.7 -> 1.8 (7 is removed in JDK 20+). JAVA_HOME for JDK 17 = /home/subinsoman/binaries/jdk-17.0.12_linux-x64_bin/jdk-17.0.12 (nested dir).]",
+    "area": "project/CommonSettingsPlugin.scala, seahorse-workflow-executor/project/CommonSettingsPlugin.scala, per-module build.sbt, GatewayServerFactory.scala",
     "depends_on": [
       "T01",
       "T10"
@@ -149,7 +149,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "build",
     "risk": "High",
     "effort_days": 5,
-    "status": "todo"
+    "status": "completed"
   },
   {
     "id": "T11a",

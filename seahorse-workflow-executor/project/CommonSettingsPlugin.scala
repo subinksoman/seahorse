@@ -73,13 +73,35 @@ object CommonSettingsPlugin extends AutoPlugin {
     test in assembly := {}
   )
 
+  // JDK 17: Spark reflects into JDK internals, blocked by the module system by default
+  // (InaccessibleObjectException). Mirror Spark 3.4's JavaModuleOptions for forked test JVMs
+  // (harmless on JDK 8/11).
+  lazy val jdk17ModuleOpts = Seq(
+    "--add-opens=java.base/java.lang=ALL-UNNAMED",
+    "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
+    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+    "--add-opens=java.base/java.io=ALL-UNNAMED",
+    "--add-opens=java.base/java.net=ALL-UNNAMED",
+    "--add-opens=java.base/java.nio=ALL-UNNAMED",
+    "--add-opens=java.base/java.util=ALL-UNNAMED",
+    "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
+    "--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED",
+    "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
+    "--add-opens=java.base/sun.nio.cs=ALL-UNNAMED",
+    "--add-opens=java.base/sun.security.ssl=ALL-UNNAMED",
+    "--add-opens=java.base/sun.security.action=ALL-UNNAMED",
+    "--add-opens=java.base/sun.util.calendar=ALL-UNNAMED",
+    "--add-opens=java.security.jgss/sun.security.krb5=ALL-UNNAMED",
+    "-Dio.netty.tryReflectionSetAccessible=true"
+  )
+
   lazy val ouritSettings = inConfig(OurIT)(Defaults.testSettings) ++ inConfig(OurIT) {
     Seq(
       testOptions ++= Seq(
         // Show full stacktraces (F), Put results in test-reports
         Tests.Argument(TestFrameworks.ScalaTest, "-oF", "-u", s"target/test-reports-${Version.spark}")
       ),
-      javaOptions := Seq(s"-DlogFile=${name.value}", "-Xmx2G", "-Xms2G"),
+      javaOptions := Seq(s"-DlogFile=${name.value}", "-Xmx2G", "-Xms2G") ++ jdk17ModuleOpts,
       fork := true,
       unmanagedClasspath += baseDirectory.value / "conf"
     )
@@ -96,7 +118,7 @@ object CommonSettingsPlugin extends AutoPlugin {
         )
       ),
       fork := true,
-      javaOptions := Seq(s"-DlogFile=${name.value}"),
+      javaOptions := Seq(s"-DlogFile=${name.value}") ++ jdk17ModuleOpts,
       unmanagedClasspath += baseDirectory.value / "conf"
     )
   }
