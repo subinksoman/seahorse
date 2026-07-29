@@ -18,17 +18,17 @@ package ai.deepsense.workflowmanager.storage.impl
 
 import com.google.inject.name.Names
 import com.google.inject.{PrivateModule, Scopes}
-import slick.driver.H2Driver.api.Database
-import slick.driver.{H2Driver, JdbcDriver}
+import slick.jdbc.H2Profile.api.Database
+import slick.jdbc.{H2Profile, JdbcProfile}
 
 import ai.deepsense.workflowmanager.storage.{NotebookStorage, WorkflowStateStorage, WorkflowStorage}
 
 class WorkflowDaoModule extends PrivateModule {
   override def configure(): Unit = {
-    bind(classOf[JdbcDriver])
+    bind(classOf[JdbcProfile])
       .annotatedWith(Names.named("workflowmanager"))
-      .toInstance(H2Driver)
-    bind(classOf[JdbcDriver#API#Database])
+      .toInstance(H2Profile)
+    bind(classOf[JdbcProfile#API#Database])
       .annotatedWith(Names.named("workflowmanager"))
       .toInstance(Database.forConfig("db"))
 

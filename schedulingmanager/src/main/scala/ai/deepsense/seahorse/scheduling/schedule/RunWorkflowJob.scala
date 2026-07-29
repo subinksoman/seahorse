@@ -26,7 +26,7 @@ import ai.deepsense.models.workflows.{Workflow, WorkflowInfo}
 class RunWorkflowJob extends WorkflowJob {
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  private[this] val logger = LoggerForCallerClass()
+  override val logger = LoggerForCallerClass()
 
   override def runWorkflow(workflowId: String, sendReportToEmail: String, presetId: Long): Future[Unit] = {
     logger.info(s"Starting workflow $workflowId scheduled execution on cluster $presetId with email " +

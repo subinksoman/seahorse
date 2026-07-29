@@ -58,8 +58,8 @@ object WorkflowManagerApp extends App with Logging {
         actorSystem)
     } yield ()
 
-    migrationFut.onFailure {
-      case t => logger.error("Migration 1.3 to 1.4 failed", t)
+    migrationFut.failed.foreach { t =>
+      logger.error("Migration 1.3 to 1.4 failed", t)
     }
 
     Await.ready(migrationFut, Duration.Inf)

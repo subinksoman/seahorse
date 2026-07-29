@@ -22,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import slick.driver.JdbcDriver
+import slick.jdbc.JdbcProfile
 
 import ai.deepsense.commons.models.ClusterDetails
 import ai.deepsense.commons.utils.Logging
@@ -30,8 +30,8 @@ import ai.deepsense.models.workflows.Workflow._
 import ai.deepsense.workflowmanager.model.WorkflowPreset
 
 class PresetsDao @Inject()(
-   @Named("workflowmanager") db: JdbcDriver#API#Database,
-   @Named("workflowmanager") driver: JdbcDriver)(implicit ec: ExecutionContext) extends Logging {
+   @Named("workflowmanager") db: JdbcProfile#API#Database,
+   @Named("workflowmanager") driver: JdbcProfile)(implicit ec: ExecutionContext) extends Logging {
 
   import driver.api._
 
@@ -53,8 +53,8 @@ class PresetsDao @Inject()(
   def getPresets(): Future[Seq[ClusterDetails]] = {
     val query = presets.result
     val storedPresets = db.run(query)
-    storedPresets.onSuccess {
-      case x => logger.info(s"Stored presets are: $x")
+    storedPresets.foreach { x =>
+      logger.info(s"Stored presets are: $x")
     }
     storedPresets
   }

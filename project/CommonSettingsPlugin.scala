@@ -29,7 +29,7 @@ object CommonSettingsPlugin extends AutoPlugin {
 
   override def globalSettings = Seq(
     //scalaVersion := "2.11.8"
-    scalaVersion := "2.12.16"
+    scalaVersion := "2.13.12"
   )
 
   override def projectSettings = Seq(
@@ -45,8 +45,6 @@ object CommonSettingsPlugin extends AutoPlugin {
     //resolvers ++= Dependencies.resolvers,
     resolvers ++= Seq(
   "sonatype.org" at "https://oss.sonatype.org/content/repositories/releases",
-  "spray.io" at "https://repo.spray.io",
-  "The New Motion Public Repo" at "https://nexus.thenewmotion.com/content/repositories/releases-public",
   Resolver.typesafeRepo("releases"),
   "Maven Central" at "https://repo1.maven.org/maven2/"
 ),

@@ -286,7 +286,7 @@ class WorkflowManagerImpl @Inject()(
       workflow: Workflow): Future[ExecutionReport] = {
     workflowStateStorage.get(workflowId).map { case allStates =>
       val nodesIds: Set[Node.Id] = workflow.graph.nodes.map(_.id)
-      val currentStates = allStates.filterKeys(nodesIds.contains)
+      val currentStates = allStates.view.filterKeys(nodesIds.contains).toMap
       ExecutionReport(currentStates)
     }
   }

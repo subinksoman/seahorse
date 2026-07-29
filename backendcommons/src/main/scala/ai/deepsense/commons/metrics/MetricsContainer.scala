@@ -20,7 +20,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 import com.codahale.metrics.{MetricRegistry, CsvReporter}
-import nl.grons.metrics.scala.InstrumentedBuilder
+import nl.grons.metrics4.scala.InstrumentedBuilder
 
 object MetricsContainer {
 

@@ -14,26 +14,13 @@
  * limitations under the License.
  */
 
-package ai.deepsense.workflowmanager.storage.impl
+package org.scalatra
 
-import scala.concurrent.duration._
-
-import org.scalatest.time.{Millis, Seconds, Span}
-import slick.jdbc.H2Profile.api._
-import slick.jdbc.{H2Profile, JdbcProfile}
-
-import ai.deepsense.commons.StandardSpec
-
-trait SlickTestSupport {
-
-  suite: StandardSpec =>
-
-  implicit override val patienceConfig =
-    PatienceConfig(timeout = Span(5, Seconds), interval = Span(5, Millis))
-
-  val operationDuration = new FiniteDuration(5, SECONDS)
-
-  val db: Database = Database.forConfig("db")
-
-  val driver: JdbcProfile = H2Profile
-}
+/**
+ * Compatibility shim. Scalatra 2.7 removed `org.scalatra.TypedParamSupport` (its typed-parameter
+ * functionality was folded into `ScalatraBase`), but the `scalatra-swagger-codegen` plugin still
+ * emits `import org.scalatra.{ TypedParamSupport, ScalatraServlet }` into generated servlets.
+ * The generated code only imports the name (it is not mixed in and none of its members are used),
+ * so an empty marker trait is enough to keep the generated import resolving on Scala 2.13.
+ */
+trait TypedParamSupport

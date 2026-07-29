@@ -32,7 +32,7 @@ import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 abstract class AbstractChoiceParam[T <: Choice, U](implicit tag: TypeTag[T]) extends Param[U] {
 
   override def extraJsFields: Map[String, JsValue] = Map(
-    "values" -> JsArray(choiceInstances.map(_.toJson)_: _*)
+    "values" -> JsArray(choiceInstances.map(_.toJson): _*)
   )
 
   override def valueFromJson(jsValue: JsValue, graphReader: GraphReader): U = jsValue match {

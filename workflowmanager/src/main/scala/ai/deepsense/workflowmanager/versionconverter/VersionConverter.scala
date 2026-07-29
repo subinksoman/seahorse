@@ -170,9 +170,9 @@ object VersionConverter extends DefaultJsonProtocol{
   }
 
   private def createNodesMap(nodesArray: JsArray): Map[String, String] = {
-    createNodeByIdMap(nodesArray).mapValues { e: JsValue =>
+    createNodeByIdMap(nodesArray).view.mapValues { e: JsValue =>
         e.asJsObject.fields(Js.operation).asJsObject.fields(Js.id).convertTo[String]
-    }
+    }.toMap
   }
 
   private def createNodeByIdMap(nodesArray: JsArray): Map[String, JsValue] = {

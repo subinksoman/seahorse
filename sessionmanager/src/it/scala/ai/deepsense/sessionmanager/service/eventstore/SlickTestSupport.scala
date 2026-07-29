@@ -19,8 +19,8 @@ package ai.deepsense.sessionmanager.service.eventstore
 import scala.concurrent.duration._
 
 import org.scalatest.time.{Millis, Seconds, Span}
-import slick.driver.H2Driver.api._
-import slick.driver.{H2Driver, JdbcDriver}
+import slick.jdbc.H2Profile.api._
+import slick.jdbc.{H2Profile, JdbcProfile}
 
 import ai.deepsense.commons.StandardSpec
 
@@ -35,7 +35,7 @@ trait SlickTestSupport {
 
   val db: Database = Database.forConfig("db")
 
-  val driver: JdbcDriver = H2Driver
+  val driver: JdbcProfile = H2Profile
 
   val sessionTableName = "SESSIONS"
 }

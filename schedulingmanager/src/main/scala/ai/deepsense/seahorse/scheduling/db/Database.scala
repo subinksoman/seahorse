@@ -17,7 +17,7 @@
 package ai.deepsense.seahorse.scheduling.db
 
 import slick.backend.DatabaseConfig
-import slick.driver.JdbcProfile
+import slick.jdbc.JdbcProfile
 
 import ai.deepsense.seahorse.scheduling.SchedulingManagerConfig
 

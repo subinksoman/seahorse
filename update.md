@@ -397,15 +397,15 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "id": "T31",
     "phase": "3 - Scala 2.13",
     "title": "Cross-compile / switch to Scala 2.13.x",
-    "description": "Set scalaVersion 2.13.x; fix collections (Seq/varargs, CollectionConverters), procedure syntax, deprecated APIs across api/commons/deeplang/graph/workflow* and services.",
-    "area": "project/CommonSettingsPlugin.scala:32, Dependencies.scala scala pin, all Scala sources",
+    "description": "Set scalaVersion 2.13.12 (both builds: root CommonSettingsPlugin + both Dependencies Version 3.4.4 arms); fix collections/deprecated APIs across all Scala sources. [MAIN COMPILE DONE & VERIFIED: whole-backend `sbt Compile/compile` green on Scala 2.13.12 + Spark 3.4.4 / JDK 11 -- api/commons/deeplang/graph/reportlib/workflowjson/workflowexecutor + backendcommons/workflowmanager/sessionmanager/datasourcemanager/schedulingmanager/libraryservice. Dropped -Xfatal-warnings (WE). Removed dead resolvers repo.spray.io + nexus.thenewmotion.com (they hung coursier). Lib bumps for 2.13 artifacts: scalatest 3.0.0->3.0.9, scalacheck 1.12.6->1.15.4 (+1.13.4->1.15.4), nscala-time 2.14.0->2.30.0, scalate 1.9.0->1.9.8, slick 3.2.0->3.3.3, metrics-scala 3.5.5->metrics4-scala 4.2.9, scalaz 7.2.8->7.2.30, shapeless 2.3.2->2.3.3, scalatra 2.5.0->2.7.1 (dropped scalatra-slf4j), json4s 3.4.2->3.6.12, scalaj-http 2.3.0->2.4.2, scalariform 0.2.0->0.2.10, scalacheck-shapeless _1.13/1.1.3->_1.15/1.3.0; removed Spray-HTTP deps from WE commons/build.sbt. Source fixes: JavaConversions->scala.jdk.CollectionConverters (+explicit .asScala/.asJava), collection.breakOut removed, .mapValues/.filterKeys ->.view....toMap, Future.onFailure/onSuccess ->.failed.foreach/.foreach, respondWithHeaders(seq), SparkTransformerWrapper `extends Transformer` FQN'd (2.13 resolved unqualified Transformer to Spark's ml.Transformer), `import scala.collection._` Seq-shadow removed, RunWorkflowJob logger override, org.scalatra.TypedParamSupport compat shim for the swagger codegen. REMAINING: ~14 test specs (backendcommons/datasourcemanager/schedulingmanager) need the same mechanical 2.13/scalatest-3.0.9 fixes -> Test/compile not yet green.]",
+    "area": "project/CommonSettingsPlugin.scala, both Dependencies.scala, all Scala sources",
     "depends_on": [
       "T30"
     ],
     "category": "build",
     "risk": "High",
     "effort_days": 10,
-    "status": "todo"
+    "status": "partial"
   },
   {
     "id": "T32",

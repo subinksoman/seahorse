@@ -22,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import slick.driver.JdbcDriver
+import slick.jdbc.JdbcProfile
 import slick.lifted.{Index, PrimaryKey, ProvenShape}
 
 import ai.deepsense.graph.Node
@@ -30,8 +30,8 @@ import ai.deepsense.models.workflows.Workflow.Id
 import ai.deepsense.workflowmanager.storage.NotebookStorage
 
 class NotebookDaoImpl @Inject()(
-    @Named("workflowmanager") db: JdbcDriver#API#Database,
-    @Named("workflowmanager") driver: JdbcDriver)
+    @Named("workflowmanager") db: JdbcProfile#API#Database,
+    @Named("workflowmanager") driver: JdbcProfile)
     (implicit ec: ExecutionContext)
   extends NotebookStorage {
 

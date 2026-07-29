@@ -26,14 +26,14 @@ import ai.deepsense.sessionmanager.service.sessionspawner.sparklauncher.spark.Sp
 
 private [clusters] object LocalSparkLauncher {
 
-  import scala.collection.JavaConversions._
+  import scala.jdk.CollectionConverters._
 
   def apply(workflowId: String,
             applicationArgs: Seq[String],
             config: SparkLauncherConfig,
             clusterConfig: ClusterDetails,
             args: SparkOptionsMultiMap): SparkLauncher = {
-    new SparkLauncher(env(config, clusterConfig.copy(userIP = "0.0.0.0")))
+    new SparkLauncher(env(config, clusterConfig.copy(userIP = "0.0.0.0")).asJava)
       .setSparkArgs(args)
       .setVerbose(true)
       .setMainClass(config.className)

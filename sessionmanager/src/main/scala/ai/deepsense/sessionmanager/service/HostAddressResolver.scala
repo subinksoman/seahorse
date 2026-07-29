@@ -37,11 +37,11 @@ object HostAddressResolver extends Logging {
   }
 
   private def getHostAddressFromInterface(): String = {
-    import collection.JavaConversions._
+    import scala.jdk.CollectionConverters._
     Try {
-      val interfaces = NetworkInterface.getNetworkInterfaces.toIterable
+      val interfaces = NetworkInterface.getNetworkInterfaces.asScala.to(Iterable)
       interfaces.flatMap { n =>
-        n.getInetAddresses.toIterable.filter {
+        n.getInetAddresses.asScala.to(Iterable).filter {
           address =>
             !address.isInstanceOf[Inet6Address] &&
               !address.isLoopbackAddress &&

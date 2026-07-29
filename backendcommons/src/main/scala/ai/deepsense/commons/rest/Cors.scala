@@ -43,5 +43,5 @@ trait Cors {
       "Accept-Encoding, Accept-Language, Host, Referer, User-Agent"),
     `Access-Control-Max-Age`(1728000))
 
-  def cors: Directive0 = respondWithHeaders(corsHeaders: _*)
+  def cors: Directive0 = respondWithHeaders(corsHeaders)
 }

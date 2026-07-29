@@ -22,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import slick.driver.JdbcDriver
+import slick.jdbc.JdbcProfile
 import slick.lifted.{Index, PrimaryKey, ProvenShape}
 import spray.json._
 
@@ -37,8 +37,8 @@ import ai.deepsense.models.workflows.{EntitiesMap, NodeState}
 import ai.deepsense.workflowmanager.storage.WorkflowStateStorage
 
 class WorkflowStateDaoImpl @Inject()(
-    @Named("workflowmanager") db: JdbcDriver#API#Database,
-    @Named("workflowmanager") driver: JdbcDriver)
+    @Named("workflowmanager") db: JdbcProfile#API#Database,
+    @Named("workflowmanager") driver: JdbcProfile)
     (implicit ec: ExecutionContext)
   extends WorkflowStateStorage
   with EntitiesMapJsonProtocol

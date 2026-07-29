@@ -23,13 +23,15 @@ import com.typesafe.config.Config
 // http://stackoverflow.com/a/34982538
 object ConfigToPropsLossy {
   def apply(config: Config): Properties = {
-    import scala.collection.JavaConversions._
+    // Scala 2.13: JavaConversions was removed and collection.breakOut dropped; use the explicit
+    // scala.jdk.CollectionConverters .asScala + .toMap.
+    import scala.jdk.CollectionConverters._
 
     val properties = new Properties()
 
-    val map: Map[String, String] = config.entrySet().map { entry =>
+    val map: Map[String, String] = config.entrySet().asScala.map { entry =>
       entry.getKey -> entry.getValue.unwrapped().toString
-    } (collection.breakOut)
+    }.toMap
 
     // JDK 9+ makes Properties.putAll(Map) ambiguous (Hashtable added a covariant
     // override); set each property explicitly to avoid the overload resolution error.

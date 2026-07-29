@@ -69,8 +69,8 @@ class Migration1_3To1_4 private (
         migration <- migrationFutures
       } {
 
-        migration.onFailure {
-          case t => logger.error("Unable to migrate workflow", t)
+        migration.failed.foreach { t =>
+          logger.error("Unable to migrate workflow", t)
         }
 
         Await.ready(migration, Duration.Inf)

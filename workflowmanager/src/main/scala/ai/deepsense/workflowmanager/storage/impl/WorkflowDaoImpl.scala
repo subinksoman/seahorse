@@ -22,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import slick.driver.JdbcDriver
+import slick.jdbc.JdbcProfile
 import slick.lifted.ProvenShape
 import spray.json._
 
@@ -36,8 +36,8 @@ import ai.deepsense.workflowmanager.rest.CurrentBuild
 import ai.deepsense.workflowmanager.storage.{WorkflowFullInfo, WorkflowStorage, WorkflowRaw}
 
 case class WorkflowDaoImpl @Inject()(
-    @Named("workflowmanager") db: JdbcDriver#API#Database,
-    @Named("workflowmanager") driver: JdbcDriver,
+    @Named("workflowmanager") db: JdbcProfile#API#Database,
+    @Named("workflowmanager") driver: JdbcProfile,
     override val graphReader: GraphReader,
     @Named("predefined-users.scheduler.id") schedulerUserId: String)
     (implicit ec: ExecutionContext)

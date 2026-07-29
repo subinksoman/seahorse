@@ -89,11 +89,12 @@ class MqModule extends AbstractModule with Logging {
       throw new TimeoutException
     }))
 
-    subscribedWithTimeout.onFailure {
+    subscribedWithTimeout.failed.foreach {
       case NonFatal(e) =>
         logger.error(s"Haven't subscribed to Heartbeats after '$timeout' millis." +
           " Shutting down!")
         AkkaUtils.terminate(system)
+      case _ => ()
     }
 
     subscribedWithTimeout.map(_.data)

@@ -21,9 +21,9 @@ object Version {
   val spark = sys.props.getOrElse("SPARK_VERSION", "3.0.0")
   println(s"SPARK_VERSION: $spark")
   val (scala, java, hadoop, akka, apacheCommons) = spark match {
-    // Step A target: Spark 3.4.4 on Scala 2.12 / Hadoop 3.3.4 (bytecode still 1.8;
-    // JDK 17 comes in Step B with Scala 2.13). Spark 3.4.4 is built with Scala 2.12.17.
-    case "3.4.4" => ("2.12.17", "1.8", "3.3.4", "2.4.12", "3.17.0")
+    // Step B: Spark 3.4.4 on Scala 2.13.12 (Spark 3.4.4 publishes _2.13 artifacts; 2.13
+    // unblocks JDK 17). Bytecode target stays 1.8 for the 2.13 build; JDK 17 comes next.
+    case "3.4.4" => ("2.13.12", "1.8", "3.3.4", "2.4.12", "3.17.0")
     case "3.0.0" => ("2.12.10", "1.8", "2.7.3", "2.4.12", "3.17.0")
     case "2.2.0" | "2.4.8" => ("2.12.6", "1.8", "2.7.3", "2.4.12", "3.17.0")
     case "2.1.0" | "2.1.1"  => ("2.12.6", "1.8", "2.7.3", "2.4.12", "3.5")
@@ -34,9 +34,9 @@ object Version {
   val amazonS3 = "1.10.16"
   val googleApi = "1.22.0"
   val mockito = "1.10.19"
-  val nsscalaTime = "2.14.0"
-  val scalacheck = "1.12.6"
-  val scalatest = "3.0.0"
+  val nsscalaTime = "2.30.0"  // 2.14.0 has no Scala 2.13 artifact
+  val scalacheck = "1.15.4"  // 1.12.x has no Scala 2.13 artifact
+  val scalatest = "3.0.9"    // last 3.0.x line; first to publish for Scala 2.13
   val scoverage = "1.4.5"
   val spray = "1.3.3"
   // 1.3.6 is the last spray-json line and is cross-published for Scala 2.13 (unlike the
@@ -105,7 +105,7 @@ object Library {
   val amqpClient = "com.rabbitmq" % "amqp-client" % "5.20.0"
   val reflections = "org.reflections" % "reflections" % "0.9.11"
   val scalacheck = "org.scalacheck" %% "scalacheck" % Version.scalacheck
-  val scalate = "org.scalatra.scalate" %% "scalate-core" % "1.9.0"
+  val scalate = "org.scalatra.scalate" %% "scalate-core" % "1.9.8"  // 1.9.0 has no Scala 2.13 artifact
   // Spark 3.4.4 uses the slf4j 2.x line (and log4j-slf4j2-impl); keep slf4j-api on the
   // same major to avoid a 1.7-vs-2.0 conflict that resolves away the slf4j-api jar.
   val slf4j = "org.slf4j" % "slf4j-api" % "2.0.7"
@@ -151,8 +151,6 @@ object Dependencies {
   val resolvers = Seq(
     "typesafe.com" at "https://repo.typesafe.com/typesafe/repo/",
     "sonatype.org" at "https://oss.sonatype.org/content/repositories/releases",
-    "spray.io" at "https://repo.spray.io",
-    "The New Motion Public Repo" at "https://nexus.thenewmotion.com/content/repositories/releases-public",
     "Maven Central" at "https://repo1.maven.org/maven2/",
     "Local Maven Repository" at "file:///home/subinsoman/.m2/repository"
   )

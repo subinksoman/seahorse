@@ -80,7 +80,7 @@ trait WorkflowStorage extends WorkflowVersionUtil with Logging {
     for {
       rawWorkflows <- getAllRaw
     } yield {
-      rawWorkflows.mapValues(rawWorkflowToFullWorkflow)
+      rawWorkflows.view.mapValues(rawWorkflowToFullWorkflow).toMap
     }
   }
 

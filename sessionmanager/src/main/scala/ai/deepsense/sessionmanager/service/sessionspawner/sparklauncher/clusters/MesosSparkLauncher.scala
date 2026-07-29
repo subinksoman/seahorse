@@ -25,7 +25,7 @@ import ai.deepsense.sessionmanager.service.sessionspawner.sparklauncher.spark.Sp
 import org.apache.spark.launcher.SparkLauncher
 
 private [clusters] object MesosSparkLauncher {
-  import scala.collection.JavaConversions._
+  import scala.jdk.CollectionConverters._
 
   val sparkVersion = BuildInfo.sparkVersion
   val hadoopVersion = BuildInfo.hadoopVersion
@@ -35,7 +35,7 @@ private [clusters] object MesosSparkLauncher {
             config: SparkLauncherConfig,
             clusterConfig: ClusterDetails,
             args: SparkOptionsMultiMap): SparkLauncher = {
-    new SparkLauncher(env(config, clusterConfig))
+    new SparkLauncher(env(config, clusterConfig).asJava)
       .setSparkArgs(args)
       .setVerbose(true)
       .setMainClass(config.className)

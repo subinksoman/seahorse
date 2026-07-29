@@ -22,24 +22,24 @@ object Version {
   val guice = "4.0"
   val h2 = "1.4.191"
 //  val json4s = "3.3.0"
-   val json4s = "3.4.2"
+   val json4s = "3.6.12"  // 3.4.2 has no Scala 2.13 artifact
   val jclouds = "2.1.0"
 //  val metricsScala = "3.5.4_a2.3"
-  val metricsScala = "3.5.5"
+  val metricsScala = "4.2.9"  // metrics4-scala; metrics-scala 3.5.x has no Scala 2.13 artifact
   val mockito = "1.10.19"
 //  val nsscalaTime = "1.8.0"
-  val nsscalaTime = "2.14.0"
-  val scalatest = "3.0.0"
+  val nsscalaTime = "2.30.0"  // 2.14.0 has no Scala 2.13 artifact
+  val scalatest = "3.0.9"  // first 3.0.x published for Scala 2.13
 //  val scalatra = "2.4.0"
-  val scalatra = "2.5.0"
+  val scalatra = "2.7.1"  // 2.5.0 has no Scala 2.13 artifact
   val scoverage = "1.4.6"
 //  val slick = "3.1.1"
-  val slick = "3.2.0"
+  val slick = "3.3.3"  // first slick line with Scala 2.13 artifacts; drops slick.driver package
 
   val spark = sys.props.getOrElse("SPARK_VERSION", "3.0.0")
   val (scala, hadoop, akka, sprayRoutingLib) = spark match {
-    // Step A: Spark 3.4.4 on Scala 2.12 (2.12.17, matching the workflow-executor build) / Hadoop 3.
-    case "3.4.4"  => ("2.12.17", "3.3", "2.4.13", "routing")
+    // Step B: Spark 3.4.4 on Scala 2.13.12 (matches the workflow-executor build) / Hadoop 3.
+    case "3.4.4"  => ("2.13.12", "3.3", "2.4.13", "routing")
     case "3.0.0"  => ("2.12.10", "2.7", "2.4.13", "routing")
     case "2.2.0"  => ("2.12.16", "2.7", "2.4.9", "routing-shapeless2")
     case "2.1.0" | "2.1.1" | "2.4.8" => ("2.12.16", "2.7", "2.4.9", "routing-shapeless2")
@@ -57,7 +57,7 @@ object Version {
   val log4j2 = "2.19.0" // matches Spark 3.4.4; provides log4j-slf4j2-impl for slf4j 2.x (Pekko)
   val amazonS3 = "1.10.16"
   val googleApi = "1.22.0"
-  val scalacheck = "1.12.6"
+  val scalacheck = "1.15.4"  // 1.12.x has no Scala 2.13 artifact
 }
 
 object Library {
@@ -105,7 +105,7 @@ object Library {
   val guiceAssistedInject = "com.google.inject.extensions" % "guice-assistedinject" % Version.guice
   val jcloudsKeystone = jclouds("keystone")
   val jettyWebapp = "org.eclipse.jetty" % "jetty-webapp" % "9.3.8.v20160314"
-  val metricsScala = "nl.grons" %% "metrics-scala" % Version.metricsScala excludeAkkaActor
+  val metricsScala = "nl.grons" %% "metrics4-scala" % Version.metricsScala excludeAkkaActor
   val mockitoCore = "org.mockito" % "mockito-core" % Version.mockito
   val nscalaTime = "com.github.nscala-time" %% "nscala-time" % Version.nsscalaTime
   val quartz = "org.quartz-scheduler" % "quartz" % "2.3.0"
@@ -116,7 +116,7 @@ object Library {
   val scalatest = "org.scalatest" %% "scalatest" % Version.scalatest
   val scalatra = "org.scalatra" %% "scalatra" % Version.scalatra
   val scalatraTest = "org.scalatra" %% "scalatra-scalatest" % Version.scalatra % "test"
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.2.8"
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.2.30"  // 7.2.8 has no Scala 2.13 artifact
   val scoverage = "org.scoverage" %% "scalac-scoverage-runtime" % Version.scoverage
   val stampy = "asia.stampy" % "stampy-core" % "1.0-RELEASE"
   val slick = "com.typesafe.slick" %% "slick" % Version.slick
@@ -154,8 +154,6 @@ object Dependencies {
 
  val resolvers = Seq(
     "sonatype.org"           at "https://oss.sonatype.org/content/repositories/releases",
-    "spray.io"               at "https://repo.spray.io",
-    "The New Motion Public Repo" at "https://nexus.thenewmotion.com/content/repositories/releases-public",
     Classpaths.typesafeReleases,
     "Maven Central"          at "https://repo1.maven.org/maven2/",
     "Local Maven Repository" at "file:///home/subinsoman/.m2/repository" 
@@ -171,7 +169,7 @@ object Dependencies {
     val onlyInTests = provided ++ test
   }
 
-  val scalajs = "org.scalaj" %% "scalaj-http" % "2.3.0"
+  val scalajs = "org.scalaj" %% "scalaj-http" % "2.4.2"  // 2.3.0 has no Scala 2.13 artifact
 
   val json4s = Seq(
     "org.json4s"              %% "json4s-jackson"                 % Version.json4s,
@@ -183,7 +181,6 @@ object Dependencies {
     "org.scalatra"            %% "scalatra"                       % Version.scalatra,
     "org.scalatra"            %% "scalatra-scalate"               % Version.scalatra,
     "org.scalatra"            %% "scalatra-json"                  % Version.scalatra,
-    "org.scalatra"            %% "scalatra-slf4j"                 % Version.scalatra,
     "org.scalatra"            %% "scalatra-atmosphere"            % Version.scalatra,
     "org.scalatra"            %% "scalatra-scalatest"             % Version.scalatra  % "test",
 
@@ -192,9 +189,9 @@ object Dependencies {
     "org.eclipse.jetty.websocket" % "websocket-server"        % Version.jetty
   )
 
-  val shapeless = "com.chuusai" %% "shapeless" % "2.3.2"
-  val scalacheck = "org.scalacheck" %% "scalacheck" % "1.13.4" % Test
-  val scalacheckShapeless = "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.3"
+  val shapeless = "com.chuusai" %% "shapeless" % "2.3.3"  // 2.3.2 has no Scala 2.13 artifact
+  val scalacheck = "org.scalacheck" %% "scalacheck" % "1.15.4" % Test
+  val scalacheckShapeless = "com.github.alexarchambault" %% "scalacheck-shapeless_1.15" % "1.3.0"  // _1.13/1.1.3 has no Scala 2.13 artifact
 
   val commons = Seq(
     pekkoActor,

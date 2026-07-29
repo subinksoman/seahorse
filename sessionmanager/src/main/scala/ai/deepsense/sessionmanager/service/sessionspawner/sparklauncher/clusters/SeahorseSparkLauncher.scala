@@ -16,7 +16,6 @@
 
 package ai.deepsense.sessionmanager.service.sessionspawner.sparklauncher.clusters
 
-import scala.collection._
 import scalaz.Scalaz._
 import scalaz.Validation
 

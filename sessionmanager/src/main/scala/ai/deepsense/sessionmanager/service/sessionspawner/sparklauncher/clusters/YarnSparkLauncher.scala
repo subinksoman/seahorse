@@ -29,7 +29,7 @@ import ai.deepsense.sessionmanager.service.sessionspawner.sparklauncher.spark.Sp
 import ai.deepsense.sessionmanager.service.sessionspawner.sparklauncher.spark.SparkArgumentParser.SparkOptionsOp
 
 private [clusters] object YarnSparkLauncher {
-  import scala.collection.JavaConversions._
+  import scala.jdk.CollectionConverters._
 
   def apply(workflowId: String,
             applicationArgs: Seq[String],
@@ -39,7 +39,7 @@ private [clusters] object YarnSparkLauncher {
     val updatedArgs = args
       .updateConfOptions("spark.yarn.dist.archives", sparkRArchivePath(config.sparkHome))
       .updateConfOptions("spark.yarn.dist.archives", pySparkArchivePath(config.sparkHome))
-    new SparkLauncher(env(config, clusterConfig))
+    new SparkLauncher(env(config, clusterConfig).asJava)
       .setSparkArgs(updatedArgs)
       .setVerbose(true)
       .setMainClass(config.className)

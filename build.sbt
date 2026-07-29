@@ -108,7 +108,7 @@ libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.3.0"
 
 libraryDependencies ++= Seq(
   "org.scoverage" %% "scalac-scoverage-reporter" % "2.3.0" exclude("org.scala-lang.modules", "scala-xml_2.12"),
-  "org.scalariform" %% "scalariform" % "0.2.0",
+  "org.scalariform" %% "scalariform" % "0.2.10",
   "org.scala-lang.modules" %% "scala-xml" % "2.3.0" // or 1.0.6
 )
 

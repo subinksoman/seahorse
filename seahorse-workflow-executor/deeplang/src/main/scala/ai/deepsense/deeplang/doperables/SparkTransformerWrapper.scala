@@ -33,7 +33,7 @@ import ai.deepsense.deeplang.{ExecutionContext, TypeUtils}
  * @tparam T Wrapped Spark transformer type
  */
 abstract class SparkTransformerWrapper[T <: ml.Transformer](implicit tag: TypeTag[T])
-  extends Transformer
+  extends ai.deepsense.deeplang.doperables.Transformer
   with ParamsWithSparkWrappers {
 
   lazy val sparkTransformer: T = TypeUtils.instanceOfType(tag)

@@ -28,7 +28,7 @@ import ai.deepsense.commons.collection.MultiMap._
 import ai.deepsense.sessionmanager.service.sessionspawner.sparklauncher.SparkLauncherError
 
 object SparkArgumentParser extends Logging {
-  import scala.collection.JavaConversions._
+  import scala.jdk.CollectionConverters._
 
 
   type SparkOptionsMultiMap = MultiMap[String, String]
@@ -103,7 +103,7 @@ object SparkArgumentParser extends Logging {
 
     try {
       val parser = new SparkAgumentParser()
-      parser.parseArgs(argsWithFixedQuotes.toList)
+      parser.parseArgs(argsWithFixedQuotes.toList.asJava)
       parser.arguments.success
     } catch {
       case unknownOptions: UnknownOption => unknownOptions.failure
@@ -126,8 +126,8 @@ object SparkArgumentParser extends Logging {
       throw UnknownOption(opt)
     }
     override def handleExtraArgs(extra: util.List[String]): Unit = {
-      if (extra.nonEmpty) {
-        logger.warn(s"Handle extra args: ${extra.mkString(", ")}")
+      if (!extra.isEmpty) {
+        logger.warn(s"Handle extra args: ${extra.asScala.mkString(", ")}")
       }
     }
   }

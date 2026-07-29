@@ -16,7 +16,7 @@
 
 package ai.deepsense.commons.auth.usercontext
 
-import scala.collection.JavaConversions.asScalaSet
+import scala.jdk.CollectionConverters._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
@@ -85,7 +85,7 @@ class KeystoneTokenTranslator @Inject()(
 
   private def rolesOfUser(keystoneUser: KeystoneUser): Set[Role] = {
     val keystoneRoleJavaSet: java.util.Set[KeystoneRole] = keystoneUser
-    val keystoneRoles: Set[KeystoneRole] = asScalaSet(keystoneRoleJavaSet).toSet
+    val keystoneRoles: Set[KeystoneRole] = keystoneRoleJavaSet.asScala.toSet
     keystoneRoles.map(toRole)
   }
 

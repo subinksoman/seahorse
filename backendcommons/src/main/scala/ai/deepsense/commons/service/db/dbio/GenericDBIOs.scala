@@ -21,7 +21,7 @@ import java.util.UUID
 import scala.language.reflectiveCalls
 
 import slick.dbio.Effect.{Read, Write}
-import slick.driver.JdbcProfile
+import slick.jdbc.JdbcProfile
 
 import ai.deepsense.commons.service.api.CommonApiExceptions
 

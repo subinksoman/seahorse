@@ -91,8 +91,8 @@ class SessionServiceActor @Inject()(
     subscription.map({
       case ChannelSetupResult(queue, chAct) => (id, subscriber, queue, chAct)
     }) pipeTo self
-    subscription.onFailure {
-      case t => logger.error(s"Unable to subscribe SessionService to workflow $id execution events topic, " +
+    subscription.failed.foreach {
+      t => logger.error(s"Unable to subscribe SessionService to workflow $id execution events topic, " +
         s"this means the service can't provide node statuses reports.")
     }
   }

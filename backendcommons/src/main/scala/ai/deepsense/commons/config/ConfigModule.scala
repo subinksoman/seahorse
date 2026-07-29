@@ -16,7 +16,7 @@
 
 package ai.deepsense.commons.config
 
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters._
 
 import com.google.inject.name.Names
 import com.google.inject.{AbstractModule, TypeLiteral}
@@ -74,7 +74,7 @@ class ConfigModule extends AbstractModule {
    * config key as the name.
    */
   private def bindConfig(config: Config): Unit = {
-    for (entry <- config.entrySet) {
+    for (entry <- config.entrySet.asScala) {
       val cv = entry.getValue
       cv.valueType match {
         case STRING | NUMBER | BOOLEAN =>
@@ -115,16 +115,16 @@ class ConfigModule extends AbstractModule {
     } else {
       val seq = list.get(0) match {
         case x: Integer =>
-          val v = list.collect({case x: java.lang.Integer => x.intValue}).toSeq
+          val v = list.asScala.collect({case x: java.lang.Integer => x.intValue}).toSeq
           bind(new TypeLiteral[Seq[Any]](){}).annotatedWith(Names.named(key)).toInstance(v)
         case x: Double =>
-          val v = list.collect({case x: java.lang.Double => x.doubleValue}).toSeq
+          val v = list.asScala.collect({case x: java.lang.Double => x.doubleValue}).toSeq
           bind(new TypeLiteral[Seq[Any]](){}).annotatedWith(Names.named(key)).toInstance(v)
         case x: Boolean =>
-          val v = list.collect({case x: java.lang.Boolean => x.booleanValue}).toSeq
+          val v = list.asScala.collect({case x: java.lang.Boolean => x.booleanValue}).toSeq
           bind(new TypeLiteral[Seq[Any]](){}).annotatedWith(Names.named(key)).toInstance(v)
         case x: String =>
-          val v = list.collect({case x: String => x}).toSeq
+          val v = list.asScala.collect({case x: String => x}).toSeq
           bind(new TypeLiteral[Seq[String]](){}).annotatedWith(Names.named(key)).toInstance(v)
         case x =>
           throw new AssertionError("Unsupported list type " + x.getClass)

@@ -24,7 +24,7 @@ case class ExecutionReport(
     states: Map[Node.Id, NodeState],
     error: Option[FailureDescription] = None) {
 
-  def nodesStatuses: Map[Node.Id, NodeStatus] = states.mapValues(_.nodeStatus)
+  def nodesStatuses: Map[Node.Id, NodeStatus] = states.view.mapValues(_.nodeStatus).toMap
 
   def resultEntities: EntitiesMap = {
     val combinedEntities = states.valuesIterator.flatMap(_.reportEntities().toSeq).toMap
@@ -46,12 +46,12 @@ object ExecutionReport {
   def statesOnly(
       nodes: Map[Node.Id, NodeStatus],
       error: Option[FailureDescription]): ExecutionReport = {
-    ExecutionReport(nodes.mapValues(status => NodeState(status, None)), error)
+    ExecutionReport(nodes.view.mapValues(status => NodeState(status, None)).toMap, error)
   }
 
   private def toNodeStates(
       nodes: Map[Node.Id, NodeStatus],
       resultEntities: EntitiesMap): Map[Node.Id, NodeState] = {
-    nodes.mapValues(status => NodeState(status, Some(resultEntities.subMap(status.results.toSet))))
+    nodes.view.mapValues(status => NodeState(status, Some(resultEntities.subMap(status.results.toSet)))).toMap
   }
 }

@@ -36,7 +36,10 @@ object CommonSettingsPlugin extends AutoPlugin {
     crossScalaVersions := Seq(Version.scala),
     scalacOptions := Seq(
       "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
-      "-language:existentials", "-language:implicitConversions", "-Xfatal-warnings"
+      "-language:existentials", "-language:implicitConversions"
+      // -Xfatal-warnings dropped for the Scala 2.13 flip: 2.13 emits many deprecation
+      // warnings (JavaConverters, procedure syntax, collection APIs) that are migrated
+      // incrementally; keeping them fatal would block the whole build.
     ),
     javacOptions ++= Seq(
       "-source", Version.java,

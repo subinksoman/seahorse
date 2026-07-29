@@ -63,7 +63,7 @@ object ExecutionReportSubscriberActor {
   // yet initialized.
   private def generateNodeStatusResponse(nodeStatusMap: NodeStatusMap, initialized: Boolean): NodeStatusesResponse = {
     if (initialized) {
-      NodeStatusesResponse(Some(nodeStatusMap.groupBy(_._2).mapValues(_.size)))
+      NodeStatusesResponse(Some(nodeStatusMap.groupBy(_._2).view.mapValues(_.size).toMap))
     } else {
       NodeStatusesResponse(None)
     }
