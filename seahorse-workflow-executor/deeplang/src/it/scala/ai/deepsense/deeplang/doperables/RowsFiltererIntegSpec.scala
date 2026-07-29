@@ -18,7 +18,7 @@ package ai.deepsense.deeplang.doperables
 
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
-import org.scalatest.Matchers
+import org.scalatest.matchers.should.Matchers
 
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.doperables.dataframe.DataFrame

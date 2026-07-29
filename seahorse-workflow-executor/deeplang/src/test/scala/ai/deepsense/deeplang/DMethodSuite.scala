@@ -16,7 +16,7 @@
 
 package ai.deepsense.deeplang
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.{AnyFunSuite => FunSuite}
 
 import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog
 import ai.deepsense.deeplang.doperables.DOperableMock

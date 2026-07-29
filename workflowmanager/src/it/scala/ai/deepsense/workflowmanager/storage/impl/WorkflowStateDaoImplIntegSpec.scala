@@ -20,7 +20,7 @@ import scala.concurrent.{Await, Future}
 
 import org.joda.time.DateTime
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfter, Matchers}
 
 import ai.deepsense.commons.StandardSpec

@@ -17,7 +17,8 @@
 package ai.deepsense.commons.config
 
 import com.typesafe.config.ConfigFactory
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.{AnyFunSpec => FunSpec}
+import org.scalatest.matchers.should.Matchers
 
 class ConfigFactoryExtSpec extends FunSpec with Matchers {
   describe ("-Denv=test specified") {

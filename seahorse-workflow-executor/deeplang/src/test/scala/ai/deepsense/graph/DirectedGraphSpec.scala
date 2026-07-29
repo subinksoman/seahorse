@@ -16,8 +16,9 @@
 
 package ai.deepsense.graph
 
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.funsuite.{AnyFunSuite => FunSuite}
+import org.scalatest.matchers.should.Matchers
 
 import ai.deepsense.commons.serialization.Serialization
 import ai.deepsense.commons.utils.Logging

@@ -21,8 +21,9 @@ import java.util.concurrent.TimeoutException
 import scala.concurrent.duration._
 
 import org.apache.spark.SparkContext
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 import ai.deepsense.deeplang.{CustomCodeExecutor, DataFrameStorage, OperationExecutionDispatcher}
 import ai.deepsense.sparkutils.SparkSQLSession

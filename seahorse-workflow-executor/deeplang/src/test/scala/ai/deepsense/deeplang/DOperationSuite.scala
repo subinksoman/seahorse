@@ -18,7 +18,7 @@ package ai.deepsense.deeplang
 
 import scala.reflect.runtime.{universe => ru}
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.{AnyFunSuite => FunSuite}
 
 import ai.deepsense.commons.utils.Version
 import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog

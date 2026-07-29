@@ -197,3 +197,15 @@ libraryDependencies ++= Dependencies.api ++ Seq(
 
 
 // scalastyle:on
+
+// Scala 2.13 / scalatest 3.2 test-support: MockitoSugar moved to org.scalatestplus.mockito
+// (mockito-1-10 keeps the project's Mockito 1.10.19) and GeneratorDrivenPropertyChecks moved to
+// org.scalatestplus.scalacheck. Added build-wide in Test scope so every module's specs resolve them.
+ThisBuild / libraryDependencies ++= Seq(
+  "org.scalatestplus" %% "mockito-1-10" % "3.1.0.0" % Test,
+  "org.scalatestplus" %% "scalacheck-1-15" % "3.2.3.0" % Test
+)
+
+// Keep Mockito at 1.10.19 (a transitive dep otherwise evicts it up to 3.x/5.x on 2.13, which
+// removed org.mockito.Matchers -> the specs' `any(...)` matchers stop resolving).
+ThisBuild / dependencyOverrides += "org.mockito" % "mockito-core" % "1.10.19"

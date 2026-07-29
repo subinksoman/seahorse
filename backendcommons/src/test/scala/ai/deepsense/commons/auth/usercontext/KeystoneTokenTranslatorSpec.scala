@@ -16,7 +16,7 @@
 
 package ai.deepsense.commons.auth.usercontext
 
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
@@ -148,7 +148,7 @@ class KeystoneTokenTranslatorSpec extends StandardSpec with UnitTestSupport {
     builder.email(email)
     builder.enabled(enabled)
     builder.tenantId(tenantId)
-    builder.roles(roles)
+    builder.roles(roles.asJava)
     builder.build()
   }
 }

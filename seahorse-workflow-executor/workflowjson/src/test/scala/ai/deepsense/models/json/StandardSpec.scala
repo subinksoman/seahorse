@@ -17,7 +17,8 @@
 package ai.deepsense.models.json
 
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 class StandardSpec
   extends WordSpec

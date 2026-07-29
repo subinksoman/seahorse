@@ -18,7 +18,8 @@ package ai.deepsense.seahorse.datasource.server
 
 import java.util.UUID
 
-import org.scalatest.{FreeSpec, Matchers}
+import org.scalatest.freespec.{AnyFreeSpec => FreeSpec}
+import org.scalatest.matchers.should.Matchers
 
 import ai.deepsense.seahorse.datasource.api.{ApiException, DatasourceManagerApi}
 import ai.deepsense.seahorse.datasource.db.FlywayMigration

@@ -19,7 +19,8 @@ package ai.deepsense.commons
 import scala.concurrent.duration._
 
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 import org.apache.pekko.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
 
 /**

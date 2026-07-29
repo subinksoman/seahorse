@@ -28,9 +28,10 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.concurrent.{TimeLimits, Timeouts}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.time.SpanSugar._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 import ai.deepsense.deeplang.DataFrameStorage
 import ai.deepsense.sparkutils.SparkSQLSession

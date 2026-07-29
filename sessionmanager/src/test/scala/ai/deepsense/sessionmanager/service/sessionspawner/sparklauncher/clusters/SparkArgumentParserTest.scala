@@ -18,7 +18,8 @@ package ai.deepsense.sessionmanager.service.sessionspawner.sparklauncher.cluster
 
 import scala.collection.mutable
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.{AnyFunSuite => FunSuite}
+import org.scalatest.matchers.should.Matchers
 
 import ai.deepsense.sessionmanager.service.sessionspawner.sparklauncher.spark.SparkArgumentParser
 import scalaz._

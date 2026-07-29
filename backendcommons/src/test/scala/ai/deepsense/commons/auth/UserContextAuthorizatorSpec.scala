@@ -39,7 +39,7 @@ class UserContextAuthorizatorSpec extends StandardSpec with UnitTestSupport {
         }
         Await.ready(shouldBeFailed, new FiniteDuration(2, duration.SECONDS))
         shouldBeFailed.value.get match {
-          case Failure(f) if f == failure => Unit
+          case Failure(f) if f == failure => ()
           case _ => fail("Future should be failed")
         }
       }
@@ -57,7 +57,7 @@ class UserContextAuthorizatorSpec extends StandardSpec with UnitTestSupport {
       val authorizator = new UserContextAuthorizator(Future.successful(userContext))
 
       val resultForRole = authorizator.withRole(workingRole) { userContext =>
-        Future.successful(Unit)
+        Future.successful(())
       }
 
       Await.ready(resultForRole, new FiniteDuration(2, duration.SECONDS))
@@ -70,11 +70,11 @@ class UserContextAuthorizatorSpec extends StandardSpec with UnitTestSupport {
         when(userContext.roles).thenReturn(Set[Role]())
         val authorizator = new UserContextAuthorizator(Future.successful(userContext))
         val shouldBeFailed = authorizator.withRole(nonExistingRole) { userContext =>
-          Future.successful(Unit)
+          Future.successful(())
         }
         Await.ready(shouldBeFailed, new FiniteDuration(2, duration.SECONDS))
         shouldBeFailed.value.get match {
-          case Failure(f) if f == NoRoleException(userContext, nonExistingRole) => Unit
+          case Failure(f) if f == NoRoleException(userContext, nonExistingRole) => ()
           case _ => fail("Future should be failed")
         }
       }

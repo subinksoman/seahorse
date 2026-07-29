@@ -16,7 +16,8 @@
 
 package ai.deepsense.deeplang.doperations
 
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FreeSpec}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
+import org.scalatest.freespec.{AnyFreeSpec => FreeSpec}
 
 import ai.deepsense.deeplang.utils.DataFrameMatchers
 import ai.deepsense.deeplang.{InMemoryDataFrame, LocalExecutionContext, TestDataSources, TestFiles}

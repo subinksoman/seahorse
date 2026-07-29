@@ -17,7 +17,9 @@
 package ai.deepsense.deeplang
 
 import org.scalatest._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 /**
  * Base class for unit tests as advised: http://www.scalatest.org/user_guide/defining_base_classes

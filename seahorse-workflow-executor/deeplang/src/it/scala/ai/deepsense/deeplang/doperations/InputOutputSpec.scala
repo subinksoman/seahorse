@@ -19,6 +19,8 @@ package ai.deepsense.deeplang.doperations
 import java.util.UUID
 
 import org.scalatest._
+import org.scalatest.freespec.{AnyFreeSpec => FreeSpec}
+import org.scalatest.matchers.should.Matchers
 
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang._

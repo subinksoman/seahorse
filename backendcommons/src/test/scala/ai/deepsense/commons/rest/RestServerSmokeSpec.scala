@@ -25,7 +25,9 @@ import org.apache.pekko.http.scaladsl.model.{HttpRequest, StatusCodes}
 import org.apache.pekko.http.scaladsl.server.Directives._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshal
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 /**
  * Runtime verification that the REST framework, migrated from Spray's actor-bound HttpService to

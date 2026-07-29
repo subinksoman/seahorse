@@ -29,7 +29,7 @@ import scalaz._
 import akka.actor.ActorSystem
 import akka.util.Timeout
 import org.scalactic.source.Position
-import org.scalatest.Matchers
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Seconds, Span}
 import spray.http.HttpResponse

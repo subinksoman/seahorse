@@ -16,8 +16,9 @@
 
 package ai.deepsense.reportlib.model
 
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 import spray.json._
 
 import ai.deepsense.reportlib.model.factory.DistributionTestFactory

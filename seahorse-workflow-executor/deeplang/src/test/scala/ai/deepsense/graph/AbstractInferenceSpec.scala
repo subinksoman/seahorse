@@ -18,7 +18,8 @@ package ai.deepsense.graph
 
 import scala.reflect.runtime.{universe => ru}
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog

@@ -19,8 +19,9 @@ package ai.deepsense.deeplang.params.wrappers.spark
 import org.apache.spark.ml
 import org.apache.spark.ml.param._
 import org.apache.spark.sql.types.StructType
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 import ai.deepsense.deeplang.params.BooleanParam
 import ai.deepsense.deeplang.params.choice.{ChoiceParam, Choice}

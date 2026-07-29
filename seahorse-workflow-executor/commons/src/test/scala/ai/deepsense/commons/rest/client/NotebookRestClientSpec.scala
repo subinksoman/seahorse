@@ -25,7 +25,8 @@ import scala.language.postfixOps
 
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.http.scaladsl.model._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 import ai.deepsense.commons.models.Id
 import ai.deepsense.commons.utils.RetryActor.RetryLimitReachedException

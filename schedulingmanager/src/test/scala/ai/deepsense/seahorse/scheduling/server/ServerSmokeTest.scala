@@ -18,7 +18,8 @@ package ai.deepsense.seahorse.scheduling.server
 
 import scalaj.http._
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 import ai.deepsense.commons.utils.LoggerForCallerClass
 import ai.deepsense.seahorse.scheduling.SchedulingManagerConfig

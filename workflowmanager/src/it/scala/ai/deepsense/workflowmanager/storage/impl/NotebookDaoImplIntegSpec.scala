@@ -20,7 +20,7 @@ import scala.concurrent.{Await, Future}
 
 import org.apache.commons.lang3.RandomStringUtils
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfter, Matchers}
 
 import ai.deepsense.commons.StandardSpec

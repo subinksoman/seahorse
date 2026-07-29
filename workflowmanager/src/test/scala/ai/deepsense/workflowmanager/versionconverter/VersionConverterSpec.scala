@@ -20,7 +20,8 @@ import java.util.UUID
 
 import org.apache.commons.io.IOUtils
 import org.scalactic.Equality
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 import spray.json._
 
 import ai.deepsense.api.datasourcemanager.model.{Datasource, DatasourceParams}

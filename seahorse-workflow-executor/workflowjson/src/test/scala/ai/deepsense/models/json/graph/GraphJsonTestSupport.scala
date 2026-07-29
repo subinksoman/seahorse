@@ -17,8 +17,9 @@
 package ai.deepsense.models.json.graph
 
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 import spray.json.{DefaultJsonProtocol, JsObject}
 
 import ai.deepsense.deeplang.DOperation

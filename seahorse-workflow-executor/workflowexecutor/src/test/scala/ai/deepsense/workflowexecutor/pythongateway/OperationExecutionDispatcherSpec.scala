@@ -17,7 +17,7 @@
 package ai.deepsense.workflowexecutor.pythongateway
 
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import ai.deepsense.commons.StandardSpec
 import ai.deepsense.commons.models.Id
 import ai.deepsense.deeplang.OperationExecutionDispatcher

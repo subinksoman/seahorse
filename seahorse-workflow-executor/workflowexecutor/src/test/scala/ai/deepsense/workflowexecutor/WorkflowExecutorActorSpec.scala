@@ -25,8 +25,10 @@ import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest._
+import org.scalatest.wordspec.{AnyWordSpecLike => WordSpecLike}
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.concurrent.{Eventually, ScalaFutures, ScaledTimeSpans}
-import org.scalatest.mockito.MockitoSugar
 import spray.json.JsObject
 import ai.deepsense.commons.datetime.DateTimeConverter
 import ai.deepsense.commons.models.Entity

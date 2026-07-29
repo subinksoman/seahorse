@@ -18,7 +18,8 @@ package ai.deepsense.deeplang.catalogs.doperable
 
 import scala.reflect.runtime.{universe => ru}
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.{AnyFunSuite => FunSuite}
+import org.scalatest.matchers.should.Matchers
 
 import ai.deepsense.deeplang.DOperable
 import ai.deepsense.deeplang.catalogs.doperable.exceptions._

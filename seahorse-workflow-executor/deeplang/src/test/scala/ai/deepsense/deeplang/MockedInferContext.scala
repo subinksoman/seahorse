@@ -16,7 +16,7 @@
 
 package ai.deepsense.deeplang
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import ai.deepsense.commons.rest.client.datasources.{DatasourceClient, DatasourceInMemoryClientFactory}
 import ai.deepsense.deeplang.catalogs.DCatalog

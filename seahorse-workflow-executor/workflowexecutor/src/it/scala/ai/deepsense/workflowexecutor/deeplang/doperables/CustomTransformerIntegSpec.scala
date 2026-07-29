@@ -18,7 +18,7 @@ package ai.deepsense.workflowexecutor.deeplang.doperables
 
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
-import org.scalatest.Matchers
+import org.scalatest.matchers.should.Matchers
 import spray.json._
 
 import ai.deepsense.deeplang._

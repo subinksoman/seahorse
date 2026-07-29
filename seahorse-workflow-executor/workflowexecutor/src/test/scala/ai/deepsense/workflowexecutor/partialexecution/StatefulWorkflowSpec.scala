@@ -17,7 +17,7 @@
 package ai.deepsense.workflowexecutor.partialexecution
 
 import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import spray.json.{JsObject, JsString}
 
 import ai.deepsense.commons.datetime.DateTimeConverter

@@ -20,7 +20,8 @@ import java.io.{File, FileNotFoundException, IOException}
 
 import scala.util.Success
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 class DirectoryListFileFinderSpec extends WordSpec with Matchers {
 

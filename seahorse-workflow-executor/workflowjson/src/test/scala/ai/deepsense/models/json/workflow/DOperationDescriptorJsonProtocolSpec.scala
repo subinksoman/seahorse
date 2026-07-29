@@ -20,8 +20,9 @@ import scala.reflect.runtime.universe.{TypeTag, typeOf}
 
 import ai.deepsense.deeplang.catalogs.SortPriority
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.flatspec.{AnyFlatSpec => FlatSpec}
+import org.scalatest.matchers.should.Matchers
 import spray.json._
 import ai.deepsense.deeplang.{DOperation, DPortPosition}
 import ai.deepsense.deeplang.catalogs.doperations.{DOperationCategory, DOperationDescriptor}

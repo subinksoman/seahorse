@@ -18,7 +18,8 @@ package ai.deepsense.seahorse.scheduling.schedule
 
 import java.util.UUID
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 import scala.concurrent.Future
 

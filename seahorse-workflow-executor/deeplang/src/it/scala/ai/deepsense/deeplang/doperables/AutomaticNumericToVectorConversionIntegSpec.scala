@@ -22,8 +22,8 @@ import ai.deepsense.sparkutils.Linalg.Vectors
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
 import org.joda.time.DateTime
-import org.scalatest.Matchers
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.{ScalaCheckDrivenPropertyChecks => GeneratorDrivenPropertyChecks}
 
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.doperables.multicolumn.MultiColumnParams.SingleOrMultiColumnChoices.SingleColumnChoice

@@ -16,7 +16,8 @@
 
 package ai.deepsense.deeplang.doperations.readwritedatasource
 
-import org.scalatest.{FreeSpec, Matchers}
+import org.scalatest.freespec.{AnyFreeSpec => FreeSpec}
+import org.scalatest.matchers.should.Matchers
 
 import ai.deepsense.api.datasourcemanager.model._
 import ai.deepsense.deeplang.doperations.ReadDataFrame.ReadDataFrameParameters

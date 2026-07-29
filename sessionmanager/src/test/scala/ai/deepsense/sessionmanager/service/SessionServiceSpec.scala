@@ -22,8 +22,9 @@ import java.util.UUID
 import org.apache.pekko.actor.Actor.Receive
 import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props}
 import org.apache.spark.launcher.SparkAppHandle.State
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

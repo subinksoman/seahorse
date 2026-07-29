@@ -22,7 +22,8 @@ import scala.language.postfixOps
 
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.util.Timeout
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 import ai.deepsense.commons.utils.RetryActor.{RetriableException, RetryLimitReachedException}
 

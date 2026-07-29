@@ -21,8 +21,8 @@ import scala.collection.JavaConverters._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
-import org.scalatest.Matchers
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.{ScalaCheckDrivenPropertyChecks => GeneratorDrivenPropertyChecks}
 
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.doperables.dataframe.DataFrame

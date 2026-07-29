@@ -18,7 +18,7 @@ package ai.deepsense.workflowexecutor.session.storage
 
 import org.apache.spark.sql.{DataFrame => SparkDataFrame}
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import ai.deepsense.commons.StandardSpec
 import ai.deepsense.commons.models.Id

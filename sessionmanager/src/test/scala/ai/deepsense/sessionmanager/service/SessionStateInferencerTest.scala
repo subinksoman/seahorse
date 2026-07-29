@@ -20,7 +20,8 @@ import java.time.Instant
 
 import org.apache.spark.launcher.SparkAppHandle
 import org.apache.spark.launcher.SparkAppHandle.State
-import org.scalatest.{FreeSpec, Matchers}
+import org.scalatest.freespec.{AnyFreeSpec => FreeSpec}
+import org.scalatest.matchers.should.Matchers
 
 import ai.deepsense.sessionmanager.service.sessionspawner.{StateInferencer, StateInferencerFactory}
 

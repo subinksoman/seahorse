@@ -16,7 +16,7 @@
 
 package ai.deepsense.commons
 
-import scala.collection.JavaConversions.asScalaSet
+import scala.jdk.CollectionConverters._
 import scala.concurrent.duration._
 import scala.reflect.{ClassTag, classTag}
 
@@ -64,7 +64,7 @@ trait IntegTestSupport extends IntegrationPatience {
     def provideApiRouter(
       apiSet: java.util.Set[RestComponent]): RestService = {
       new RestService {
-        protected[this] def apis = asScalaSet(apiSet).toSeq
+        protected[this] def apis = apiSet.asScala.toSeq
       }
     }
   })

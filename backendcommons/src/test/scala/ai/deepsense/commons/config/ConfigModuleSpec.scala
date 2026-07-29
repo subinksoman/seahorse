@@ -16,11 +16,12 @@
 
 package ai.deepsense.commons.config
 
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters._
 
 import com.google.inject.Guice
 import com.typesafe.config.{Config, ConfigFactory}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.{AnyFunSpec => FunSpec}
+import org.scalatest.matchers.should.Matchers
 
 import ai.deepsense.commons.config.TestInjectable.Params
 
@@ -36,10 +37,10 @@ class ConfigModuleSpec extends FunSpec with Matchers {
       config.getInt("test.int"),
       config.getDouble("test.double"),
       config.getBoolean("test.boolean"),
-      config.getStringList("test.stringList"),
-      config.getIntList("test.intList").map(_.intValue).toSeq,
-      config.getDoubleList("test.doubleList").map(_.doubleValue).toSeq,
-      config.getBooleanList("test.booleanList").map(_.booleanValue).toSeq
+      config.getStringList("test.stringList").asScala.toList,
+      config.getIntList("test.intList").asScala.map(_.intValue).toSeq,
+      config.getDoubleList("test.doubleList").asScala.map(_.doubleValue).toSeq,
+      config.getBooleanList("test.booleanList").asScala.map(_.booleanValue).toSeq
     )
   }
 

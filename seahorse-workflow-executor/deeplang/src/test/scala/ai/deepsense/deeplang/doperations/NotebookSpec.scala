@@ -27,8 +27,9 @@ import org.mockito.Matchers.{eq => eqMatcher, _}
 import org.mockito.Mockito._
 import org.mockito.{ArgumentCaptor, Mockito}
 import org.scalatest.concurrent.Eventually
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 import ai.deepsense.commons.mail.EmailSender
 import ai.deepsense.commons.rest.client.NotebookRestClient

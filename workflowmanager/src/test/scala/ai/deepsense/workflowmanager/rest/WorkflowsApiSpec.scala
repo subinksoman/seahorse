@@ -707,7 +707,7 @@ class WorkflowsApiSpec
   def mockStatesStorage(): WorkflowStateStorage = {
     val workflowStatesStorage = mock[WorkflowStateStorage]
     when(workflowStatesStorage.save(any(), any()))
-      .thenReturn(Future.successful[Unit](Unit))
+      .thenReturn(Future.successful[Unit](()))
     workflowStatesStorage
   }
 

@@ -18,7 +18,7 @@ package ai.deepsense.graph
 
 import scala.reflect.runtime.{universe => ru}
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import ai.deepsense.commons.utils.Version
 import ai.deepsense.deeplang._

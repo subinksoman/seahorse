@@ -25,7 +25,9 @@ import com.rabbitmq.client.ConnectionFactory
 import org.apache.pekko.actor.{ActorRef, ActorSystem}
 import org.apache.pekko.testkit.TestKit
 import org.apache.pekko.util.Timeout
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpecLike => WordSpecLike}
 
 /**
  * Broker round-trip test for the Pekko akka-rabbitmq replacement (task T33). Requires a running

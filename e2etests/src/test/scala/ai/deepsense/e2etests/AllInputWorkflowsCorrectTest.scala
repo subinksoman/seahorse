@@ -16,7 +16,7 @@
 
 package ai.deepsense.e2etests
 
-import org.scalatest.WordSpec
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 import ai.deepsense.deeplang.CatalogRecorder
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader

@@ -18,7 +18,8 @@ package ai.deepsense.e2etests.session
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 import ai.deepsense.e2etests.{SeahorseIntegrationTestDSL, TestClusters, TestDatasourcesInserter, TestWorkflowsIterator}
 

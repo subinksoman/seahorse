@@ -27,8 +27,10 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.mockito.{Matchers => matchers}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpecLike => WordSpecLike}
 
 import ai.deepsense.commons.models.Id
 import ai.deepsense.commons.models.ClusterDetails

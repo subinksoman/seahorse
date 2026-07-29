@@ -23,7 +23,12 @@ object LoggerForCallerClass {
   def apply(): Logger = {
     // We use the third stack element; second is this method, first is .getStackTrace()
     val myCaller = Thread.currentThread().getStackTrace()(2)
-    assert(myCaller.getMethodName() == "<init>", "Must be called in constructor")
+    // Scala 2.13 runs field initializers of a trait in `$init$` and of an `object` in the static
+    // initializer `<clinit>` (2.12 used the instance `<init>`), so accept all three when this is
+    // invoked from a `val logger = LoggerForCallerClass()` in a class, trait, or object.
+    val method = myCaller.getMethodName()
+    assert(method == "<init>" || method == "$init$" || method == "<clinit>",
+      "Must be called in constructor")
     LoggerFactory.getLogger(myCaller.getClassName)
   }
 

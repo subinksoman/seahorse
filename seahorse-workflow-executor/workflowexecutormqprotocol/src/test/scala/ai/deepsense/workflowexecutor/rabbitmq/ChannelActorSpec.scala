@@ -21,7 +21,9 @@ import java.util.concurrent.atomic.AtomicInteger
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.testkit.{TestFSMRef, TestKit}
 import org.mockito.Mockito.mock
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpecLike => WordSpecLike}
 
 /**
  * Broker-free verification of the ported ChannelActor FSM (buffering/replay semantics of the

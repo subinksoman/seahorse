@@ -20,7 +20,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.{SparkConf, SparkContext}
-import org.scalatest.mockito.MockitoSugar._
+import org.scalatestplus.mockito.MockitoSugar._
 
 import ai.deepsense.commons.rest.client.datasources.{DatasourceClient, DatasourceInMemoryClientFactory}
 import ai.deepsense.commons.spark.sql.UserDefinedFunctions

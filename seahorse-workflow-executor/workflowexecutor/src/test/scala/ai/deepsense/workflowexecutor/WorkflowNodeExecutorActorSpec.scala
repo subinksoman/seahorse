@@ -21,7 +21,7 @@ import org.apache.pekko.testkit.{TestActorRef, TestKit, TestProbe}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.Eventually
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, Matchers, WordSpecLike}
 
 import ai.deepsense.deeplang._

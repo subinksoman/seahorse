@@ -16,7 +16,8 @@
 
 package ai.deepsense.commons.json.envelope
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.{AnyFlatSpec => FlatSpec}
+import org.scalatest.matchers.should.Matchers
 import spray.json._
 
 class EnvelopeSpec

@@ -17,7 +17,8 @@
 package ai.deepsense.reportlib.model
 
 import ai.deepsense.reportlib.model.factory.ReportContentTestFactory
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 import spray.json._
 
 class ReportContentJsonSpec

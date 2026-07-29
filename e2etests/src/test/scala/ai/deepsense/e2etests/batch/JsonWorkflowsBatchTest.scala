@@ -17,7 +17,8 @@
 package ai.deepsense.e2etests.batch
 
 import scala.concurrent.Await
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 import ai.deepsense.e2etests.{TestClusters, TestWorkflowsIterator}
 import ai.deepsense.sessionmanager.service.sessionspawner.sparklauncher.clusters.ClusterType
 

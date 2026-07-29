@@ -83,7 +83,7 @@ object StandaloneSparkClusterForTests {
     FileScheme.HDFS.pathPrefix + s"$hdfsAddress/root/tmp/seahorse_tests/" + UUID.randomUUID()
 
   lazy val executionContext: ExecutionContext = {
-    import org.scalatest.mockito.MockitoSugar._
+    import org.scalatestplus.mockito.MockitoSugar._
 
     System.setProperty("HADOOP_USER_NAME", "root")
 

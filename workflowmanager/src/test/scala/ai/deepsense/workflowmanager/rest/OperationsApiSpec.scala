@@ -20,7 +20,7 @@ import scala.collection.immutable.{ListMap, SortedMap}
 import scala.concurrent._
 
 import org.mockito.Mockito._
-import org.scalatest.Matchers
+import org.scalatest.matchers.should.Matchers
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import spray.json._
 import org.apache.pekko.http.scaladsl.server.Route

@@ -21,6 +21,8 @@ import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
 import org.scalatest._
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
+import org.scalatest.matchers.should.Matchers
 
 import ai.deepsense.commons.utils.OptionOpts._
 import ai.deepsense.e2etests.{ExampleWorkflowsFetcher, SeahorseIntegrationTestDSL, TestClusters}

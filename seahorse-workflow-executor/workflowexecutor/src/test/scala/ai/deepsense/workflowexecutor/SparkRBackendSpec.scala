@@ -18,8 +18,10 @@ package ai.deepsense.workflowexecutor
 
 import org.apache.spark.api.r._
 import org.scalatest.concurrent.TimeLimits
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, PrivateMethodTester, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.PrivateMethodTester
+import org.scalatest.wordspec.{AnyWordSpec => WordSpec}
 
 import ai.deepsense.workflowexecutor.customcode.CustomCodeEntryPoint
 
