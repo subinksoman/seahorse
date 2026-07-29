@@ -23,7 +23,7 @@ import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.mockito.MockitoSugar
-import spray.routing.Route
+import org.apache.pekko.http.scaladsl.server.Route
 
 import ai.deepsense.commons.auth.usercontext.{CannotGetUserException, Role, TokenTranslator, UserContext}
 

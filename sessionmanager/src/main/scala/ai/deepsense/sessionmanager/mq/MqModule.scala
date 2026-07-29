@@ -18,11 +18,11 @@ package ai.deepsense.sessionmanager.mq
 
 import java.util.concurrent.TimeoutException
 
-import akka.actor.{ActorRef, ActorSystem}
+import org.apache.pekko.actor.{ActorRef, ActorSystem}
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.rabbitmq.client.ConnectionFactory
-import com.thenewmotion.akka.rabbitmq.ConnectionActor
+import ai.deepsense.workflowexecutor.rabbitmq.ConnectionActor
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal

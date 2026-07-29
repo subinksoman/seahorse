@@ -19,8 +19,8 @@ package ai.deepsense.sessionmanager.service
 import java.time.Instant
 import java.util.UUID
 
-import akka.actor.Actor.Receive
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import org.apache.pekko.actor.Actor.Receive
+import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props}
 import org.apache.spark.launcher.SparkAppHandle.State
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Matchers, WordSpec}

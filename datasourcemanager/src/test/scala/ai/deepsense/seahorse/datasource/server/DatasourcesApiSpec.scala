@@ -19,7 +19,7 @@ package ai.deepsense.seahorse.datasource.server
 import java.util.UUID
 
 import org.scalatest.{FreeSpec, Matchers}
-import spray.http.StatusCodes
+import org.apache.pekko.http.scaladsl.model.StatusCodes
 
 import ai.deepsense.seahorse.datasource.api.{ApiException, ApiExceptionWithJsonBody}
 import ai.deepsense.seahorse.datasource.db.dbio.Get

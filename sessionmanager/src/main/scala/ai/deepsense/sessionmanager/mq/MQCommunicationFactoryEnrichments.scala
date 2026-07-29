@@ -20,8 +20,8 @@ import java.util
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
-import akka.actor.{ActorRef, Props}
-import com.thenewmotion.akka.rabbitmq._
+import org.apache.pekko.actor.{ActorRef, Props}
+import ai.deepsense.workflowexecutor.rabbitmq._
 
 import ai.deepsense.workflowexecutor.communication.mq.MQCommunication
 import ai.deepsense.workflowexecutor.rabbitmq.{ChannelSetupResult, MQCommunicationFactory, MQSubscriber}

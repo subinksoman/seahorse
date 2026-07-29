@@ -24,8 +24,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 import scalaz._
 
-import akka.actor.ActorSystem
-import akka.util.Timeout
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.util.Timeout
 import spray.json.JsValue
 
 import ai.deepsense.commons.rest.client.RestClient

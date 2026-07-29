@@ -25,9 +25,9 @@ import scalaz.OptionT
 import scalaz.OptionT._
 import scalaz.std.scalaFuture._
 
-import akka.actor.ActorRef
-import akka.pattern.ask
-import akka.util.Timeout
+import org.apache.pekko.actor.ActorRef
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.util.Timeout
 import com.google.inject.Inject
 import com.google.inject.name.Named
 

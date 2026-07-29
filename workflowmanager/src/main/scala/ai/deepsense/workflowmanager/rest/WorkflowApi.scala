@@ -22,15 +22,14 @@ import scala.util.{Failure, Success, Try}
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import org.apache.commons.lang3.StringUtils
-import spray.http.HttpHeaders.{RawHeader, `Content-Disposition`}
-import spray.http.MediaTypes._
-import spray.http._
-import spray.httpx.marshalling.Marshaller
-import spray.httpx.unmarshalling.Unmarshaller
+import org.apache.pekko.http.scaladsl.model.headers.{RawHeader, `Content-Disposition`}
+import org.apache.pekko.http.scaladsl.model.MediaTypes._
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.marshalling.Marshaller
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
 import spray.json._
-import spray.routing._
+import org.apache.pekko.http.scaladsl.server._
 import spray.routing.authentication.{BasicAuth, UserPass}
-import spray.util.LoggingContext
 
 import ai.deepsense.commons.auth.directives._
 import ai.deepsense.commons.auth.usercontext.TokenTranslator

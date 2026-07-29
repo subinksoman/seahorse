@@ -22,13 +22,13 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.reflect.runtime.universe.TypeTag
 
-import akka.testkit._
+import org.apache.pekko.testkit._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import spray.http.HttpHeaders.{RawHeader, `Content-Disposition`}
-import spray.http._
+import org.apache.pekko.http.scaladsl.model.headers.{RawHeader, `Content-Disposition`}
+import org.apache.pekko.http.scaladsl.model._
 import spray.json._
 import spray.routing.{HttpServiceBase, Route}
 import ai.deepsense.commons.auth.usercontext.{TokenTranslator, UserContext}

@@ -21,7 +21,7 @@ import java.net.URL
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import com.google.inject.name.Names
 import com.google.inject.{Guice, Key, Stage}
 

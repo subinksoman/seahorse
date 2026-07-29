@@ -18,7 +18,7 @@ package ai.deepsense.sessionmanager.service.actors
 
 import scala.util.Success
 
-import akka.actor.{Actor, ActorRef, Props}
+import org.apache.pekko.actor.{Actor, ActorRef, Props}
 
 import ai.deepsense.graph.Node
 import ai.deepsense.graph.nodestate.name.NodeStatusName

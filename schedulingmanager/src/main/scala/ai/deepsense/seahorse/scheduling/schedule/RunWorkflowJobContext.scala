@@ -18,7 +18,7 @@ package ai.deepsense.seahorse.scheduling.schedule
 
 import java.util.UUID
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 
 import ai.deepsense.seahorse.scheduling.SchedulingManagerConfig
 

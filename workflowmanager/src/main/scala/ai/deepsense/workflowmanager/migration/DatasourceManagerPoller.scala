@@ -20,9 +20,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-import akka.actor.ActorSystem
-import akka.util.Timeout
-import spray.client.pipelining._
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.util.Timeout
+import org.apache.pekko.http.scaladsl.client.RequestBuilding._
 import spray.http.StatusCodes.Success
 
 import ai.deepsense.commons.rest.client.RestClient

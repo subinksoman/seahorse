@@ -21,10 +21,10 @@ import scala.concurrent.{Future, Promise}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.mockito.Matchers
-import spray.http.{HttpRequest, StatusCodes}
-import spray.httpx.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.model.{HttpRequest, StatusCodes}
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json._
-import spray.routing.Route
+import org.apache.pekko.http.scaladsl.server.Route
 
 import ai.deepsense.commons.json.IdJsonProtocol
 import ai.deepsense.commons.json.envelope.{Envelope, EnvelopeJsonFormat}

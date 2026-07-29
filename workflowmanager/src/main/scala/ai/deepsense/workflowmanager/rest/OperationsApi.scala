@@ -21,9 +21,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import org.apache.commons.lang3.StringUtils
-import spray.http.StatusCodes
-import spray.httpx.SprayJsonSupport
-import spray.routing.{PathMatchers, Route}
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.server.{PathMatchers, Route}
 
 import ai.deepsense.commons.auth.AuthorizatorProvider
 import ai.deepsense.commons.auth.directives.{AbstractAuthDirectives, AuthDirectives, InsecureAuthDirectives}

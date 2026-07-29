@@ -16,7 +16,7 @@
 
 package ai.deepsense.workflowmanager.model
 
-import spray.httpx.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json.DefaultJsonProtocol
 
 import ai.deepsense.commons.json.IdJsonProtocol

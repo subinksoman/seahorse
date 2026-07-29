@@ -22,8 +22,8 @@ import scalaz.std.scalaFuture._
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import shapeless.HNil
-import spray.http.StatusCodes
-import spray.routing._
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server._
 
 import ai.deepsense.commons.json.IdJsonProtocol
 import ai.deepsense.commons.json.envelope.{Envelope, EnvelopeJsonFormat}

@@ -23,10 +23,10 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import spray.http.HttpHeaders.RawHeader
+import org.apache.pekko.http.scaladsl.model.headers.RawHeader
 import spray.http.{BasicHttpCredentials, HttpChallenge, HttpHeaders, StatusCodes}
 import spray.json._
-import spray.routing._
+import org.apache.pekko.http.scaladsl.server._
 
 import ai.deepsense.commons.auth.usercontext.{TokenTranslator, UserContext}
 import ai.deepsense.commons.auth.{AuthorizatorProvider, UserContextAuthorizator}

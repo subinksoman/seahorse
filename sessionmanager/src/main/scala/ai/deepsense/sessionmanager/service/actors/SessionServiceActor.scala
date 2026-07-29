@@ -21,8 +21,8 @@ import scala.concurrent.ExecutionContext
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
-import akka.actor.{Actor, ActorRef}
-import akka.pattern.pipe
+import org.apache.pekko.actor.{Actor, ActorRef}
+import org.apache.pekko.pattern.pipe
 import com.google.inject.Inject
 
 import ai.deepsense.commons.models.ClusterDetails

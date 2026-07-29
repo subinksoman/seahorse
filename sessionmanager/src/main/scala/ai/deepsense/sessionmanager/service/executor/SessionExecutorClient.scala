@@ -16,7 +16,7 @@
 
 package ai.deepsense.sessionmanager.service.executor
 
-import akka.actor.ActorRef
+import org.apache.pekko.actor.ActorRef
 
 import ai.deepsense.models.workflows.Workflow
 import ai.deepsense.workflowexecutor.communication.message.global.{Launch, PoisonPill}

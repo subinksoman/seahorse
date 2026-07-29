@@ -19,7 +19,7 @@ package ai.deepsense.seahorse.scheduling.schedule
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration

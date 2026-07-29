@@ -21,9 +21,9 @@ import scala.concurrent._
 
 import org.mockito.Mockito._
 import org.scalatest.Matchers
-import spray.http.StatusCodes
+import org.apache.pekko.http.scaladsl.model.StatusCodes
 import spray.json._
-import spray.routing.Route
+import org.apache.pekko.http.scaladsl.server.Route
 import ai.deepsense.commons.auth.usercontext.{TokenTranslator, UserContext}
 import ai.deepsense.commons.auth.{Authorizator, AuthorizatorProvider, UserContextAuthorizator}
 import ai.deepsense.commons.{StandardSpec, UnitTestSupport}

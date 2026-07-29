@@ -23,7 +23,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 
 import ai.deepsense.commons.utils.{Logging, Version}
 import ai.deepsense.models.workflows.Workflow

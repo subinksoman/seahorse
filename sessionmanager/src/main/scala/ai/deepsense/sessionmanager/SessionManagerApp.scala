@@ -16,7 +16,7 @@
 
 package ai.deepsense.sessionmanager
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import com.google.inject.{Guice, Stage}
 import ai.deepsense.commons.rest.RestServer
 import ai.deepsense.commons.utils.Logging

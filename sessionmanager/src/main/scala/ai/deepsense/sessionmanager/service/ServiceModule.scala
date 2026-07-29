@@ -16,7 +16,7 @@
 
 package ai.deepsense.sessionmanager.service
 
-import akka.actor.{ActorRef, ActorSystem}
+import org.apache.pekko.actor.{ActorRef, ActorSystem}
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Provides, Singleton}
 

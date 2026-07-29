@@ -20,10 +20,11 @@ import java.net.URL
 import java.util.UUID
 
 import scala.concurrent.{ExecutionContext, Future}
-import akka.actor.ActorSystem
-import akka.util.Timeout
-import spray.client.pipelining._
-import spray.http.{HttpCredentials, HttpResponse}
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.util.Timeout
+import org.apache.pekko.http.scaladsl.client.RequestBuilding._
+import org.apache.pekko.http.scaladsl.model.HttpResponse
+import org.apache.pekko.http.scaladsl.model.headers.HttpCredentials
 
 import ai.deepsense.commons.json.envelope.{Envelope, EnvelopeJsonFormat}
 import ai.deepsense.commons.models.ClusterDetails

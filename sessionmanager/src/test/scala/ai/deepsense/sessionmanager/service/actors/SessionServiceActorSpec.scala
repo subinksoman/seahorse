@@ -19,10 +19,10 @@ package ai.deepsense.sessionmanager.service.actors
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 
-import akka.actor.{ActorRef, ActorSystem, Props}
-import akka.pattern.ask
-import akka.testkit.{ImplicitSender, TestKit}
-import akka.util.Timeout
+import org.apache.pekko.actor.{ActorRef, ActorSystem, Props}
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.testkit.{ImplicitSender, TestKit}
+import org.apache.pekko.util.Timeout
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.mockito.{Matchers => matchers}

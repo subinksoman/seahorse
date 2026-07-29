@@ -221,7 +221,10 @@ object Dependencies {
   ) ++ scalatraAndJetty ++ Seq(pekkoTestkit, pekkoHttpTestkit, mockitoCore, scalatest).map(_ % Test)
 
   val workflowmanager = Spark.components ++ Seq(
-    akkaActor,
+    pekkoActor,
+    pekkoStream,
+    pekkoHttp,
+    pekkoHttpSprayJson,
     apacheCommons,
     guice,
     guiceMultibindings,
@@ -229,10 +232,7 @@ object Dependencies {
     h2,
     slick,
     flyway,
-    sprayCan,
-    sprayClient,
     sprayJson,
-    sprayRouting,
     scalaz,
     log4jApi,
     log4jCore,
@@ -240,31 +240,27 @@ object Dependencies {
     log4jSlf4jImpl,
     log4j12Api,
     slf4j,
-    mimepull,
-    parboiledScala
-  ) ++ Seq(akkaTestkit, mockitoCore, scalatest, scoverage, sprayTestkit).map(_ % s"$Test,it")
+    mimepull
+  ) ++ Seq(pekkoTestkit, pekkoHttpTestkit, mockitoCore, scalatest, scoverage).map(_ % s"$Test,it")
 
   val sessionmanager = Spark.components ++ Seq(
-    akkaActor,
-    akkaAgent,
+    pekkoActor,
+    pekkoStream,
+    pekkoHttp,
+    pekkoHttpSprayJson,
     apacheCommonsExec,
     h2,
     slick,
     flyway,
     scalaz,
-    sprayCan,
-    sprayClient,
     sprayJson,
-    sprayRouting,
     sparkLauncher,
-    parboiledScala,
-    sprayHttpx,
     log4jApi,
     log4jCore,
     log4jSlf4jImpl,
     log4j12Api,
     slf4j
-  ) ++ Seq(akkaTestkit, mockitoCore, scalatest, scoverage, sprayTestkit, wiremock)
+  ) ++ Seq(pekkoTestkit, pekkoHttpTestkit, mockitoCore, scalatest, scoverage, wiremock)
     .map(_ % s"$Test,it")
 
   val libraryservice = Seq(
@@ -279,6 +275,7 @@ object Dependencies {
   ) ++ Seq(scoverage).map(_ % s"$Test,it")
 
   val datasourcemanager = scalatraAndJetty ++ json4s ++ Seq(
+    pekkoHttp, // for org.apache.pekko.http.scaladsl.model.StatusCodes
     h2,
     flyway,
     scalajs,
@@ -289,6 +286,8 @@ object Dependencies {
   )
 
   val schedulingmanager = scalatraAndJetty ++ json4s ++ Seq(
+    pekkoActor,  // akka.* -> org.apache.pekko.*
+    pekkoHttp,   // for org.apache.pekko.http.scaladsl.model.headers.BasicHttpCredentials
     cronUtils,
     h2,
     flyway,
