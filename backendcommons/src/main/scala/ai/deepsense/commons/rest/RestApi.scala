@@ -125,6 +125,13 @@ trait RestApiAbstractAuth
           logger.info(s"A request was rejected because did not contain '$TokenHeader' header")
           complete((StatusCodes.Unauthorized, s"Request is missing required header '$param'"))
 
+        case MissingHeaderRejection(param) =>
+          // Any other required application header (e.g. the X-Seahorse-User* headers extracted by
+          // the auth directives) is a client error. Spray's directives completed with BadRequest
+          // directly; in Pekko HTTP a required header rejects, so the handler maps it back to 400.
+          logger.info(s"A request was rejected because it is missing required header '$param'")
+          complete((StatusCodes.BadRequest, s"Request is missing required header '$param'"))
+
         case ValidationRejection(rejectionMessage, cause) =>
           // Pekko HTTP raises unmarshalling require(...) failures as ValidationRejection (Spray
           // used MalformedRequestContentRejection); treat them as malformed content so the client

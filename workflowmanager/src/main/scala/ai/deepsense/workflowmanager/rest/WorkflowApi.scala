@@ -136,7 +136,12 @@ abstract class WorkflowApi @Inject() (
             pathPrefix(presetPathPrefixMatcher) {
               path(LongNumber) { presetId =>
                 get {
-                  complete(presetService.getPreset(presetId))
+                  // Pekko's Option marshaller renders None as an empty 200; map None -> 404 while
+                  // preserving the Some(_) marshalling (Spray's Option marshaller did this).
+                  onSuccess(presetService.getPreset(presetId)) {
+                    case None => complete(StatusCodes.NotFound)
+                    case result => complete(result)
+                  }
                 } ~
                 delete {
                   complete {
@@ -177,6 +182,9 @@ abstract class WorkflowApi @Inject() (
                       case Failure(exception) =>
                         logger.info("Get Workflow & results failed", exception)
                         failWith(exception)
+                      case Success(None) =>
+                        logger.info("Get Workflow & results: not found")
+                        complete(StatusCodes.NotFound)
                       case Success(workflowWithResults) =>
                         logger.info("Get Workflow & results")
                         complete(workflowWithResults)
@@ -266,8 +274,10 @@ abstract class WorkflowApi @Inject() (
               path(JavaUUID / "preset") { workflowId =>
                 get {
                   withUserId { userContext =>
-                    val preset = presetService.getWorkflowsPreset(workflowId)
-                    complete(preset)
+                    onSuccess(presetService.getWorkflowsPreset(workflowId)) {
+                      case None => complete(StatusCodes.NotFound)
+                      case result => complete(result)
+                    }
                   }
                 } ~
                 post {
@@ -315,9 +325,10 @@ abstract class WorkflowApi @Inject() (
               path(JavaUUID / "notebook" / JavaUUID) { (workflowId, nodeId) =>
                 get {
                   withUserId { userContext =>
-                    complete {
-                      workflowManagerProvider.forContext(userContext)
-                        .getNotebook(workflowId, nodeId)
+                    onSuccess(workflowManagerProvider.forContext(userContext)
+                      .getNotebook(workflowId, nodeId)) {
+                      case None => complete(StatusCodes.NotFound)
+                      case result => complete(result)
                     }
                   }
                 } ~

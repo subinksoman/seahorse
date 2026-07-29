@@ -355,15 +355,15 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "id": "T30g",
     "phase": "3 - Pekko",
     "title": "Fix service REST-test Pekko-vs-Spray behavioral semantics",
-    "description": "After T30f (whole backend compiles + 45/60 workflowmanager REST tests pass), 15 workflowmanager REST tests fail on genuine Pekko HTTP semantic differences from Spray (not test-only): (A) complete(Option[T]) no longer maps None->404 (returns 200+null) -- routes that returned Option must go through the checkEither None->NotFound path or reject; (B) rejection precedence/handling: missing X-Seahorse-UserId (MissingHeaderRejection) vs missing Authorization (AuthenticationFailedRejection) ordering + sealing to 401 vs 400; (C) auth-before-content-unmarshal ordering. Compare each failing route against the Spray original (git HEAD) and adjust WorkflowApi/PresetApi route + rejectionHandler. Then run workflowmanager + sessionmanager REST specs to green.",
-    "area": "workflowmanager/.../rest/WorkflowApi.scala, PresetApiSpec/WorkflowsApiSpec expectations, rejectionHandler",
+    "description": "After T30f (whole backend compiles + 45/60 workflowmanager REST tests pass), 15 tests failed on genuine Pekko HTTP semantic differences from Spray. Two root causes fixed: (A) Pekko's Option marshaller renders None as an empty 200, so complete(Option) no longer 404s -- 4 routes (getPreset, getWorkflowsPreset, get workflow by id, getNotebook) now match `case None => NotFound; case result => complete(result)`, preserving Some(_) marshalling; (B) a required app header now rejects (MissingHeaderRejection) instead of Spray's complete(BadRequest), so the shared RestApiAbstractAuth rejection handler maps any non-token MissingHeaderRejection -> BadRequest. [DONE & VERIFIED: workflowmanager WorkflowsApiSpec+PresetApiSpec 60/60 PASS; backendcommons 31/31 still PASS (shared-handler change safe).]",
+    "area": "backendcommons/.../rest/RestApi.scala (rejectionHandler), workflowmanager/.../rest/WorkflowApi.scala",
     "depends_on": [
       "T30f"
     ],
     "category": "testing",
     "risk": "Med",
     "effort_days": 3,
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "id": "T34",
