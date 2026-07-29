@@ -17,14 +17,14 @@
 package ai.deepsense.commons.rest
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration._
 
-import spray.http.MediaTypes._
-import spray.http.{HttpCharsets, MultipartFormData}
-import spray.httpx._
-import spray.httpx.unmarshalling._
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.model.{HttpEntity, Multipart}
+import org.apache.pekko.http.scaladsl.server._
+import org.apache.pekko.http.scaladsl.server.directives.BasicDirectives
+import org.apache.pekko.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshal, Unmarshaller}
 import spray.json._
-import spray.routing._
-import spray.routing.directives.BasicDirectives
 
 import ai.deepsense.commons.auth.directives.AbstractAuthDirectives
 import ai.deepsense.commons.auth.usercontext.UserContext
@@ -65,19 +65,21 @@ class FailureRestApi(implicit ec: ExecutionContext)
 
   val partName = "testFile"
 
-  def multipartUnmarshaller[T](reader: RootJsonReader[T]): Unmarshaller[T] = {
-    Unmarshaller.delegate[MultipartFormData, T](`multipart/form-data`) {
-      case multipartFormData =>
-        val stringData = selectFormPart(multipartFormData, partName)
-        reader.read(JsonParser(ParserInput(stringData)))
+  // Pekko HTTP multipart is streamed; unmarshal the entity to Multipart.FormData, strictify it,
+  // pick the named part and feed its text to the json reader. withMaterializer defers the
+  // ExecutionContext/Materializer to unmarshalling time (supplied by the route execution).
+  def multipartUnmarshaller[T](reader: RootJsonReader[T]): FromEntityUnmarshaller[T] =
+    Unmarshaller.withMaterializer[HttpEntity, T] { implicit ec => implicit mat => entity =>
+      Unmarshal(entity).to[Multipart.FormData].flatMap { formData =>
+        formData.toStrict(5.seconds).map { strict =>
+          val stringData = strict.strictParts
+            .filter(_.name == partName)
+            .map(_.entity.data.utf8String)
+            .mkString
+          reader.read(JsonParser(stringData))
+        }
+      }
     }
-  }
-
-  private def selectFormPart(multipartFormData: MultipartFormData, partName: String): String =
-    multipartFormData.fields
-      .filter(_.name.get == partName)
-      .map(_.entity.asString(HttpCharsets.`UTF-8`))
-      .mkString
 
   def route: Route = {
     handleRejections(rejectionHandler) {

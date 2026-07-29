@@ -20,7 +20,8 @@ import scala.collection.JavaConversions.asScalaSet
 import scala.concurrent.duration._
 import scala.reflect.{ClassTag, classTag}
 
-import _root_.akka.actor.ActorRefFactory
+import org.apache.pekko.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.testkit.RouteTestTimeout
 import com.google.inject.{AbstractModule, Guice, Module, Provides}
 import com.typesafe.config.Config
 import org.scalatest.concurrent.IntegrationPatience
@@ -61,11 +62,8 @@ trait IntegTestSupport extends IntegrationPatience {
      */
     @Provides
     def provideApiRouter(
-      apiSet: java.util.Set[RestComponent],
-      arf: ActorRefFactory): RestService = {
+      apiSet: java.util.Set[RestComponent]): RestService = {
       new RestService {
-        implicit def actorRefFactory: ActorRefFactory = arf
-
         protected[this] def apis = asScalaSet(apiSet).toSeq
       }
     }
@@ -90,7 +88,7 @@ trait IntegTestSupport extends IntegrationPatience {
    */
   protected[this] def getRestServiceInstance = {
     val router = getInstance[RestService]
-    router.sealRoute(router.standardRoute)
+    Route.seal(router.standardRoute)
   }
 
   protected[this] def getConfig: Config = getInstance[Config]

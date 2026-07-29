@@ -327,7 +327,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "id": "T30e",
     "phase": "3 - Pekko",
     "title": "Migrate backendcommons test-side + in-process HTTP smoke test",
-    "description": "Spray ScalatestRouteTest -> Pekko HTTP ScalatestRouteTest; MultipartFormData/HttpEntity API differences. Run RestServerSmokeSpec (in-process bind/serve) as the framework runtime gate.",
+    "description": "Spray ScalatestRouteTest -> Pekko HTTP ScalatestRouteTest; MultipartFormData/HttpEntity API differences. Run RestServerSmokeSpec (in-process bind/serve) as the framework runtime gate. [DONE & VERIFIED: test-side migrated (ScalatestRouteTest, Multipart.FormData, Route.seal); log4j->2.19.0/slf4j2 + slf4j-api 2.0.7 in root build; ValidationRejection now yields JSON FailureDescription. 13 backendcommons REST tests pass incl. in-process HTTP bind/serve smoke test.]",
     "area": "backendcommons/src/test/.../rest, auth",
     "depends_on": [
       "T30d"
@@ -335,7 +335,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "testing",
     "risk": "Med",
     "effort_days": 3,
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "id": "T30f",

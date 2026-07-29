@@ -20,8 +20,8 @@ import scala.concurrent.Future
 
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import spray.routing.Directives._
-import spray.routing.MissingHeaderRejection
+import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.server.MissingHeaderRejection
 
 import ai.deepsense.commons.{StandardSpec, UnitTestSupport}
 import ai.deepsense.commons.auth.directives.AuthDirectives

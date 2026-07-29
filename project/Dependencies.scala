@@ -54,7 +54,7 @@ object Version {
   val wiremock = "1.57"
   val flyway = "4.0"
   val jetty = "9.3.8.v20160314"
-  val log4j2 = "2.17.2"
+  val log4j2 = "2.19.0" // matches Spark 3.4.4; provides log4j-slf4j2-impl for slf4j 2.x (Pekko)
   val amazonS3 = "1.10.16"
   val googleApi = "1.22.0"
   val scalacheck = "1.12.6"
@@ -140,9 +140,11 @@ object Library {
 
   val log4jApi = "org.apache.logging.log4j" % "log4j-api" % Version.log4j2
   val log4jCore = "org.apache.logging.log4j" % "log4j-core" % Version.log4j2
-  val log4jSlf4jImpl = "org.apache.logging.log4j" % "log4j-slf4j-impl" % Version.log4j2
+  // slf4j 2.x binding (log4j-slf4j2-impl, not log4j-slf4j-impl) to match Pekko's slf4j 2.x;
+  // the 1.7 binding caused a runtime NoSuchMethodError in Log4jLoggerFactory.
+  val log4jSlf4jImpl = "org.apache.logging.log4j" % "log4j-slf4j2-impl" % Version.log4j2
   val log4j12Api = "org.apache.logging.log4j" % "log4j-1.2-api" % Version.log4j2
-  val slf4j = "org.slf4j" % "slf4j-api" % "1.7.36"
+  val slf4j = "org.slf4j" % "slf4j-api" % "2.0.7"
   val mimepull = "org.jvnet.mimepull" % "mimepull" % "1.9.5"
 }
 

@@ -20,7 +20,7 @@ import scala.concurrent.duration._
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
-import spray.testkit.ScalatestRouteTest
+import org.apache.pekko.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
 
 /**
  * Standard base class for tests.  Includes the following features:
@@ -36,8 +36,6 @@ class StandardSpec
   with Matchers
   with ScalaFutures
   with ScalatestRouteTest {
-  protected implicit def routeTestTimeout: StandardSpec.this.type#RouteTestTimeout = {
-    RouteTestTimeout(1.second)
-  }
+  protected implicit def routeTestTimeout: RouteTestTimeout = RouteTestTimeout(1.second)
 }
 

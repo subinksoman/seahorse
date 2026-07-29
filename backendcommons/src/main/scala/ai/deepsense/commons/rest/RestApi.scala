@@ -126,12 +126,11 @@ trait RestApiAbstractAuth
           complete((StatusCodes.Unauthorized, s"Request is missing required header '$param'"))
 
         case ValidationRejection(rejectionMessage, cause) =>
-          val message = s"A request was rejected because it was invalid: '$rejectionMessage'."
-          cause match {
-            case Some(throwable) => logger.info(message, throwable)
-            case None => logger.info(message)
-          }
-          complete(StatusCodes.BadRequest)
+          // Pekko HTTP raises unmarshalling require(...) failures as ValidationRejection (Spray
+          // used MalformedRequestContentRejection); treat them as malformed content so the client
+          // still receives a JSON FailureDescription rather than a bare 400.
+          logger.info(s"A request was rejected because it was invalid: '$rejectionMessage'.")
+          handleMalformedRequestContentRejection(rejectionMessage, cause)
       }
       .result()
   }

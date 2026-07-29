@@ -18,7 +18,7 @@ package ai.deepsense.commons.rest
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import spray.routing.{Directives, Route}
+import org.apache.pekko.http.scaladsl.server.{Directives, Route}
 
 /**
  * A simple REST API that uses a failing service.
@@ -54,7 +54,7 @@ class FailureTestApi(implicit ec: ExecutionContext)
     } ~
     path("exception") {
       get {
-        parameters('code.?.as[Option[Int]]) { (code) =>
+        parameters("code".as[Int].?) { (code) =>
           complete {
             service.fail(
               code match {

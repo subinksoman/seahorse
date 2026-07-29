@@ -16,9 +16,8 @@
 
 package ai.deepsense.commons.rest
 
-import akka.actor.ActorSystem
-import spray.http.StatusCodes
-import spray.testkit.ScalatestRouteTest
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.testkit.ScalatestRouteTest
 
 import ai.deepsense.commons.StandardSpec
 
@@ -26,7 +25,6 @@ class RestServiceFailureHandlingSpec
   extends StandardSpec
   with RestService
   with ScalatestRouteTest {
-  override def actorRefFactory: ActorSystem = system
 
   override def apis: Seq[RestComponent] = {
     Seq(new FailureTestApi()(executor))
@@ -54,20 +52,8 @@ class RestServiceFailureHandlingSpec
         status equals (expected)
       }
     }
-    "return 503 when service timed out" in {
-      Get("/timeout") ~> standardRoute ~> check {
-        // Ideally this test would ensure that a timed out request
-        // results in a SeviceUnavailable response. Unfortunately, this
-        // can't be tested without the HttpServer wrapper, since this is
-        // responsible for detecting the timeout and issuing a Timedout
-        // message to the actor. The best we can do here, is ensure
-        // that the original request is not completed and that issuing
-        // the request to the timeoutRoute results in the correct response.
-        handled equals (false)
-        Get("/timeout") ~> timeoutRoute ~> check {
-          status equals (StatusCodes.ServiceUnavailable)
-        }
-      }
-    }
+    // The Spray-era "return 503 when service timed out" test drove a custom timeoutRoute.
+    // Pekko HTTP handles request timeouts via configuration (pekko.http.server.request-timeout)
+    // with a configurable timeout-response, not a route, so that test no longer applies.
   }
 }

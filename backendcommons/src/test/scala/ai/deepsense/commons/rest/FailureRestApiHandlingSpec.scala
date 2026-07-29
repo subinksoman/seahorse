@@ -16,13 +16,11 @@
 
 package ai.deepsense.commons.rest
 
-import akka.actor.ActorSystem
-import spray.http.HttpEntity.NonEmpty
-import spray.http.MediaTypes._
-import spray.http._
-import spray.httpx.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.testkit.ScalatestRouteTest
 import spray.json.{DefaultJsonProtocol, JsObject}
-import spray.testkit.ScalatestRouteTest
 
 import ai.deepsense.commons.StandardSpec
 
@@ -32,34 +30,34 @@ class FailureRestApiHandlingSpec
   with SprayJsonSupport
   with DefaultJsonProtocol
   with ScalatestRouteTest {
-  override def actorRefFactory: ActorSystem = system
 
   override def apis: Seq[RestComponent] = {
     Seq(new FailureRestApi()(executor))
   }
 
-  val testEntity: HttpEntity = HttpEntity(`application/json`, """{ "foo": "bar" }""")
+  // Typed as RequestEntity (HttpEntity.Strict is one) so Post has an entity marshaller.
+  val testEntity: RequestEntity = HttpEntity(ContentTypes.`application/json`, """{ "foo": "bar" }""")
 
   "RestApi" should {
     "answer BadRequest with Json error description" when {
       "entity json reader throws runtime exception" in {
-        Post("/nullpointer", testEntity) ~> sealRoute(standardRoute) ~> check {
+        Post("/nullpointer", testEntity) ~> Route.seal(standardRoute) ~> check {
           shouldBeInternalServerError()
         }
       }
       "entity json reader throws deepsense exception" in {
-        Post("/deepsense", testEntity) ~> sealRoute(standardRoute) ~> check {
+        Post("/deepsense", testEntity) ~> Route.seal(standardRoute) ~> check {
           status should be(StatusCodes.BadRequest)
           shouldBeDeepsenseExceptionDescription()
         }
       }
       "entity json reader throws deserialization exception" in {
-        Post("/deserialization", testEntity) ~> sealRoute(standardRoute) ~> check {
+        Post("/deserialization", testEntity) ~> Route.seal(standardRoute) ~> check {
           shouldBeDeserializationExceptionDescription()
         }
       }
       "uploaded file is not JSON and cannot be deserialized" in {
-        Post("/upload-ok", uploadFile("{; ; not json")) ~> sealRoute(standardRoute) ~> check {
+        Post("/upload-ok", uploadFile("{; ; not json")) ~> Route.seal(standardRoute) ~> check {
           status should be(StatusCodes.BadRequest)
           shouldBeFailureDescription(
             responseAs[JsObject],
@@ -69,38 +67,36 @@ class FailureRestApiHandlingSpec
         }
       }
       "uploaded entity's requirement failed" in {
-        Post("/upload-ok", uploadFile("{     }")) ~> sealRoute(standardRoute) ~> check {
+        Post("/upload-ok", uploadFile("{     }")) ~> Route.seal(standardRoute) ~> check {
           shouldBeDeserializationExceptionDescription()
         }
       }
       "uploaded file reader throws deepsense exception" in {
-        Post("/upload-deepsense", uploadFile()) ~> sealRoute(standardRoute) ~> check {
+        Post("/upload-deepsense", uploadFile()) ~> Route.seal(standardRoute) ~> check {
           shouldBeDeepsenseExceptionDescription()
         }
       }
       "uploaded file reader throws deserialization exception" in {
 
-        Post("/upload-deserialization", uploadFile()) ~> sealRoute(standardRoute) ~> check {
+        Post("/upload-deserialization", uploadFile()) ~> Route.seal(standardRoute) ~> check {
           shouldBeDeserializationExceptionDescription()
         }
       }
       "uploaded file reader throws null exception" in {
-        Post("/upload-nullpointer", uploadFile()) ~> sealRoute(standardRoute) ~> check {
+        Post("/upload-nullpointer", uploadFile()) ~> Route.seal(standardRoute) ~> check {
           shouldBeInternalServerError()
         }
       }
     }
   }
 
-  def uploadFile(data: String): MultipartFormData = uploadFile(Some(data))
-  def uploadFile(data: Option[String] = None): MultipartFormData = {
-    val httpEntity = HttpEntity(
-      MediaTypes.`multipart/form-data`,
-      HttpData(data.getOrElse("{}"))
-    ).asInstanceOf[NonEmpty]
-    val formFile = FormFile("testFile", httpEntity)
-    val mfd = MultipartFormData(Seq(BodyPart(formFile, "testFile")))
-    mfd
+  def uploadFile(data: String): Multipart.FormData = uploadFile(Some(data))
+  def uploadFile(data: Option[String] = None): Multipart.FormData = {
+    // Pekko HTTP multipart: a strict body part named "testFile" carrying the payload text.
+    Multipart.FormData(
+      Multipart.FormData.BodyPart.Strict(
+        "testFile",
+        HttpEntity(ContentTypes.`text/plain(UTF-8)`, data.getOrElse("{}"))))
   }
 
   def shouldBeDeserializationExceptionDescription(): Unit = {
