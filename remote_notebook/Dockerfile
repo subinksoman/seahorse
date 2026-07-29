@@ -1,26 +1,24 @@
-FROM jupyter/minimal-notebook:python-3.7
+# Copyright 2015 deepsense.ai (CodiLime, Inc)
+#
+# Seahorse notebook image. Rebuilt on the current Jupyter docker-stacks base:
+# JupyterLab 4 / Notebook 7 / jupyter-server 2 on Python 3.12 (was jupyter/minimal-notebook
+# :python-3.7 with the classic notebook). The docker-stacks images now live on quay.io.
+FROM quay.io/jupyter/minimal-notebook:python-3.12
 
 USER root
 
-# Install pip for Python 3.7
-RUN wget -q https://bootstrap.pypa.io/pip/3.7/get-pip.py && python3.7 get-pip.py
-
-# Copy requirements.txt into the container
+# The base image already ships pip for the /opt/conda Python 3.12; no get-pip bootstrap needed.
+# Install the Seahorse extras on top of the base Jupyter stack.
 COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
 
-# Install packages from requirements.txt
-RUN pip3 install --no-cache-dir $(grep -v '^pika==' /tmp/requirements.txt)
-
-# Install a version of pika compatible with Python 3.7
-RUN pip3 install pika==1.1.0
-
-# Install jupyter_contrib_nbextensions
-RUN pip3 install jupyter_contrib_nbextensions
+# jupyter_contrib_nbextensions is abandoned and incompatible with Notebook 7 / jupyter-server 2
+# (it targeted the classic notebook). It is intentionally NOT installed anymore.
 
 # Install and enable the Python 3 kernel
 RUN python3 -m ipykernel install --name python3 --display-name "Python 3"
 
-# Copy necessary files
+# Copy the custom forwarding kernel (RabbitMQ bridge) and its helper modules.
 COPY code/forwarding_kernel/ /usr/local/share/jupyter/kernels/pyspark/
 COPY code/rabbit_mq_client.py \
      code/socket_forwarder.py \
@@ -30,22 +28,22 @@ COPY code/rabbit_mq_client.py \
 COPY code/forwarding_kernel_py/ /usr/local/share/jupyter/kernels/forwarding_kernel_py/
 COPY code/forwarding_kernel_r/ /usr/local/share/jupyter/kernels/forwarding_kernel_r/
 
-# Copy seahorse_notebook_path for Python 3.7
-COPY seahorse_notebook_path /usr/local/lib/python3.7/site-packages
+# The notebook server and the forwarding kernels both run under the base image's
+# /opt/conda Python 3.12, so the Seahorse packages are installed once into its site-packages.
+# Jupyter Server 2's canonical config filename is jupyter_server_config.py (was the classic
+# jupyter_notebook_config.py, which drove the removed NotebookApp).
+COPY jupyter_server_config.py /home/jovyan/.jupyter/
+COPY seahorse_notebook_path /opt/conda/lib/python3.12/site-packages/
+COPY wmcontents /opt/conda/lib/python3.12/site-packages/wmcontents
+COPY execute_saver /opt/conda/lib/python3.12/site-packages/execute_saver
+COPY headless_notebook_handler.py /opt/conda/lib/python3.12/site-packages/headless_notebook_handler/
 
-COPY jupyter_notebook_config.py /home/jovyan/.jupyter
-COPY wmcontents /opt/conda/lib/python3.7/site-packages/wmcontents
-
-# Copy additional files
-COPY seahorse_notebook_path /opt/conda/lib/python3.7/site-packages/
-COPY execute_saver /opt/conda/lib/python3.7/site-packages/execute_saver
-COPY headless_notebook_handler.py /opt/conda/lib/python3.7/site-packages/headless_notebook_handler/
-
-# Create a custom jupyter_notebook_config.py
-RUN echo "c.NotebookApp.kernel_info_timeout = 60" >> /home/jovyan/.jupyter/jupyter_notebook_config.py
-RUN echo "c.NotebookApp.allow_root = True" >> /home/jovyan/.jupyter/jupyter_notebook_config.py
-RUN echo "c.NotebookApp.token = ''" >> /home/jovyan/.jupyter/jupyter_notebook_config.py  # Disable token authentication
-RUN echo "c.NotebookApp.disable_check_xsrf = True" >> /home/jovyan/.jupyter/jupyter_notebook_config.py  # Disable XSRF checks
+# Runtime overrides appended to the copied config. Jupyter Server 2 keys (NotebookApp.* are
+# deprecated aliases of ServerApp.*; the auth token moved to IdentityProvider).
+RUN echo "c.ServerApp.allow_root = True" >> /home/jovyan/.jupyter/jupyter_server_config.py \
+ && echo "c.ServerApp.token = ''" >> /home/jovyan/.jupyter/jupyter_server_config.py \
+ && echo "c.IdentityProvider.token = ''" >> /home/jovyan/.jupyter/jupyter_server_config.py \
+ && echo "c.ServerApp.disable_check_xsrf = True" >> /home/jovyan/.jupyter/jupyter_server_config.py
 
 COPY custom-start.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/custom-start.sh

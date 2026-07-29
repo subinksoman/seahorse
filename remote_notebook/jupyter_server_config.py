@@ -12,33 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Jupyter Server 2 config (was jupyter_notebook_config.py driving the classic NotebookApp).
+# Notebook 7 / `jupyter notebook` launches a Jupyter Server, which reads THIS file and the
+# ServerApp trait namespace; the old c.NotebookApp.* keys are deprecated aliases.
 
 import os
 
 from wmcontents import WMContentsManager
 
 c = get_config()
-c.NotebookApp.open_browser = False
-c.NotebookApp.port = int(os.environ.get('JUPYTER_LISTENING_PORT', 8888))
-c.NotebookApp.ip = os.environ.get('JUPYTER_LISTENING_IP', '127.0.0.1')
-if c.NotebookApp.ip == '0.0.0.0':
-    c.NotebookApp.ip = '*'
-c.NotebookApp.allow_origin = '*'
-c.NotebookApp.base_url = '/jupyter/'
-c.NotebookApp.tornado_settings = {
+c.ServerApp.open_browser = False
+c.ServerApp.port = int(os.environ.get('JUPYTER_LISTENING_PORT', 8888))
+c.ServerApp.ip = os.environ.get('JUPYTER_LISTENING_IP', '127.0.0.1')
+# Jupyter Server 2 binds 0.0.0.0 directly; the classic '*' wildcard IP is no longer accepted.
+c.ServerApp.allow_origin = '*'
+c.ServerApp.base_url = '/jupyter/'
+c.ServerApp.tornado_settings = {
     'headers': {
         'Content-Security-Policy': "frame-ancestors 'self' *"
     }
 }
 
-c.NotebookApp.contents_manager_class = WMContentsManager
+c.ServerApp.contents_manager_class = WMContentsManager
 c.WMContentsManager.workflow_manager_url = os.environ.get('WM_URL', 'http://localhost:9080')
 c.WMContentsManager.workflow_manager_user = os.environ.get('WM_AUTH_USER', '')
 c.WMContentsManager.workflow_manager_pass = os.environ.get('WM_AUTH_PASS', '')
 
-c.NotebookApp.server_extensions = [
-  'headless_notebook_handler.headless_notebook_handler'
-]
+# Jupyter Server 2: server extensions are a {module: enabled} dict (was the removed
+# NotebookApp.server_extensions list). The module exposes _jupyter_server_extension_points()
+# and _load_jupyter_server_extension() (see headless_notebook_handler).
+c.ServerApp.jpserver_extensions = {
+    'headless_notebook_handler.headless_notebook_handler': True
+}
 
 c.Exporter.preprocessors = ['execute_saver.ExecuteSaver']
 c.ClearOutputPreprocessor.enabled = True
