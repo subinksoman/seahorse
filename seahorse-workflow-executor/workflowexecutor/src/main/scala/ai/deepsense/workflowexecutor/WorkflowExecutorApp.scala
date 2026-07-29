@@ -37,7 +37,7 @@ object WorkflowExecutorApp extends Logging {
     head(BuildInfo.toString)
 
     // Hidden option: Running modes:
-    opt[Unit]("interactive-mode") hidden() action {
+    opt[Unit]("interactive-mode").hidden() action {
       (_, c) => c.copy(interactiveMode = true)
     } text "use interactive mode (used only in Seahorse Desktop)"
 
@@ -56,94 +56,94 @@ object WorkflowExecutorApp extends Logging {
     note("")
     note("Miscellaneous:")
 
-    opt[(String, String)]('e', "extra-var") optional() unbounded() valueName "NAME=VALUE" action {
+    opt[(String, String)]('e', "extra-var").optional().unbounded() valueName "NAME=VALUE" action {
       (x, c) => c.copy(extraVars = c.extraVars.updated(x._1, x._2))
     } text "extra variable; can be specified multiple times; " +
       "name or value can be surrounded by quotation marks " +
       "if it contains special characters (e.g. space)"
 
     // Hidden option:
-    opt[String]('m', "message-queue-host") hidden() valueName "HOST" action {
+    opt[String]('m', "message-queue-host").hidden() valueName "HOST" action {
       (x, c) => c.copy(messageQueueHost = Some(x))
     } text "message queue host"
 
     // Hidden option:
-    opt[Int]("message-queue-port") hidden() valueName "PORT" action {
+    opt[Int]("message-queue-port").hidden() valueName "PORT" action {
       (x, c) => c.copy(messageQueuePort = Some(x))
     } text "message queue port"
 
     // Hidden option:
-    opt[String]('m', "message-queue-user") hidden() valueName "USER" action {
+    opt[String]('m', "message-queue-user").hidden() valueName "USER" action {
       (x, c) => c.copy(messageQueueUser = Some(x))
     } text "message queue user"
 
     // Hidden option:
-    opt[String]("message-queue-pass") hidden() valueName "PASS" action {
+    opt[String]("message-queue-pass").hidden() valueName "PASS" action {
       (x, c) => c.copy(messageQueuePass = Some(x))
     } text "message queue pass"
 
     // Hidden option:
-    opt[String]("workflow-id") hidden() valueName "JOB" action {
+    opt[String]("workflow-id").hidden() valueName "JOB" action {
       (x, c) => c.copy(workflowId = Some(x))
     } text "job id"
 
-    opt[String]("wm-address") hidden() valueName "URL" action {
+    opt[String]("wm-address").hidden() valueName "URL" action {
       (x, c) => c.copy(wmAddress = Some(x))
     } text "workflow Manager address"
 
-    opt[String]('d', "deps-zip") hidden() valueName "FILE" action {
+    opt[String]('d', "deps-zip").hidden() valueName "FILE" action {
       (x, c) => c.copy(depsZip = Some(x))
     } text "dependencies zip file"
 
-    opt[String]('u', "user-id") hidden() valueName "USER_ID" action {
+    opt[String]('u', "user-id").hidden() valueName "USER_ID" action {
       (x, c) => c.copy(userId = Some(x))
     } text "id of the workflow's owner"
 
-    opt[String]("wm-username") hidden() valueName "USER" action {
+    opt[String]("wm-username").hidden() valueName "USER" action {
       (x, c) => c.copy(wmUsername = Some(x))
     } text "user for accessing Workflow Manager API"
 
-    opt[String]("wm-password") hidden() valueName "PASSWORD" action {
+    opt[String]("wm-password").hidden() valueName "PASSWORD" action {
       (x, c) => c.copy(wmPassword = Some(x))
     } text "password for accessing Workflow Manager API"
 
-    opt[String]("mail-server-host") hidden() valueName "HOST" action {
+    opt[String]("mail-server-host").hidden() valueName "HOST" action {
       (x, c) => c.copy(mailParams = c.mailParams.copy(mailServerHost = Some(x)))
     }
 
-    opt[Int]("mail-server-port") hidden() valueName "PORT" action {
+    opt[Int]("mail-server-port").hidden() valueName "PORT" action {
       (x, c) => c.copy(mailParams = c.mailParams.copy(mailServerPort = Some(x)))
     }
 
-    opt[String]("mail-server-user") hidden() valueName "USER" action {
+    opt[String]("mail-server-user").hidden() valueName "USER" action {
       (x, c) => c.copy(mailParams = c.mailParams.copy(mailServerUser = Some(x)))
     }
 
-    opt[String]("mail-server-password") hidden() valueName "PASS" action {
+    opt[String]("mail-server-password").hidden() valueName "PASS" action {
       (x, c) => c.copy(mailParams = c.mailParams.copy(mailServerPassword = Some(x)))
     }
 
-    opt[String]("mail-server-sender") hidden() valueName "EMAIL" action {
+    opt[String]("mail-server-sender").hidden() valueName "EMAIL" action {
       (x, c) => c.copy(mailParams = c.mailParams.copy(mailServerSender = Some(x)))
     }
 
-    opt[String]("notebook-server-address") hidden() valueName "URL" action {
+    opt[String]("notebook-server-address").hidden() valueName "URL" action {
       (x, c) => c.copy(notebookServerAddress = Some(new URL(x)))
     }
 
-    opt[String]("datasource-server-address") hidden() valueName "URL" action {
+    opt[String]("datasource-server-address").hidden() valueName "URL" action {
       (x, c) => c.copy(datasourceServerAddress = Some(new URL(x)))
     }
 
-    opt[String]('x', "custom-code-executors-path") optional() valueName "PATH" action {
+    opt[String]('x', "custom-code-executors-path").optional() valueName "PATH" action {
       (x, c) => c.copy(customCodeExecutorsPath = Some(x))
     } text "Custom code executors (included in workflowexecutor.jar) path"
 
-    opt[String]("python-binary") optional() valueName "PATH" action {
+    opt[String]("python-binary").optional() valueName "PATH" action {
       (x, c) => c.copy(pythonBinaryPath = Some(x))
     } text "Python binary path"
 
-    opt[String]('t', "temp-dir") optional() valueName "PATH" action {
+    opt[String]('t', "temp-dir").optional() valueName "PATH" action {
       (x, c) => c.copy(tempPath = Some(x))
     } text "Temporary directory path"
 

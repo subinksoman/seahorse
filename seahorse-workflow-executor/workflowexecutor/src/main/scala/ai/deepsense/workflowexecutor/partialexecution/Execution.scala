@@ -48,7 +48,7 @@ sealed abstract class Execution {
   final def node(id: Node.Id): DeeplangNode = graph.node(id)
 
   def executionReport: ExecutionReport = {
-    ExecutionReport(graph.states.mapValues(_.nodeState), graph.executionFailure)
+    ExecutionReport(graph.states.view.mapValues(_.nodeState).toMap, graph.executionFailure)
   }
 
   type NodeStates = Map[Node.Id, NodeStateWithResults]
@@ -146,7 +146,7 @@ case class IdleExecution(
     }.toMap
 
     if (newStructure.containsCycle) {
-      noMissingStates.mapValues(_.draft.clearKnowledge)
+      noMissingStates.view.mapValues(_.draft.clearKnowledge).toMap
     } else {
       val wholeGraph = StatefulGraph(newStructure, noMissingStates, None)
 

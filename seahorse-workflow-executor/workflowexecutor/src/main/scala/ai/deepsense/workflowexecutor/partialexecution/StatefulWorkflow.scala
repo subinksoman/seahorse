@@ -130,7 +130,7 @@ class StatefulWorkflow(
     execution.graph.states.filterNot { case (id, stateWithResults) =>
       startingPointExecution.graph.states.contains(id) &&
         stateWithResults.clearKnowledge == startingPointExecution.graph.states(id).clearKnowledge
-    }.mapValues(_.nodeState)
+    }.view.mapValues(_.nodeState).toMap
   }
 }
 

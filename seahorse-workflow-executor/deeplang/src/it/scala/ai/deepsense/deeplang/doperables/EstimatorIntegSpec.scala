@@ -26,7 +26,7 @@ class EstimatorIntegSpec extends UnitSpec with DeeplangTestSupport {
 
   private def estimator = {
     val e = mock[Estimator[Transformer]]
-    when(e.fit) thenCallRealMethod()
+    when(e.fit).thenCallRealMethod()
     e
   }
 

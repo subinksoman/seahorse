@@ -27,7 +27,7 @@ import org.apache.spark.SparkContext
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.Eventually._
-import org.scalatest.concurrent.{TimeLimits, Timeouts}
+import org.scalatest.concurrent.TimeLimits
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.time.SpanSugar._
 import org.scalatest.matchers.should.Matchers

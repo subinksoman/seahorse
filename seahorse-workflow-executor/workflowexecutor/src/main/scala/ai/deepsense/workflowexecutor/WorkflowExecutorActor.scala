@@ -161,7 +161,7 @@ abstract class WorkflowExecutorActor(
   }
 
   def executionToReport(execution: Execution): ExecutionReport =
-    ExecutionReport(execution.graph.states.mapValues(_.nodeState))
+    ExecutionReport(execution.graph.states.view.mapValues(_.nodeState).toMap)
 
   def launchReadyNodes(): Unit = {
     logger.debug("launchReadyNodes")

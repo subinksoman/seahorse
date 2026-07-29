@@ -188,7 +188,7 @@ class WorkflowExecutorActorSpec
         val states: Map[Id, NodeStateWithResults] =
           Map(node1.id -> nodeState(nodestate.Draft()), node2.id -> nodeState(nodestate.Draft()))
         when(statefulWorkflow.changesExecutionReport(any())).thenReturn(
-          ExecutionReport(states.mapValues(_.nodeState)))
+          ExecutionReport(states.view.mapValues(_.nodeState).toMap))
         when(statefulWorkflow.currentExecution).thenReturn(
           Execution(
             StatefulGraph(
@@ -224,7 +224,7 @@ class WorkflowExecutorActorSpec
           val states: Map[Id, NodeStateWithResults] =
             Map(node1.id -> nodeState(nodestate.Draft()), node2.id -> nodeState(nodestate.Draft()))
           when(statefulWorkflow.changesExecutionReport(any())).thenReturn(
-            ExecutionReport(states.mapValues(_.nodeState)))
+            ExecutionReport(states.view.mapValues(_.nodeState).toMap))
           when(statefulWorkflow.currentExecution).thenReturn(
             RunningExecution(
               StatefulGraph(
@@ -265,7 +265,7 @@ class WorkflowExecutorActorSpec
         val states: Map[Id, NodeStateWithResults] =
           Map(node1.id -> nodeState(nodestate.Draft()), node2.id -> nodeState(nodestate.Draft()))
         when(statefulWorkflow.changesExecutionReport(any())).thenReturn(
-          ExecutionReport(states.mapValues(_.nodeState)))
+          ExecutionReport(states.view.mapValues(_.nodeState).toMap))
         when(statefulWorkflow.currentExecution).thenReturn(
           Execution(
             StatefulGraph(

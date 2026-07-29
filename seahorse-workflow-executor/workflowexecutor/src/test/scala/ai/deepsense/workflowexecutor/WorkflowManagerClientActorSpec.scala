@@ -29,7 +29,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import org.parboiled.common.Base64
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
-import spray.http.StatusCodes
+import org.apache.pekko.http.scaladsl.model.StatusCodes
 import spray.json._
 
 import ai.deepsense.commons.StandardSpec

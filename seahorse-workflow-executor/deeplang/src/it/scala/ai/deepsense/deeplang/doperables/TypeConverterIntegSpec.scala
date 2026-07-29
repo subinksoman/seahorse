@@ -267,7 +267,8 @@ class TypeConverterIntegSpec
     val asString = Seq(dateTime1String, null, dateTime2String)
 
     def timestampStringToSparkDouble(ts: String): Double = // Welcome to Spark.
-      DateTimeUtils.stringToTimestamp(UTF8String.fromString(ts)).get.toDouble / 1000000.0d
+      DateTimeUtils.stringToTimestamp(
+        UTF8String.fromString(ts), java.time.ZoneId.systemDefault()).get.toDouble / 1000000.0d
 
     val asDouble = Seq(
       timestampStringToSparkDouble(dateTime1String),

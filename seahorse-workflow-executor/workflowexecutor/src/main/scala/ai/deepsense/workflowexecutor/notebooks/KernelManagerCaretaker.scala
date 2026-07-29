@@ -143,7 +143,7 @@ class KernelManagerCaretaker(
     override def receive: Receive = {
       case KernelManagerReady() =>
         logger.debug("Received KernelManagerReady!")
-        startPromise.success(Unit)
+        startPromise.success(())
     }
   }
 }

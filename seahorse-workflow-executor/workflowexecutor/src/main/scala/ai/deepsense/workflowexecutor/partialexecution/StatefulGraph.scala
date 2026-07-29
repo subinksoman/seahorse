@@ -102,7 +102,7 @@ case class StatefulGraph(
     if (isRunning) {
       throw new IllegalStateException("Cannot enqueue running graph")
     }
-    val updatedStates = states.mapValues(state => state.enqueue)
+    val updatedStates = states.view.mapValues(state => state.enqueue).toMap
     copy(states = updatedStates)
   }
 
@@ -182,17 +182,17 @@ case class StatefulGraph(
   }
 
   def enqueueDraft: StatefulGraph = {
-    val enqueued = states.mapValues(state => if (state.isDraft) state.enqueue else state)
+    val enqueued = states.view.mapValues(state => if (state.isDraft) state.enqueue else state).toMap
     copy(states = enqueued)
   }
 
   def abortQueued: StatefulGraph = {
-    val aborted = states.mapValues(state => if (state.isQueued) state.abort else state)
+    val aborted = states.view.mapValues(state => if (state.isQueued) state.abort else state).toMap
     copy(states = aborted)
   }
 
   def executionReport: ExecutionReport =
-    ExecutionReport(states.mapValues(_.nodeState), executionFailure)
+    ExecutionReport(states.view.mapValues(_.nodeState).toMap, executionFailure)
 
   def notExecutedNodes: Set[Node.Id] = {
     states.collect { case (nodeId, state) if state.isDraft || state.isAborted => nodeId }.toSet
@@ -332,7 +332,7 @@ case class StatefulGraph(
 
   private def abortUnfinished(
       unfinished: Map[Id, NodeStateWithResults]): Map[Id, NodeStateWithResults] = {
-    unfinished.mapValues(abortIfAbortable)
+    unfinished.view.mapValues(abortIfAbortable).toMap
   }
 
   private def abortIfAbortable(nodeStateWithResults: NodeStateWithResults) = nodeStateWithResults match {

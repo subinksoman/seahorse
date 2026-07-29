@@ -26,7 +26,7 @@ class PythonPathGenerator(
 ) {
 
   private val config = ConfigFactory.load.getConfig("pyspark")
-  private val additionalPythonPath: Seq[String] = config.getStringList("python-path").asScala
+  private val additionalPythonPath: Seq[String] = config.getStringList("python-path").asScala.toSeq
   private val additionalPaths = additionalPythonPath.map(p => s"$pySparkPath/$p")
   private val pythonPathEnvKey = "PYTHONPATH"
   private val envPythonPath = Option(System.getenv().get(pythonPathEnvKey))
