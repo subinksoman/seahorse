@@ -35,7 +35,10 @@ dockerfile in docker := {
     runRaw("/opt/conda/bin/pip install py4j")
     runRaw("/opt/conda/bin/pip install mlxtend==0.22.0")
     runRaw("/opt/conda/bin/pip install scikit-learn")
-    runRaw("/opt/conda/bin/pip install reportlab==3.6.5")
+    // reportlab==3.6.5 has no cp312 wheel and its C extension fails to compile on Python 3.12
+    // (PyFrameObject became opaque in the 3.11+ C API). The seahorse-spark base already
+    // installs a cp312 reportlab via requirements.txt, so leave it unpinned (already satisfied).
+    runRaw("/opt/conda/bin/pip install reportlab")
     /*runRaw(
       """/opt/conda/bin/pip install --no-cache-dir \
          pika==1.3.2 \
