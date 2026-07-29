@@ -504,7 +504,8 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "python",
     "risk": "Med",
     "effort_days": 3,
-    "status": "todo"
+    "status": "completed",
+    "notes": "Done on the Spark 3.4.4 target (T40 is Spark 4.0, out of scope; the coordinated 3.4.4 jump satisfies the 'new Spark' dependency). (1) r_executor.R and remote_notebook/code/sparkr_kernel/kernel_init.R hard-coded a Spark version allow-list of 2.0.0-2.2.x and stop('Unhandled Spark Version') on anything else, so they rejected 3.4.4 outright; broadened both gates to startsWith(v,'3.')||startsWith(v,'4.') (mirrors the T50 pyexecutor gate). The SparkR APIs they use (getSparkSession, SparkDataFrame class, createDataFrame, dataFrame, callJMethod) are unchanged from the 2.x line, so the same bodies apply. (2) RExecutionCaretaker had been stubbed to a no-op (fake port/entry-point, import commented out) in the initial import baseline; re-wired it to the real org.apache.spark.api.r.SparkRBackend shim (sparkutils3.0.x, reused by the 3.4.4 arm), which already unpacks Spark 3.x's backend.init() -> (port, authHelper) tuple. Added a shutdown hook to close the backend. (3) Executor image deployment/spark-docker/Dockerfile: added r-base (Rscript) + mkdir /opt/R_Libs; SparkR itself ships in the Spark 3.4.4 binary tarball under $SPARK_HOME/R/lib. Verified: workflowexecutor/Compile/compile green on JDK 17 + Scala 2.13.12 + Spark 3.4.4. Live end-to-end R-workflow smoke-test requires a running Spark cluster with the built image (not runnable in this build-only env)."
   },
   {
     "id": "T60",

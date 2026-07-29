@@ -16,11 +16,14 @@ assign("sc", get(".sparkRjsc", envir = SparkR:::.sparkREnv), envir = .GlobalEnv)
 sparkSQLSession <- SparkR:::callJMethod(entryPoint, "getNewSparkSQLSession")
 
 sparkVersion <- SparkR:::callJMethod(sc, "version")
-if (sparkVersion %in% c("2.0.0", "2.0.1", "2.0.2", "2.1.0", "2.1.1", "2.2.0", "2.2.1")) {
+# Spark 3.x/4.x (modernization target 3.4.4). SparkR's getSparkSession API is unchanged
+# from the 2.x line, so the same body applies.
+sparkVersionSupported <- startsWith(sparkVersion, "3.") || startsWith(sparkVersion, "4.")
+if (sparkVersionSupported) {
   assign(".sparkRsession", SparkR:::callJMethod(sparkSQLSession, "getSparkSession"), envir = SparkR:::.sparkREnv)
   assign("spark", get(".sparkRsession", envir = SparkR:::.sparkREnv), envir = .GlobalEnv)
 } else {
-  msg <- paste("Unhandled Spark Version:", sparkVersion)
+  msg <- paste("Unhandled Spark Version:", sparkVersion, "- this code is for Spark 3.x/4.x")
   stop(msg)
 }
 

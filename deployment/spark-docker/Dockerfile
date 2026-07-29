@@ -21,9 +21,15 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     liblapack3 \
     libopenblas-dev \
     krb5-user \
+    r-base \
     && apt-get clean \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/*
+
+# R custom-code executor: r_executor.R runs via Rscript (r-base above) and loads SparkR
+# from $SPARK_HOME/R/lib (shipped in the Spark 3.4.4 binary tarball). It installs any extra
+# R packages into /opt/R_Libs (its first .libPaths() entry) — create it so the mount/write works.
+RUN mkdir -p /opt/R_Libs
 
 # Setup passwordless SSH
 RUN ssh-keygen -q -N "" -t rsa -f /root/.ssh/id_rsa

@@ -15,7 +15,8 @@
  */
 
 package ai.deepsense.workflowexecutor.executor
-// import org.apache.spark.api.r.SparkRBackend
+
+import org.apache.spark.api.r.SparkRBackend
 
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang.CustomCodeExecutor
@@ -25,21 +26,26 @@ import ai.deepsense.workflowexecutor.customcode.CustomCodeEntryPoint
 class RExecutionCaretaker(rExecutorPath: String,
                           customCodeEntryPoint: CustomCodeEntryPoint) extends Logging {
 
-  // Placeholder values to mimic SparkRBackend
-  private val fakePort: Int = 12345
-  private val fakeEntryPointId: String = "dummy-entry-point"
+  // The SparkRBackend shim (sparkutils) wraps Spark's RBackend; its init() returns the
+  // (port, authHelper) tuple on Spark 2.2+/3.x/4.x. port and entryPointId are only valid
+  // after start(); SessionExecutor calls start() before rCodeExecutor/backendListeningPort.
+  private val sparkRBackend: SparkRBackend = new SparkRBackend()
 
-  def backendListeningPort: Int = fakePort
+  def backendListeningPort: Int = sparkRBackend.port
 
   def rCodeExecutor: CustomCodeExecutor = new RExecutor(
-    fakePort,
-    fakeEntryPointId,
+    sparkRBackend.port,
+    sparkRBackend.entryPointId,
     customCodeEntryPoint,
     extractRExecutor()
   )
 
   def start(): Unit = {
-    logger.warn("RExecutionCaretaker.start() called, but SparkRBackend is disabled. This is a no-op.")
+    sparkRBackend.start(customCodeEntryPoint)
+    sys.addShutdownHook {
+      sparkRBackend.close()
+    }
+    logger.info(s"SparkRBackend started on port ${sparkRBackend.port}")
   }
 
   private def extractRExecutor(): String = {
