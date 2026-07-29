@@ -53,14 +53,14 @@ class SessionsApi @Inject()(
   implicit val envelopedSessionIdFormat = new EnvelopeJsonFormat[Id]("sessionId")
 
   override def route: Route = {
-    cors {
+    handleRejections(rejectionHandler) {
+      cors {
       withUserId { userId =>  // We expect header with userId for all requests
         path("") {
           get {
             complete("Session Manager")
           }
         } ~
-        handleRejections(rejectionHandler) {
           handleExceptions(exceptionHandler) {
             waitForHeartbeat {
               pathPrefix(sessionsPathPrefixMatcher) {
@@ -74,9 +74,10 @@ class SessionsApi @Inject()(
                       }}} ~
                     pathEndOrSingleSlash {
                       get {
-                        complete {
-                          val session = sessionService.getSession(userId, sessionId)
-                          session.map(Envelope[Session]).run
+                        // Pekko's Option marshaller renders None as an empty 200; map None -> 404.
+                        onSuccess(sessionService.getSession(userId, sessionId).map(Envelope[Session]).run) {
+                          case None => complete(StatusCodes.NotFound)
+                          case result => complete(result)
                         }
                       } ~
                         post {
@@ -124,6 +125,10 @@ class SessionsApi @Inject()(
           logger.warn("Rejected a request because not yet subscribed to Heartbeats!")
           (StatusCodes.ServiceUnavailable, "Session Manager is starting!")
         }
+      case MissingHeaderRejection(header) =>
+        // The X-Seahorse-UserId header (extracted by withUserId) is required; a missing required
+        // header is a client error. Pekko rejects rather than completing, so map it to 400 here.
+        complete((StatusCodes.BadRequest, s"Request is missing required header '$header'"))
     }
     .result()
 

@@ -22,7 +22,7 @@ object Version {
   val guice = "4.0"
   val h2 = "1.4.191"
 //  val json4s = "3.3.0"
-   val json4s = "3.6.12"  // 3.4.2 has no Scala 2.13 artifact
+   val json4s = "3.7.0-M11"  // align with Spark 3.4.4 (avoids json4s core/ext skew); 3.4.2 had no 2.13
   val jclouds = "2.1.0"
 //  val metricsScala = "3.5.4_a2.3"
   val metricsScala = "4.2.9"  // metrics4-scala; metrics-scala 3.5.x has no Scala 2.13 artifact
