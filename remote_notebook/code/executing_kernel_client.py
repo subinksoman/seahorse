@@ -205,7 +205,9 @@ class ExecutingKernelClient(Logging):
     def _execute_code(self, code):
         self.logger.debug("Executing code: %s", code)
         try:
-            content = dict(code=code, silent=True, user_variables=[],
+            # user_variables was removed from the execute_request message spec (dropped in
+            # the Jupyter messaging protocol); modern kernels reject/ignore it.
+            content = dict(code=code, silent=True,
                            user_expressions={}, allow_stdin=False)
             msg = self.session.msg('execute_request', content)
             ser = self.session.serialize(msg)

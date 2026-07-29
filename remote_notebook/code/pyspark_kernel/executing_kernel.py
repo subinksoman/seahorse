@@ -17,7 +17,6 @@
 import sys
 import os
 
-import zmq
 from ipykernel.ipkernel import IPythonKernel
 from ipykernel.kernelapp import IPKernelApp
 from traitlets import Type
@@ -33,7 +32,7 @@ class ExecutingKernel(IPythonKernel):
     """
 
     def __init__(self, **kwargs):
-        super(ExecutingKernel, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
 class ExecutingKernelApp(IPKernelApp):
     kernel_class = Type(ExecutingKernel, config=True)
@@ -41,6 +40,9 @@ class ExecutingKernelApp(IPKernelApp):
 
 
 if __name__ == '__main__':
-    app = ExecutingKernelApp.instance(context=zmq.Context.instance())
+    # ipykernel 6 creates and owns the zmq Context inside init_sockets (which asserts
+    # self.context is None); passing context= here is both an unknown-trait kwarg and
+    # would trip that assert, so let the app build its own context.
+    app = ExecutingKernelApp.instance()
     app.initialize()
     app.start()

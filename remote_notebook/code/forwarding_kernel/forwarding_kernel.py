@@ -122,7 +122,9 @@ class ForwardingKernel(IPythonKernel, Logging):
         self._rabbit_execution_sender_client.send({
             'type': 'zmq_socket_forward',
             'stream': stream_name,
-            'body': [base64.b64encode(s) for s in message]
+            # base64.b64encode returns bytes on Python 3; decode to str so json.dumps
+            # (in the RabbitMQ JSON sender) can serialize it.
+            'body': [base64.b64encode(s).decode('ascii') for s in message]
         })
 
     def _handle_execution_message_from_rabbit(self, message):
@@ -178,7 +180,9 @@ class ForwardingKernel(IPythonKernel, Logging):
         self._rabbit_listener.subscribe(topic=self.EXECUTION_SUBSCRIPTION_TOPIC.format(kernel_id=self._kernel_id),
                                         handler=self._handle_execution_message_from_rabbit)
 
-        sock_forwarder_values = self._socket_forwarders.itervalues() if 'itervalues' in dir(dict) else self._socket_forwarders.values()
+        # dict.itervalues() is gone in Python 3; materialize the values so the list can be
+        # iterated twice (the wait-loop below and the start-loop after it).
+        sock_forwarder_values = list(self._socket_forwarders.values())
         while not any([f.received_message_from_rabbit for f in sock_forwarder_values]):
             self.logger.info('===***===*** Still waiting for executing kernel ===***===***')
             self.logger.debug('Still waiting for executing kernel')
@@ -203,18 +207,21 @@ class ForwardingKernel(IPythonKernel, Logging):
 
     @staticmethod
     def get_kernel_id(connection_file):
-        m = re.search('kernel-(?P<kernel_id>.*)\.json', connection_file)
+        # Raw string: the '\.' escape is a SyntaxWarning on Python 3.12 in a normal string.
+        m = re.search(r'kernel-(?P<kernel_id>.*)\.json', connection_file)
         if m is not None:
             return m.group('kernel_id')
         else:
             m = hashlib.md5()
-            m.update(connection_file)
+            # hashlib.update requires bytes on Python 3.
+            m.update(connection_file.encode('utf-8'))
             return str(m.hexdigest())
 
     @property
     def _signature_key(self):
         if not self._signature_key_impl:
-            connection_dict = json.loads(open(self.parent.connection_file, 'r').read())
+            with open(self.parent.connection_file, 'r') as f:
+                connection_dict = json.loads(f.read())
             self._signature_key_impl = connection_dict['key']
         return self._signature_key_impl
 

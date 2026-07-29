@@ -16,7 +16,7 @@ import tempfile
 
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import SQLContext, DataFrame
-from py4j.java_gateway import JavaGateway, GatewayClient, java_import
+from py4j.java_gateway import JavaGateway, GatewayParameters, java_import
 from py4j.protocol import Py4JJavaError
 
 # ------------------------------------------------------------------------------
@@ -25,11 +25,16 @@ from py4j.protocol import Py4JJavaError
 #   workflow_id, node_id, port_number, dataframe_storage_type ('input' | 'output')
 # ------------------------------------------------------------------------------
 
-# Build a Py4J gateway to the already-running JVM
+# Build a Py4J gateway to the already-running JVM. Modern py4j (0.10.9.x, bundled with
+# Spark 3.4) configures the client via GatewayParameters; the old positional GatewayClient
+# with address=/port= kwargs is legacy. This matches how PySpark 3.4's own java_gateway
+# connects. The callback server is off by default.
 gateway = JavaGateway(
-    GatewayClient(address=gateway_address, port=gateway_port),
-    start_callback_server=False,
-    auto_convert=True,
+    gateway_parameters=GatewayParameters(
+        address=gateway_address,
+        port=gateway_port,
+        auto_convert=True,
+    ),
 )
 
 # Get existing Spark handles from the entry point
@@ -62,10 +67,15 @@ if SparkContext._active_spark_context is None:
     sc._gateway = gateway
     sc._conf = SparkConf(_jvm=gateway.jvm, _jconf=java_spark_conf)
 
-    # Minimal serializer setup
-    from pyspark.serializers import PickleSerializer, BatchedSerializer
+    # Minimal serializer setup. Spark 3.0 renamed PickleSerializer -> CPickleSerializer
+    # (the old name is gone in Spark 3.4); fall back for older Spark just in case.
+    try:
+        from pyspark.serializers import CPickleSerializer as _PickleSerializer
+    except ImportError:
+        from pyspark.serializers import PickleSerializer as _PickleSerializer
+    from pyspark.serializers import BatchedSerializer
     sc._batchSize = 1
-    sc._unbatched_serializer = PickleSerializer()
+    sc._unbatched_serializer = _PickleSerializer()
     sc._serializer = BatchedSerializer(sc._unbatched_serializer, batchSize=sc._batchSize)
     sc.serializer = sc._serializer
 
