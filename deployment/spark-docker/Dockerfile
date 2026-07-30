@@ -57,10 +57,10 @@ RUN set -e \
        4.*) SPARK_PACKAGE="spark-$SPARK_VERSION-bin-hadoop$HADOOP_VERSION" ;; \
        *)   SPARK_PACKAGE="spark-$SPARK_VERSION-bin-hadoop$HADOOP_VERSION-scala2.13" ;; \
      esac \
-  && { wget -q -O /tmp/$SPARK_PACKAGE.tgz \
-         "https://dlcdn.apache.org/spark/spark-$SPARK_VERSION/$SPARK_PACKAGE.tgz" \
-       || wget -O /tmp/$SPARK_PACKAGE.tgz \
-         "https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/$SPARK_PACKAGE.tgz"; } \
+  && { wget --continue --timeout=30 --tries=2 -O /tmp/$SPARK_PACKAGE.tgz \
+         "https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/$SPARK_PACKAGE.tgz" \
+       || wget --continue --timeout=30 --tries=2 -O /tmp/$SPARK_PACKAGE.tgz \
+         "https://dlcdn.apache.org/spark/spark-$SPARK_VERSION/$SPARK_PACKAGE.tgz"; } \
   && tar -xzf /tmp/$SPARK_PACKAGE.tgz -C /tmp/ \
   && rm -f /tmp/$SPARK_PACKAGE.tgz \
   && mv /tmp/$SPARK_PACKAGE $SPARK_HOME \
