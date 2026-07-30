@@ -1,3 +1,111 @@
+# Seahorse Release 3.0.0.8
+
+| | |
+|---|---|
+| **Tag** | `v3.0.0.8` |
+| **Release date** | 2026-07-30 |
+| **Previous tag** | `v3.0.0.7` |
+| **Type** | Platform modernization (major) |
+| **Spark** | **3.4.4** (bin-hadoop3, Scala 2.13) on **JDK 17** |
+
+## Summary
+A coordinated modernization of the entire Seahorse platform off the end-of-life
+Spark 3.0.0 / Scala 2.12 / JDK 8 / Python 3.7 baseline onto a current, supported
+runtime. This lifts the Spark engine, the Scala/Java toolchain, the actor/HTTP
+stack, the Python/PySpark/SparkR runtime, the Jupyter notebook stack, the frontend
+build, and the Docker image set — with the full backend test suite green and the
+full `docker compose` stack verified end-to-end.
+
+The migration was executed as a tracked, task-by-task effort; the plan and per-task
+status live in [update.md](update.md). See [README.md](README.md) for the updated
+architecture and build/run guide.
+
+## Upgrade matrix
+
+| Area | Was (≤ 3.0.0.7) | Now (3.0.0.8) |
+|---|---|---|
+| Apache Spark | 3.0.0 (bin-hadoop2.7) | **3.4.4** (bin-hadoop3, Scala 2.13 distribution) |
+| Scala | 2.12.x | **2.13.12** |
+| JDK | 8 / 11 | **17 (LTS)** |
+| Actor / HTTP stack | Akka 2.4 + Spray | **Apache Pekko 1.1 + Pekko HTTP 1.1** |
+| RabbitMQ | 3.x (SockJS web-stomp) | **4.x** (raw-WebSocket web-stomp) |
+| Python (executor & notebook) | 3.7 | **3.12** |
+| Jupyter | Notebook classic / Server 1 | **Jupyter Server 2 / Notebook 7 / JupyterLab 4** |
+| Frontend build | prebuilt bundle (webpack 1 config unbuildable) | **built from source** (webpack 2, Node 22) |
+| Build tooling | Python 2 helper scripts | **Python 3** |
+
+## Changes
+
+### Spark / Scala / JDK
+- Migrated **both** sbt builds (root services + `seahorse-workflow-executor`) to
+  **Spark 3.4.4** on **Scala 2.13.12** and **JDK 17**, via the existing
+  `sparkutils<ver>` shim + `csv*`/`readjson*` feature-module pattern.
+- Added the Spark 3.4 `--add-opens` set for JDK 17, plus
+  `--add-opens=java.base/sun.security.ssl=ALL-UNNAMED` for the executor's HTTPS client.
+- **Scala 2.13 distribution required:** the `seahorse-spark` image now installs the
+  `spark-3.4.4-bin-hadoop3-scala2.13` tarball to match the 2.13 executor (the default
+  2.12 tarball fails at runtime with `NoSuchMethodError scala.util.matching.Regex.<init>`).
+
+### Actor / HTTP stack (Akka/Spray → Pekko)
+- Replaced the EOL Akka 2.4 + Spray stack with **Apache Pekko 1.1 / Pekko HTTP 1.1**
+  across `commons`, the workflow executor, the RabbitMQ integration, and every backend
+  service REST API.
+- Ported the shared REST client to use an absolute request URI (required by Pekko
+  `Http().singleRequest`).
+- Upgraded RabbitMQ to **4.x** with a broker integration test.
+
+### Python / PySpark / SparkR
+- Moved the executor and notebook images to **Python 3.12**; generalized the PySpark
+  bridge for Spark 3.4+.
+- Restored the **SparkR / R executor** on Spark 3.4.4.
+- Ported the workflow-examples SQL codegen to Python 3.
+
+### Jupyter notebook stack
+- Rebuilt the notebook image on **JupyterLab 4 / Notebook 7 / Python 3.12**, base
+  `quay.io/jupyter/minimal-notebook:python-3.12`.
+- Ported the custom forwarding/executing kernels to **ipykernel 6 / jupyter_client 8**
+  and the contents manager / headless handler to **Jupyter Server 2**.
+- Fixed the notebook chain end-to-end: `.ipynb` path so Notebook 7 renders (not raw
+  JSON); `require_hash`/contents-model validation; forwarding-kernel "connecting"
+  (Session digest history); `RabbitMQClient.consume` for the heartbeat handler;
+  restart-kernel POST body as bytes; notebook display name
+  `Analytical engine <sessionId> <notebookNumber>`.
+
+### Editor / messaging reliability
+- Moved the frontend MQ client off SockJS to a **raw WebSocket** (RabbitMQ 4.x) and
+  re-enabled the STOMP heartbeat so the connection no longer drops at 60 s idle.
+- Serialized `RabbitMQClient` publishes to fix AMQP frame corruption / reconnect churn
+  (pika `BlockingConnection` is not thread-safe).
+
+### Frontend
+- Migrated the webpack **1 → 2** config so the `seahorse-frontend` image now **builds
+  from source** on **Node 22 / npm 10** (previously shipped as a sed-patched prebuilt
+  bundle). This bakes the editor/notebook runtime fixes into the source build.
+- Fixed the container entrypoint (`run.sh` execute bit).
+
+### Docker & build tooling
+- Modernized the Docker build orchestration for **Spark 3.4.4 / JDK 17**; rebuilt the
+  full image set and verified a complete `docker compose` bring-up.
+- Repaired rotted deployment Dockerfiles (exim, h2, authorization).
+- Ported the `build/` helper scripts and the `docker-compose` generator to **Python 3**.
+- Gated the jclouds/Keystone modules out of the workflow manager's mocked-security mode.
+
+## Upgrade notes
+- **Full rebuild required.** All images move to the new stack; rebuild and redeploy
+  the entire image set (`python3 ./build/manage-docker.py -b --all`).
+- **Run on JDK 17.** Spark 3.0.0-on-JDK-11 is replaced by Spark 3.4.4-on-JDK-17;
+  earlier JDKs are not supported.
+- **External Spark clusters** must be Spark 3.4.4 built for **Scala 2.13**.
+- `authorization` and `documentation` are consumed from the prebuilt
+  `quay.io/deepsense_io/...:1.4.3` images (commented out of the `--all` build set).
+
+## Files changed
+Broad — spanning both sbt builds, the deployment Dockerfiles, `remote_notebook/`,
+`frontend/`, and `build/`. See the commit range `v3.0.0.7..v3.0.0.8` and the
+per-task deliverables tracked in [update.md](update.md).
+
+---
+
 # Seahorse Release 3.0.0.7
 
 | | |
@@ -81,3 +189,32 @@ docker run --rm --entrypoint sh seahorse-spark:<tag> -c \
 
 ## Files changed
 - [deployment/spark-docker/Dockerfile](deployment/spark-docker/Dockerfile) — Log4j 1.x removal, Log4j 2.17.2 install, `log4j2.properties` generation.
+
+---
+
+# Seahorse Release 3.0.0.3
+
+| | |
+|---|---|
+| **Tag** | `3.0.0.3` |
+| **Type** | Spark & Arrow compatibility |
+| **Spark** | 3.0.0 (bin-hadoop2.7) on JDK 11 |
+
+## ⚠️ Critical Requirement: JDK 11
+This release is specifically configured to run **Spark 3.0.0 on JDK 11**.
+Ensure that all nodes (Driver, Workers, and Executors) are running **Java 11**.
+Running on Java 8 is **not supported** with this configuration due to the use of Java 9+ specific flags (`--add-opens`).
+
+## Changes
+
+### Spark & Arrow Compatibility Fixes
+- **Java 11 Support**: Resolved invalid memory access errors (`sun.misc.Unsafe`, `java.nio.DirectByteBuffer`) by:
+  - Adding comprehensive `--add-opens` JVM flags to expose internal JDK modules to Spark and Arrow.
+  - Enabling `-Dio.netty.tryReflectionSetAccessible=true` to allow Netty to bypass safe access checks via reflection.
+  - These flags are applied to both the **Spark Executors** and the **SessionManager/WorkflowExecutor** (Driver) processes.
+- **Arrow Compatibility**:
+  - Reverted the internal Arrow upgrade to strictly use **Arrow 0.15.1**, matching the version bundled with Spark 3.0.0.
+  - Pinned `pyarrow==0.15.1` in the python environment.
+  - Added `ARROW_PRE_0_15_IPC_FORMAT=1` to ensure PyArrow uses the legacy IPC format expected by Spark.
+- **Stability**:
+  - Fixed an issue where improper quoting in `spark-defaults.conf` caused Spark Executors to crash on startup in remote clusters.
