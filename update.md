@@ -531,7 +531,8 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "build",
     "risk": "Low",
     "effort_days": 2,
-    "status": "todo"
+    "status": "partial",
+    "notes": "Full Spark 4.2 image set BUILT and the deploy assembled. All 12 seahorse images rebuilt/retagged on Spark 4.2 at HEAD (sessionmanager rebuilt to bake the pyexecutor 4.x gate; the other 11 retagged). seahorse-deploy/docker-compose.yml repointed to the HEAD sha and the stack verified: docker compose up -> all services Up, a workflow session reaches status=running on a live Spark 4.2 executor from the BAKED image (no runtime patch). Tagged the publish set locally as subinksoman/ae-<name>:4.2.0 (14 images incl. auth/docs from upstream 1.4.3). PUSH HELD at user request - images are tagged and ready; run `docker images | grep subinksoman/ae-.*:4.2.0` then docker push each (or manage-docker.py -t --push -v 4.2.0) when approved."
   },
   {
     "id": "T50",
