@@ -89,9 +89,14 @@ class WMContentsManager(ContentsManager):
         return req
 
     def create_model(self, content_json, path, require_hash=False):
+        # Report the path/name with a .ipynb extension so JupyterLab / Notebook 7 open the file
+        # with the notebook widget (it selects the document factory by extension) rather than the
+        # plain-text editor (which showed the raw notebook JSON). The extension is stripped again
+        # by SeahorseNotebookPath.deserialize.
+        serialized = path.serialize()
         model = {
-            "name": "Seahorse Editor Notebook",
-            "path": path.serialize(),
+            "name": "Seahorse Editor Notebook.ipynb",
+            "path": serialized + ".ipynb",
             "type": "notebook",
             "writable": True,
             "last_modified": DUMMY_CREATED_DATE,

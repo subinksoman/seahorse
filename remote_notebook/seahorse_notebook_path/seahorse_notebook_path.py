@@ -38,6 +38,10 @@ class SeahorseNotebookPath(object):
         assert isinstance(seahorse_notebook_path, str)
         if seahorse_notebook_path.startswith('/'):
             seahorse_notebook_path = seahorse_notebook_path[1:]
+        # JupyterLab / Notebook 7 choose the document widget by the .ipynb extension, so the
+        # Jupyter-facing path carries a trailing .ipynb that is not part of the Seahorse path.
+        if seahorse_notebook_path.endswith('.ipynb'):
+            seahorse_notebook_path = seahorse_notebook_path[:-len('.ipynb')]
         try:
             workflow_id, node_id, params = seahorse_notebook_path.split('/')
             # base64.decodestring was removed in Python 3.9; decodebytes is the replacement.

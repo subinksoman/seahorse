@@ -91,8 +91,12 @@ function OperationAttributes($rootScope, AttributesPanelService, config, version
 
         const encodedParams = btoa(JSON.stringify(notebookParams));
         const onlineUrlPart = $scope.disabledMode ? 'OfflineNotebook' : 'notebooks';
+        // JupyterLab / Notebook 7 pick the notebook widget by the .ipynb extension; the offline
+        // (headless) handler serves rendered HTML and its route excludes dots, so only the online
+        // notebooks URL gets the extension.
+        const extension = $scope.disabledMode ? '' : '.ipynb';
 
-        const url = `${config.notebookHost}/${onlineUrlPart}/${$scope.workflowId}/${$scope.node.id}/${encodedParams}`;
+        const url = `${config.notebookHost}/${onlineUrlPart}/${$scope.workflowId}/${$scope.node.id}/${encodedParams}${extension}`;
 
         return $sce.trustAsResourceUrl(url);
       };
