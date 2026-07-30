@@ -37,8 +37,18 @@ class WorkflowManagerAppModule(withMockedSecurity: Boolean) extends AbstractModu
   private def installCore(): Unit = {
     install(new ConfigModule)
     install(new AkkaModule)
-    install(new KeystoneApiModule)
-    install(new TokenApiModule)
+    // The jclouds-based OpenStack Keystone modules are only needed for real (non-mocked)
+    // security: AuthModule binds TokenTranslator -> KeystoneTokenTranslator only when
+    // !withMockedSecurity, and TokenApi/KeystoneApi have no other consumers. In mocked
+    // security (the default deployment, ENABLE_AUTHORIZATION=false) KeystoneApiModule's
+    // eager @Singleton provider would still be instantiated by Guice Stage.PRODUCTION and
+    // crash on the jclouds 2.1.0 <-> gson 2.8.9 incompatibility
+    // (NoSuchMethodError ReflectiveTypeAdapterFactory.<init>). Only install them when they
+    // are actually used.
+    if (!withMockedSecurity) {
+      install(new KeystoneApiModule)
+      install(new TokenApiModule)
+    }
   }
 
   private def installServices(): Unit = {
