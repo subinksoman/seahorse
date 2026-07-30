@@ -18,7 +18,8 @@
 
 'use strict';
 
-import SockJS from 'sockjs-client';
+// RabbitMQ 4.x dropped SockJS from its web-stomp plugin (raw WebSocket only), so we connect
+// with a native WebSocket instead of SockJS. Stomp.over() accepts a raw WebSocket directly.
 
 const _messages = [
   'executionStatus',
@@ -33,7 +34,6 @@ class ServerCommunication {
   constructor($log, $q, $timeout, $rootScope, config) {
     _.assign(this, {$log, $q, $timeout, $rootScope, config});
 
-    Stomp.WebSocketClass = SockJS;
     this.connectionAttemptId = Math.floor(Math.random() * 1000000);
     this.exchangeSubscriptions = {};
 
@@ -159,7 +159,10 @@ class ServerCommunication {
   }
 
   _connectToWebSocket(user = `${this.config.mqUser}`, pass = `${this.config.mqPass}`) {
-    this.socket = new SockJS(`${this.config.socketConnectionHost}stomp`);
+    // Raw WebSocket to /stomp (http->ws, https->wss); RabbitMQ 4.x serves web-stomp there
+    // (web_stomp.ws_path=/stomp) and the proxy forwards /stomp with a WebSocket upgrade.
+    const wsUrl = `${this.config.socketConnectionHost.replace(/^http/, 'ws')}stomp`;
+    this.socket = new WebSocket(wsUrl);
     this.client = Stomp.over(this.socket);
 
     this.client.heartbeat = {
