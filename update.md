@@ -498,7 +498,8 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "build",
     "risk": "Med",
     "effort_days": 4,
-    "status": "todo"
+    "status": "completed",
+    "notes": "Spark 4.2 runtime image (deployment/spark-docker) DONE and verified. Dockerfile: package name per major (4.x = spark-<v>-bin-hadoop3, no -scala2.13 suffix; <=3.4.x keeps -scala2.13); Log4j 1.x strip skipped for 4.x (4.2 bundles patched log4j2); download archive-primary + dlcdn-fallback with --timeout/--tries (dlcdn stalled at 0 B/s here); pip --timeout 120 --retries 10 (large wheels tripped the 15s default). requirements: pandas >=2.2,<3 (Spark 4.2 requires >=2.2.0; installs 2.3.3) and pyarrow>=18 (installs 25.0.0; 15.x fell back to non-Arrow). VERIFIED in the built image (JDK 17): spark-submit --version = Spark 4.2.0 / Scala 2.13.18 / OpenJDK 17.0.19; python 3.12.7, pyspark 4.2.0; JDK add-opens (incl sun.security.ssl) picked up; SparkSession + Arrow-OPTIMIZED toPandas passes with fallback DISABLED (T44_ARROW_OPTIMIZED_OK). numpy still <2 (1.26.4) - Spark 4.2 supports numpy 2 but the ML stack (tensorflow/numba/xgboost) gates it; lifting is an open follow-up. Image ~7.6GB. manage-docker.py still defaults SPARK_VERSION=3.4.4; build 4.2 with --build-arg SPARK_VERSION=4.2.0 (flip default at release = T46). See migration/T44-spark4-runtime-image.md."
   },
   {
     "id": "T45",
