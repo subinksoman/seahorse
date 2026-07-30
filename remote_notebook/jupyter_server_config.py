@@ -55,3 +55,11 @@ c.CSSHTMLHeaderPreprocessor.enabled = True
 c.LatexPreprocessor.enabled = True
 c.HighlightMagicsPreprocessor.enabled = True
 c.MappingKernelManager.kernel_info_timeout = 300
+
+# The Seahorse forwarding kernel proxies messages (verbatim, same signing key) between the
+# notebook server and the remote executing kernel, so the server legitimately sees repeated
+# message signatures. jupyter_client 8 added strict replay-protection that raises
+# "ValueError: Duplicate Signature" and drops those forwarded messages (e.g. kernel_info_reply),
+# leaving the kernel stuck "connecting". Disable the digest history (size 0 => never tracked)
+# to allow the forwarded messages through.
+c.Session.digest_history_size = 0
