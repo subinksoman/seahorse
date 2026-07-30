@@ -1,6 +1,6 @@
 import json
 import time
-from threading import Thread
+from threading import Thread, Lock
 
 import pika
 from pika.exceptions import ConnectionClosed, ChannelClosed, AMQPError, StreamLostError
@@ -23,6 +23,11 @@ class RabbitMQClient(Logging):
         self._connection = None
         self._publisher=None
         self._consumer_thread = None
+        # pika's BlockingConnection is NOT thread-safe. The forwarding/executing kernels publish
+        # from several SocketForwarder threads (shell/iopub/control/stdin) through one client, which
+        # interleaves AMQP frames and makes RabbitMQ drop the connection ("unexpected_frame",
+        # "frame_too_large"), causing constant reconnects. Serialize all publishes with this lock.
+        self._publish_lock = Lock()
 
         try:
             self._connect_consumer()
@@ -102,6 +107,12 @@ class RabbitMQClient(Logging):
         self._declare_exchange_publisher()
 
     def send(self, topic, message, max_retries=3):
+        # Serialize concurrent publishes (see _publish_lock) so AMQP frames from different
+        # SocketForwarder threads don't interleave and corrupt the publisher connection.
+        with self._publish_lock:
+            self._send_locked(topic, message, max_retries)
+
+    def _send_locked(self, topic, message, max_retries=3):
         for attempt in range(max_retries):
             try:
                 self.logger.debug(f"Attempt {attempt + 1}: Sending message to topic: {topic} message :{message}")
