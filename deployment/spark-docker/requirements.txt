@@ -14,9 +14,9 @@ traitlets
 # Core numerics — keep numpy < 2: Spark 3.4's Arrow<->pandas bridge and the ML libs below
 # are not validated against the numpy 2.0 ABI break.
 numpy<2
-# pyspark 3.4's Arrow/pandas API is validated against pandas 1.x/2.x, not the pandas 3.0
-# rewrite; pin to the 2.1 line (cp312 wheels, numpy<2 compatible).
-pandas>=1.5,<2.2
+# Spark 4.2's PySpark requires pandas >= 2.2.0 (require_minimum_pandas_version). Spark 3.4.4 also
+# works with 2.2.x (it only enforces a lower bound). Cap below the pandas 3.0 rewrite.
+pandas>=2.2,<3
 python-dateutil
 pytz
 requests
@@ -38,9 +38,9 @@ kmodes==0.12.2
 flask
 matplotlib
 
-# Arrow: pyspark 3.4 <-> pandas conversion. 1.0.1 predates cp312; 15.x has cp312 wheels and
-# works with Spark 3.4's Arrow protocol.
-pyarrow==15.0.2
+# Arrow: pyspark <-> pandas conversion. Spark 4.2 requires PyArrow >= 18.0.0 for the optimized
+# Arrow path (with 15.x it warns and falls back to slow non-Arrow). 18.x has cp312 wheels.
+pyarrow>=18.0.0
 
 # DB / connectors
 oracledb==2.3.0
