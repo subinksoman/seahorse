@@ -641,7 +641,8 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "build",
     "risk": "Med",
     "effort_days": 2,
-    "status": "todo"
+    "status": "completed",
+    "notes": "Ported deployment/docker-compose/docker-compose.py + its docker_compose_generation package + utils/api_version.py (a required import) from Python 2 to Python 3. docker-compose.py: shebang -> python3; git_sha subprocess.check_output bytes now .decode('utf-8').strip() so image tags are clean sha (not b'...'); tempfile.NamedTemporaryFile opened mode='w' (Py3 default is binary, a str write would fail). generation.py: implicit relative import from docker_compose_utils -> absolute from docker_compose_generation.docker_compose_utils (Py3 has no implicit relative imports; matches configurations.py); properties.iteritems() -> .items(). docker_compose_utils.py: Env.iteritems returns self.d.items(); PortMappings.__iter__ uses self.mappings.values() (itervalues removed). utils/api_version.py: shebang -> python3; 'print read_api_version()' statement -> print() call (a Py3 SyntaxError that broke the whole module import, hence 'from api_version import read_api_version'). Removed stale Python 2 .pyc + __pycache__ under docker_compose_generation (untracked/gitignored). Verified: py_compile clean on all 5 files; PyYAML 5.3.1; python3 docker-compose.py --generate-only produces a 262-line docker-compose.yml with clean sha image tags, correct 10.255.3.0/24 subnet, ipv4_address assignments and full service set, both with and without cached bytecode. (Running path uses the docker-compose v1 binary; unchanged here.)"
   },
   {
     "id": "T76",

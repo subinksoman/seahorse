@@ -15,7 +15,9 @@
 
 import yaml
 
-from docker_compose_utils import *
+# Python 3 has no implicit relative imports; use the absolute package path (matches
+# configurations.py).
+from docker_compose_generation.docker_compose_utils import *
 
 
 class GenerationConfig(object):
@@ -87,7 +89,7 @@ class ServiceGeneration(object):
                 }
             }
 
-        return self.service.name(), {k: v for (k, v) in properties.iteritems() if v is not None}
+        return self.service.name(), {k: v for (k, v) in properties.items() if v is not None}
 
 
 class ConfigurationGeneration(object):

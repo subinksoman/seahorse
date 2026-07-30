@@ -42,7 +42,8 @@ class Env(object):
         return self
 
     def iteritems(self):
-        return self.d.iteritems()
+        # Python 3: dict.iteritems() was removed; items() returns a view.
+        return self.d.items()
 
     def to_dict(self):
         return self.d
@@ -119,7 +120,7 @@ class PortMappings(object):
         return self.mappings[name]
 
     def __iter__(self):
-        for m in self.mappings.itervalues():
+        for m in self.mappings.values():
             yield m
 
 

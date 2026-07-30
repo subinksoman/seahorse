@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Copyright 2016 deepsense.ai (CodiLime, Inc)
 #
@@ -37,7 +37,7 @@ def extract_api_version(sbt_setting):
 
 
 def main():
-    print read_api_version()
+    print(read_api_version())
 
 
 if __name__ == '__main__':

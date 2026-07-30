@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # PYTHON_ARGCOMPLETE_OK
 # Copyright 2017 deepsense.ai (CodiLime, Inc)
 #
@@ -32,7 +32,9 @@ from api_version import read_api_version
 cwd = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 
 
-git_sha = subprocess.check_output("git rev-parse HEAD", shell=True, cwd=cwd).strip()
+# Python 3: check_output returns bytes; decode so the tag is a clean sha string (not b'...')
+# when written into the generated docker-compose image references.
+git_sha = subprocess.check_output("git rev-parse HEAD", shell=True, cwd=cwd).decode("utf-8").strip()
 
 
 def main():
@@ -113,7 +115,9 @@ def main():
     elif not extra_args:
         parser.print_help()
     else:
-        with tempfile.NamedTemporaryFile(dir='.', suffix = '.yml') as temp:
+        # Python 3: NamedTemporaryFile defaults to binary mode; open it in text mode so the
+        # generated YAML string can be written directly (no bytes/str mismatch).
+        with tempfile.NamedTemporaryFile(mode='w', dir='.', suffix='.yml') as temp:
             temp.write(docker_compose)
             temp.flush()
             # Ignore interruptions - they'll still be passed to the child process and this
