@@ -1,0 +1,5 @@
+# Webpack build output (produced by build.sh / build-frontend.sh)
+dist/
+
+# Local docker build staging (build-frontend.sh copies ../dist here)
+docker/dist/

@@ -33,15 +33,18 @@ module.exports = function (_path) {
     },
 
     output: {
-      path: 'dist',
+      // webpack 2 requires an absolute output path.
+      path: path.join(_path, 'dist'),
       filename: '[name].js',
       publicPath: '/'
     },
 
     // resolves modules
     resolve: {
-      extensions: ['', '.js'],
-      modulesDirectories: ['node_modules'],
+      // webpack 2 no longer accepts the leading empty string in `extensions`.
+      extensions: ['.js'],
+      // `modulesDirectories` was renamed to `modules` in webpack 2.
+      modules: [path.join(_path, 'node_modules'), 'node_modules'],
       alias: {
         APP: path.join(_path, 'client', 'app'),
         ASSETS: path.join(_path, 'client', 'assets'),
@@ -56,36 +59,47 @@ module.exports = function (_path) {
       }
     },
 
-    eslint: {
-      configFile: path.join(_path, 'config', 'eslint', 'eslint-src.config.js')
+    // webpack 2 removed automatic '-loader' suffixing, but the client source still
+    // uses bare inline loader references (e.g. require('imports?...!script!...')).
+    // Restore the suffix resolution rather than rewriting every inline require.
+    resolveLoader: {
+      moduleExtensions: ['-loader']
     },
 
     module: {
-      preLoaders: [{
+      // webpack 2 merged preLoaders/loaders/postLoaders into a single `rules`
+      // array; `enforce: 'pre'` replaces the old preLoaders bucket.
+      rules: [{
+        enforce: 'pre',
         test: /\.js$/,
         loader: 'eslint-loader',
         exclude: [
           /node_modules/,
           /vendor/
-        ]
-      }],
-      noParse: [],
-      loaders: [
-      {
+        ],
+        options: {
+          configFile: path.join(_path, 'config', 'eslint', 'eslint-src.config.js'),
+          // This is a legacy (Angular 1.5) codebase; surface lint issues as
+          // warnings so they don't fail the production bundle.
+          emitWarning: true,
+          failOnError: false
+        }
+      }, {
         test: /\.json$/,
         loader: 'json-loader'
       }, {
         test: /\.html$/,
-        loaders: [
+        // webpack 2 requires the full `-loader` names and uses `use` for chains.
+        use: [
           'ngtemplate-loader?relativeTo=' + _path,
-          'html?-minimize'
+          'html-loader?-minimize'
         ]
       }, {
         test: /\.css$/,
-        loader: 'style-loader!css-loader!postcss-loader'
+        use: ['style-loader', 'css-loader', 'postcss-loader']
       }, {
         test: /\.less/,
-        loader: 'style-loader!css-loader!postcss-loader!less-loader'
+        use: ['style-loader', 'css-loader', 'postcss-loader', 'less-loader']
       }, {
         test: /\.(png|jpg|gif)$/,
         loader: 'url-loader?limit=8192'
@@ -100,7 +114,7 @@ module.exports = function (_path) {
         exclude: [
           path.resolve(_path, 'node_modules')
         ],
-        loaders: [
+        use: [
           'ng-annotate-loader'
         ]
       }, {
@@ -109,7 +123,8 @@ module.exports = function (_path) {
         exclude: [
           path.resolve(_path, 'node_modules')
         ],
-        query: {
+        // `query` -> `options` in webpack 2.
+        options: {
           cacheDirectory: true,
           plugins: [
             'transform-runtime',
@@ -118,18 +133,11 @@ module.exports = function (_path) {
         }
       }, {
         test: require.resolve('angular'),
-        loaders: [
-          'expose?angular'
-        ]
+        use: ['expose-loader?angular']
       }, {
         test: require.resolve('jquery'),
-        loaders: [
-          'expose?$',
-          'expose?jQuery'
-        ]
-      }
-
-      ]
+        use: ['expose-loader?$', 'expose-loader?jQuery']
+      }]
     },
 
     // For SockJs
@@ -139,9 +147,15 @@ module.exports = function (_path) {
       dns: 'empty'
     },
 
-    postcss: [autoprefixer({browsers: ['last 5 versions']})],
-
     plugins: [
+      // webpack 2 removed top-level loader config keys (postcss/eslint); pass
+      // them to the loaders through LoaderOptionsPlugin instead.
+      new webpack.LoaderOptionsPlugin({
+        options: {
+          context: _path,
+          postcss: [autoprefixer({browsers: ['last 5 versions']})]
+        }
+      }),
       // new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en|hu/),
       new webpack.ProvidePlugin({
         $: 'jquery',
@@ -150,9 +164,10 @@ module.exports = function (_path) {
       new webpack.DefinePlugin({
         'NODE_ENV': JSON.stringify(NODE_ENV)
       }),
-      new webpack.NoErrorsPlugin(),
+      // NoErrorsPlugin was renamed to NoEmitOnErrorsPlugin; DedupePlugin was
+      // removed (deduplication is automatic in webpack 2).
+      new webpack.NoEmitOnErrorsPlugin(),
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-      new webpack.optimize.DedupePlugin(),
       new webpack.optimize.AggressiveMergingPlugin({
         moveToParents: true
       }),

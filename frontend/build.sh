@@ -16,7 +16,12 @@
 
 
 function prepare_environment() {
-  npm install
+  # npm 7+ (Node 22) enforces peerDependencies strictly; this legacy tree pins
+  # several webpack-1-era dev tools (extract-text-webpack-plugin, karma-webpack,
+  # webpack-dev-server@1) that declare a webpack ^1 peer while the build runs on
+  # webpack 2. --legacy-peer-deps restores the npm 4-6 resolution the lockfile
+  # was created with. None of those webpack-1-only tools are used by `npm run dist`.
+  npm install --legacy-peer-deps
 }
 
 function build() {

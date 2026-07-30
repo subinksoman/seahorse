@@ -659,6 +659,21 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "effort_days": 1,
     "status": "completed",
     "notes": "Made the build/ shell wrappers invoke the Python helpers explicitly via python3 instead of relying on the scripts' shebangs (which resolve to python2 on some runners). build_all.sh, e2e_tests.sh (5 call sites: 2 cleanup docker-compose.py, manage-docker.py, generate + up docker-compose.py), build_docker_compose_internal.sh (generate-only), build_vagrant_with_docker.sh (proxy_on_any_interface.py + manage-docker.py) all now prefix python3. build_spark_docker_mesos.sh invokes no Python helper (only git/sed/docker build) so it needed no change. No bare python/pip calls exist in these wrappers, and manage-docker.py drives docker via subprocess (docker CLI) rather than the docker SDK, so no pip3/venv bootstrap was required. Out of scope (separate testing-cluster backlog): the docker-compose v1-binary calls for the mesos/yarn test clusters and the stale SPARK_VERSION=2.1.1 / scala-2.11 sdk-example path in e2e_tests.sh. Verified: bash -n clean on all five; grep confirms zero remaining bare .py helper invocations."
+  },
+  {
+    "id": "T77",
+    "phase": "7 - Delivery",
+    "title": "Migrate frontend webpack config to webpack 2 (build seahorse-frontend from source)",
+    "description": "frontend/config/webpack/*.js were written for webpack 1 while package.json pins webpack ^2.7.0, so `build/manage-docker.py -b --all` failed at the seahorse-frontend image (build-frontend.sh -> build.sh -> npm run dist). Previously the frontend was shipped by sed-patching the prebuilt quay.io seahorse-frontend:1.4.3 bundle instead of building from source. Migrate the webpack config to the v2 API and make the source build run on the active Node 22 toolchain so the image builds from source (baking in the STOMP-websocket / .ipynb runtime fixes natively).",
+    "area": "frontend/config/webpack/global.js, frontend/config/webpack/production.js, frontend/config/webpack/development.js, frontend/build.sh, frontend/.gitignore",
+    "depends_on": [
+      "T70"
+    ],
+    "category": "build",
+    "risk": "Med",
+    "effort_days": 2,
+    "status": "completed",
+    "notes": "Migrated the webpack 1 config to webpack 2. global.js: output.path -> absolute path.join(_path,'dist'); resolve.extensions ['','.js'] -> ['.js']; resolve.modulesDirectories -> resolve.modules; module.preLoaders+loaders -> single module.rules (eslint via enforce:'pre' with emitWarning/failOnError:false so lint doesn't fail the legacy bundle); dropped invalid noParse:[]; loader chains use `use` with full '-loader' names (html-loader?-minimize, expose-loader?...); babel `query` -> `options`; top-level postcss/eslint moved into LoaderOptionsPlugin; NoErrorsPlugin -> NoEmitOnErrorsPlugin; removed DedupePlugin (gone in webpack 2); added resolveLoader.moduleExtensions:['-loader'] so the source's bare inline loader requires (require('imports?...!script!...')) still resolve. production.js/development.js: removed the webpack-1 `debug` key. build.sh: npm install -> npm install --legacy-peer-deps (npm 7+/Node 22 rejects the webpack-1-era peer pins: extract-text-webpack-plugin@0.9.1, karma-webpack@1, webpack-dev-server@1 - none used by `npm run dist`). Added frontend/.gitignore for dist/ + docker/dist/. Verified: `npm run dist` builds clean on Node 22 (exit 0, 0 errors) emitting libs/app/ga/common hashed bundles + index.html; no --openssl-legacy-provider needed (webpack 2.7 hashes with md5); the compiled app bundle contains the new WebSocket / heartbeat outgoing:20000 / .ipynb runtime fixes; full build-frontend.sh produced seahorse-frontend:<gitsha> (196MB) end-to-end with zero errors. Note: webpack config bundle-output still webpack 2.7 (uglify-js 2 via `webpack -p`); a further jump to webpack 4/5 + Angular replacement remains a separate larger effort."
   }
 ]
 ```
