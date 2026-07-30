@@ -35,8 +35,13 @@ RUN mkdir -p /opt/R_Libs
 RUN ssh-keygen -q -N "" -t rsa -f /root/.ssh/id_rsa
 RUN cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
 
-# Install Spark
-ENV SPARK_PACKAGE=spark-$SPARK_VERSION-bin-hadoop$HADOOP_VERSION
+# Install Spark. Use the Scala 2.13 distribution: the whole project is built with Scala
+# 2.13, so the workflow-executor (we.jar) carries the 2.13 Scala library. The default
+# spark-<ver>-bin-hadoop<h>.tgz is Scala 2.12 and mixing it with a 2.13 executor throws
+# at runtime (NoSuchMethodError scala.util.matching.Regex.<init>(String, scala.collection.Seq)
+# in org.apache.spark.util.Utils$.<init> — the 2.12 vs 2.13 Seq/varargs signature change).
+# SPARK_HOME stays /opt/spark-<ver>; only the extracted package dir carries the -scala2.13 suffix.
+ENV SPARK_PACKAGE=spark-$SPARK_VERSION-bin-hadoop$HADOOP_VERSION-scala2.13
 ENV SPARK_HOME=/opt/spark-$SPARK_VERSION
 ENV PATH=$PATH:$SPARK_HOME/bin
 ENV LOG4J2_VERSION=2.17.2
