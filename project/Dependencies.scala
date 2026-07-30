@@ -22,7 +22,11 @@ object Version {
   val guice = "4.0"
   val h2 = "1.4.191"
 //  val json4s = "3.3.0"
-   val json4s = "3.7.0-M11"  // align with Spark 3.4.4 (avoids json4s core/ext skew); 3.4.2 had no 2.13
+   // Align json4s with the running Spark: Spark 3.4.4 bundles 3.7.x, Spark 4.x bundles 4.0.7.
+   // Mixing lines causes classpath skew (JValue missing / MappingException + losslessDate changes).
+   // NB: read the sys-prop directly — `spark` is declared later in this object, so referencing it
+   // here would hit a null during initialization.
+   val json4s = if (sys.props.getOrElse("SPARK_VERSION", "3.0.0").startsWith("4.")) "4.0.7" else "3.7.0-M11"
   val jclouds = "2.1.0"
 //  val metricsScala = "3.5.4_a2.3"
   val metricsScala = "4.2.9"  // metrics4-scala; metrics-scala 3.5.x has no Scala 2.13 artifact
@@ -31,7 +35,9 @@ object Version {
   val nsscalaTime = "2.30.0"  // 2.14.0 has no Scala 2.13 artifact
   val scalatest = "3.0.9"  // first 3.0.x published for Scala 2.13
 //  val scalatra = "2.4.0"
-  val scalatra = "2.7.1"  // 2.5.0 has no Scala 2.13 artifact
+  // scalatra 2.7.1 pulls json4s 3.6.10; 2.8.4 pulls json4s 4.0.x — use 2.8.4 on Spark 4.x so
+  // scalatra-json and Spark agree on the json4s 4.0 line. (sys-prop read: see json4s note above.)
+  val scalatra = if (sys.props.getOrElse("SPARK_VERSION", "3.0.0").startsWith("4.")) "2.8.4" else "2.7.1"
   val scoverage = "1.4.6"
 //  val slick = "3.1.1"
   val slick = "3.3.3"  // first slick line with Scala 2.13 artifacts; drops slick.driver package
