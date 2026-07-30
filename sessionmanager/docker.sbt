@@ -69,6 +69,9 @@ dockerfile in docker := {
       "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED " +
       "--add-opens=java.base/sun.nio.cs=ALL-UNNAMED " +
       "--add-opens=java.base/sun.security.action=ALL-UNNAMED " +
+      // The workflow-executor reflects into sun.security.ssl.SSLSocketFactoryImpl
+      // (Executor.createExecutionContext) when setting up its HTTPS client on JDK 17.
+      "--add-opens=java.base/sun.security.ssl=ALL-UNNAMED " +
       "--add-opens=java.base/sun.util.calendar=ALL-UNNAMED " +
       "--add-opens=java.security.jgss/sun.security.krb5=ALL-UNNAMED " +
       "-Dio.netty.tryReflectionSetAccessible=true"
