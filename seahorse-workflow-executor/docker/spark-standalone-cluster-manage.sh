@@ -63,6 +63,10 @@ if  [ "$SPARK_VERSION" == "2.1.0" ] || [ "$SPARK_VERSION" == "2.1.1" ] || [ "$SP
 elif [ "$SPARK_VERSION" == "2.0.0" ] || [ "$SPARK_VERSION" == "2.0.1" ] || [ "$SPARK_VERSION" == "2.0.2" ]; then
   export HADOOP_VERSION="2.7"
   export HADOOP_VERSION_FULL="2.7.1"
+elif [ "${SPARK_VERSION%%.*}" == "3" ] || [ "${SPARK_VERSION%%.*}" == "4" ]; then
+  # Spark 3.3+/4.x bundle Hadoop 3 (download_spark.sh picks the Scala-2.13 vs plain package).
+  export HADOOP_VERSION="3"
+  export HADOOP_VERSION_FULL="3.4.1"
 else
   echo 'Unhandled Spark version ${$SPARK_VERSION}'
   exit 1

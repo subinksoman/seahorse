@@ -220,7 +220,8 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "spark",
     "risk": "Med",
     "effort_days": 3,
-    "status": "todo"
+    "status": "completed",
+    "notes": "Model persistence VERIFIED on Spark 4.2 in the image: a Pipeline (VectorAssembler + LogisticRegression) trained, .save() (MLWriter) then PipelineModel.load() (MLReader) round-tripped and produced correct predictions [0,1,0,1] (T23_PERSIST_OK). This is the same-runtime save/load the executor actually uses. Caveat: cross-major load (a model saved on 3.4.4 read on 4.2) was not exercised here (no 3.4-era model artifact on hand); Spark's MLReader keys off the sparkVersion metadata for backward compat, but that path is unverified. Fresh deployments save+load within one Spark version, so the practical case is covered."
   },
   {
     "id": "T24",
@@ -234,7 +235,8 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "spark",
     "risk": "Med",
     "effort_days": 2,
-    "status": "todo"
+    "status": "partial",
+    "notes": "Source updated for Spark 4.x standalone launcher. download_spark.sh: package name per major (4.x = spark-<v>-bin-hadoop<h>, no -scala2.13; <=3.4.x keeps -scala2.13) + archive-primary/dlcdn-fallback with timeouts (matches the spark-docker Dockerfile). spark-standalone-cluster-manage.sh: added a 3.x/4.x arm (HADOOP_VERSION=3, HADOOP_VERSION_FULL=3.4.1) so it no longer errors 'Unhandled Spark version' for 4.2.0. MESOS is REMOVED in Spark 4.x, so MesosSparkLauncher.scala + the mesos cluster Dockerfile (both still pointing at the dead d3kbcqa49mib13.cloudfront.net URL) are OBSOLETE for 4.x and were left as-is (not reachable on Spark 4). Partial: the source is correct but the standalone/YARN cluster e2e was NOT run here (no cluster in this env) - full cluster verification belongs to T42's e2e."
   },
   {
     "id": "T25",
