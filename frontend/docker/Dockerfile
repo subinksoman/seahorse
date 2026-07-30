@@ -10,6 +10,9 @@ ENV SESSION_POLLING_INTERVAL 5000
 COPY dist/ /usr/share/nginx/html
 COPY src/config.js.tmpl /tmp/
 COPY src/run.sh /tmp/
+# COPY preserves the host file mode; ensure the entrypoint is executable
+# regardless of the source file's bit (git tracks it 100644).
+RUN chmod +x /tmp/run.sh
 # Update nginx configuration so it would request browser not to cache index.html
 COPY default.conf /etc/nginx/conf.d/
 
