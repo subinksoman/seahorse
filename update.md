@@ -613,6 +613,49 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "risk": "Low",
     "effort_days": 2,
     "status": "todo"
+  },
+  {
+    "id": "T74",
+    "phase": "7 - Delivery",
+    "title": "Modernize build/ helper scripts for Python 3",
+    "description": "The build/ Python helpers target the ambiguous '#!/usr/bin/env python' (python2 on older distros) and carry Python-2-isms. build/docker.py: subprocess.check_output(...).strip() returns bytes on Python 3, so find_image/tag/push format bytes into shell strings as b'...'; decode to str. build/manage-docker.py: same class of bug (git_sha bytes) was already fixed in T70 with .decode('utf-8'); switch its shebang to python3 and confirm the docker SDK + argcomplete imports import under Python 3.12. build/scripts/proxy_on_any_interface.py: python3 shebang + a print()/socket API pass. Also remove the committed build/docker.pyc bytecode artifact and gitignore **/*.pyc.",
+    "area": "build/manage-docker.py, build/docker.py, build/docker.pyc, build/scripts/proxy_on_any_interface.py, .gitignore",
+    "depends_on": [
+      "T70"
+    ],
+    "category": "build",
+    "risk": "Low",
+    "effort_days": 2,
+    "status": "todo"
+  },
+  {
+    "id": "T75",
+    "phase": "7 - Delivery",
+    "title": "Port the docker-compose generator to Python 3",
+    "description": "deployment/docker-compose/docker-compose.py (invoked by build/e2e_tests.sh and build/build_docker_compose_internal.sh to generate and run the stack's docker-compose.yml) still targets Python 2: '#!/usr/bin/env python' shebang plus a needed pass for print()/except-as/dict-view (iteritems)/str-vs-bytes and any ConfigParser/urllib2 imports. Port to Python 3.12 and validate the generated compose against the modernized image set (JDK17 / Spark 3.4.4 / Py3.12 tags), including the network subnet and the mail log-volume issues already seen at runtime.",
+    "area": "deployment/docker-compose/docker-compose.py",
+    "depends_on": [
+      "T70"
+    ],
+    "category": "build",
+    "risk": "Med",
+    "effort_days": 2,
+    "status": "todo"
+  },
+  {
+    "id": "T76",
+    "phase": "7 - Delivery",
+    "title": "Point build/CI shell wrappers at python3",
+    "description": "The build/ shell scripts invoke the Python helpers via bare './manage-docker.py' / 'docker-compose.py' (relying on their shebangs), and any explicit 'python'/'pip' calls resolve to python2 on some runners. Make the wrappers (build_all.sh, e2e_tests.sh, build_docker_compose_internal.sh, build_vagrant_with_docker.sh, build_spark_docker_mesos.sh) and CI use python3/pip3 (and a py3 venv for build-time tooling), consistent with the python3 shebangs from T74/T75.",
+    "area": "build/build_all.sh, build/e2e_tests.sh, build/build_docker_compose_internal.sh, build/build_vagrant_with_docker.sh, build/build_spark_docker_mesos.sh",
+    "depends_on": [
+      "T74",
+      "T75"
+    ],
+    "category": "build",
+    "risk": "Low",
+    "effort_days": 1,
+    "status": "todo"
   }
 ]
 ```
