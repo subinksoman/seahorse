@@ -30,9 +30,11 @@ rm -rf /var/lib/apt/lists/*
 ENV MESOS_WORK_DIR /tmp/mesos
 
 # Download spark executor
+# NOTE: Mesos was removed in Spark 3.5/4.x; this cluster image is legacy (<=3.1). The old
+# cloudfront mirror is dead — use archive.apache.org.
 RUN mkdir /spark-$SPARK_VERSION && \
     wget -q -O /spark-$SPARK_VERSION/packed.tgz \
-    http://d3kbcqa49mib13.cloudfront.net/spark-$SPARK_VERSION-bin-hadoop$HADOOP_VERSION.tgz && \
+    https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop$HADOOP_VERSION.tgz && \
     tar -xzf /spark-$SPARK_VERSION/packed.tgz -C /spark-$SPARK_VERSION && \
     rm /spark-$SPARK_VERSION/packed.tgz
 

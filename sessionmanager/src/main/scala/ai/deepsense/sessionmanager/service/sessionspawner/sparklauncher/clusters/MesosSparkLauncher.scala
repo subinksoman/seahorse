@@ -46,8 +46,11 @@ private [clusters] object MesosSparkLauncher {
       .setAppName(s"Sixdee Analytical Engine - Workflow: $workflowId")
       .addAppArgs(applicationArgs: _*)
       .addFile(config.weDepsPath)
+      // NOTE: Apache Mesos support was removed in Spark 3.5 / 4.x, so this launcher cannot run on
+      // the Spark 4.x target (kept only for legacy <=3.1 clusters). The old cloudfront mirror
+      // (d3kbcqa49mib13) was decommissioned years ago; point at archive.apache.org.
       .setConf("spark.executor.uri",
-        s"http://d3kbcqa49mib13.cloudfront.net/spark-$sparkVersion-bin-hadoop$hadoopVersion.tgz")
+        s"https://archive.apache.org/dist/spark/spark-$sparkVersion/spark-$sparkVersion-bin-hadoop$hadoopVersion.tgz")
   }
 
   private def env(
