@@ -231,21 +231,24 @@ seahorse-notebooks        seahorse-mail            seahorse-frontend
 images; re-enable them in `manage-docker.py` to build from source.
 
 **Tag & push to a registry** — `-t/--tag` retags the built images to
-`<repository>/<prefix>-<name>:<version>`, and `-p/--push` pushes them. All three
-parts are variables (CLI flag or env var):
+`<repository>/<prefix>-<name>:<version>`, and `--push` pushes them. All three
+naming parts are variables (CLI flag or env var):
 
 | Part | Flag | Env var | Default |
 |---|---|---|---|
 | repository / namespace | `-r`, `--repository` | `DOCKER_REPOSITORY` | `subinksoman` |
-| image prefix | `--prefix` | `IMAGE_PREFIX` | `ae` |
-| version tag | `-v`, `--version` | `IMAGE_VERSION` | git HEAD sha |
+| image prefix | `-p`, `--prefix` | `IMAGE_PREFIX` | `seahorse` |
+| version tag | `-v`, `--version` | `IMAGE_VERSION` | git HEAD commit id |
 
 ```bash
-# build all, then tag + push subinksoman/ae-<name>:3.0.0.8
-python3 ./build/manage-docker.py -b --all -t -p -v 3.0.0.8
+# build all, then tag + push with the defaults -> subinksoman/seahorse-<name>:<commit>
+python3 ./build/manage-docker.py -b --all -t --push
 
-# override repository and prefix -> myorg/engine-<name>:4.2.0
-python3 ./build/manage-docker.py -b --all -t -p -r myorg --prefix engine -v 4.2.0
+# publish the ae-branded set at a release version -> subinksoman/ae-<name>:3.0.0.8
+python3 ./build/manage-docker.py -b --all -t --push -p ae -v 3.0.0.8
+
+# different org / prefix -> myorg/engine-<name>:4.2.0
+python3 ./build/manage-docker.py -b --all -t --push -r myorg -p engine -v 4.2.0
 ```
 
 (Requires `docker login` to the target registry for `--push`.)

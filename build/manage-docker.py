@@ -43,9 +43,10 @@ hadoop_version = "3"
 # env var or the -r/--repository CLI flag. Default keeps the current publish target.
 # e.g. subinksoman/ae-workflowmanager:3.0.0.8
 docker_repository = os.environ.get("DOCKER_REPOSITORY", "subinksoman")
-# Product-group prefix for published images: the internal build name "seahorse-<x>" is
-# published as "<repository>/ae-<x>". Override with IMAGE_PREFIX if ever needed.
-image_prefix = os.environ.get("IMAGE_PREFIX", "ae")
+# Image name prefix for published images: the internal build name "seahorse-<x>" is
+# published as "<repository>/<prefix>-<x>". Default "seahorse"; pass -p/--prefix (e.g. "ae")
+# or set IMAGE_PREFIX to override.
+image_prefix = os.environ.get("IMAGE_PREFIX", "seahorse")
 # Version tag for published images. Defaults (at run time) to the git HEAD sha to match the
 # internal build tags; override with IMAGE_VERSION env or -v/--version (e.g. a release "3.0.0.8").
 image_version_env = os.environ.get("IMAGE_VERSION")
@@ -151,21 +152,21 @@ def main():
                         default=docker_repository,
                         help='Docker repository/namespace for published images (env DOCKER_REPOSITORY)',
                         action='store')
-    parser.add_argument('--prefix',
+    parser.add_argument('-p', '--prefix',
                         default=image_prefix,
                         help='Image name prefix for published <repository>/<prefix>-<name> images '
-                             '(env IMAGE_PREFIX)',
+                             '(env IMAGE_PREFIX; default "seahorse")',
                         action='store')
     parser.add_argument('-v', '--version',
                         default=image_version_env,
-                        help='Version tag for published <repository>/ae-<name>:<version> images '
-                             '(env IMAGE_VERSION; defaults to the git HEAD sha)',
+                        help='Version tag for published <repository>/<prefix>-<name>:<version> images '
+                             '(env IMAGE_VERSION; defaults to the git HEAD commit id)',
                         action='store')
     parser.add_argument('-t', '--tag',
-                        help='Tag built images as <repository>/ae-<name>:<version>',
+                        help='Tag built images as <repository>/<prefix>-<name>:<version>',
                         action='store_true')
-    parser.add_argument('-p', '--push',
-                        help='Push the <repository>/ae-<name>:<version> images (implies --tag)',
+    parser.add_argument('--push',
+                        help='Push the <repository>/<prefix>-<name>:<version> images (implies --tag)',
                         action='store_true')
 
     try:
