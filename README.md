@@ -6,9 +6,11 @@ compiles, schedules and executes them on Spark, and a Jupyter-based notebook let
 users interact with the resulting `DataFrame`s in Python, R or SQL.
 
 This repository has been **modernized** from the original Spark 3.0.0 / Scala 2.12 /
-JDK 8 baseline to a current runtime — see [Technology Stack](#technology-stack).
-The ongoing modernization plan and task tracker live in [update.md](update.md);
-per-task notes are in [migration/](migration/).
+JDK 8 baseline to a current runtime — see [Technology Stack](#technology-stack). The
+default build targets **Spark 3.4.4**, and the whole **Spark 4.x line (up to 4.2.0)**
+is supported and verified end-to-end (`SPARK_VERSION=4.2.0`) — see
+[Spark version support](#spark-version-support). The modernization plan and task
+tracker live in [update.md](update.md); per-task notes are in [migration/](migration/).
 
 ## Architecture
 
@@ -108,15 +110,35 @@ Any dependency or Spark-version change generally has to be made in **both** buil
 
 | Area | Version | Notes |
 |---|---|---|
-| Apache Spark | **3.4.4** | Hadoop 3, **Scala 2.13** distribution (`spark-3.4.4-bin-hadoop3-scala2.13`) |
-| Scala | **2.13.12** | migrated from 2.12 |
-| JDK | **17** (LTS) | migrated from 8; needs Spark 3.4 `--add-opens` incl. `sun.security.ssl` |
+| Apache Spark | **3.4.4** (default) · **4.0.x–4.2.0** supported | Hadoop 3, **Scala 2.13** distribution; `SPARK_VERSION` selects the arm |
+| Scala | **2.13.12** (3.4.4) / **2.13.18** (4.x) | migrated from 2.12 |
+| JDK | **17** (LTS) | Spark 3.4/4.x `--add-opens` incl. `sun.security.ssl` |
 | HTTP / actor stack | **Apache Pekko 1.1.x** (pekko-http 1.1.0) | replaced Akka/Spray |
 | sbt | **1.8.2** | |
 | Python (executor & notebook) | **3.12** | PySpark bridge + Jupyter kernels |
+| Python data/ML stack | numpy **2.4** · pandas **2.3** · pyarrow **25** | on the 4.x arm (numpy `<2.5` — numba ceiling); 3.4.4 keeps numpy `<2` |
 | Jupyter | **Server 2 / Notebook 7** | base image `quay.io/jupyter/minimal-notebook:python-3.12` |
 | Frontend | Angular 1.5 + **webpack 2** on **Node 22 / npm 10** | built from source |
 | Containers | Docker + Docker Compose v2 | |
+
+### Spark version support
+
+`SPARK_VERSION` selects the compatibility arm (via the `sparkutils<ver>` shim + feature
+modules). Two arms are wired:
+
+- **`3.4.4`** (default) — the shipped 3.0.0.x baseline; Scala 2.13.12 / Hadoop 3.3 / numpy `<2`.
+- **`4.x`** (`4.0.0`–`4.2.0`) — Scala **2.13.18** / Hadoop 3.5 / numpy **2.4** (pandas 2.3, pyarrow 25).
+  Uses the `spark-<ver>-bin-hadoop3` distribution (no `-scala2.13` suffix — 4.x is Scala‑2.13 only).
+
+**Spark 4.2.0 is verified end-to-end:** both sbt builds compile (12/12 backend modules), the
+deeplang suite passes under ANSI‑default (345 tests), PySpark (Arrow), SparkR and ML persistence
+work in the runtime image, and a live `docker compose` stack executes a workflow session on a
+Spark 4.2.0 executor. Build it with `SPARK_VERSION=4.2.0` (see [Building](#building)); roll back to
+3.4.4 by omitting the variable. Details in `migration/T40–T46`.
+
+> Note: on Spark 4.x, the `schedulingmanager`/`datasourcemanager` services carry a small build-time
+> patch that rewrites their swagger‑generated code from json4s‑3 to json4s‑4 idioms (the external
+> codegen plugin still emits json4s‑3); it's guarded so the 3.4.4 build is untouched.
 
 ---
 
