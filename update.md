@@ -513,7 +513,8 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "migration",
     "risk": "Med",
     "effort_days": 2,
-    "status": "todo"
+    "status": "completed",
+    "notes": "VERIFIED on Spark 4.2 with NO code changes needed. Spark 4.2 still ships SparkR ($SPARK_HOME/R/lib/SparkR + sparkr.zip + bin/sparkR); the image has R 4.3.3. Ran a SparkR session in the seahorse-spark:spark4-test image: sparkR.session(local[1]) launched, sparkR.version()=4.2.0, createDataFrame + collect round-tripped 3 rows correctly (T45_SPARKR_OK). The T52 version gate (r_executor.R / kernel_init.R startsWith 3./4.) already covers 4.x. R executor is functional on Spark 4.2."
   },
   {
     "id": "T46",

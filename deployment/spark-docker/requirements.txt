@@ -11,9 +11,11 @@ pyzmq
 tornado
 traitlets
 
-# Core numerics — keep numpy < 2: Spark 3.4's Arrow<->pandas bridge and the ML libs below
-# are not validated against the numpy 2.0 ABI break.
-numpy<2
+# Core numerics — numpy 2.x, capped below 2.5 because numba (pulled by shap) supports numpy
+# >=1.22,<2.5. Verified in the Spark 4.2 image: numpy 2.4.6 imports cleanly with the whole ML
+# stack (numba/shap/tensorflow/xgboost/lightgbm/sklearn/scipy) + the PySpark Arrow bridge.
+# Raise the cap when a numba release supports numpy 2.5+.
+numpy>=2,<2.5
 # Spark 4.2's PySpark requires pandas >= 2.2.0 (require_minimum_pandas_version). Spark 3.4.4 also
 # works with 2.2.x (it only enforces a lower bound). Cap below the pandas 3.0 rewrite.
 pandas>=2.2,<3

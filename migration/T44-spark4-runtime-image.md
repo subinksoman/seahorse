@@ -51,10 +51,13 @@ numpy stays `<2` (pandas 2.2/2.3 + these ML libs are fine on numpy 1.26).
 - **pandas:** `>=2.2,<3` installs the latest 2.x (2.3.3). This is the newest pandas Spark 4.2
   supports — pyspark 4.2 does not support the pandas 3.0 rewrite, so `<3` is intentional.
 - **pyarrow:** unpinned above 18 → resolves to the latest (25.0.0).
-- **numpy:** still `<2` (1.26.4) — **not** the latest. Spark 4.2 itself supports numpy 2; the cap
-  is for the bundled ML stack (tensorflow / numba-via-shap / xgboost / lightgbm). Lifting it to
-  numpy 2 needs those libraries verified on the numpy-2 ABI first (numba is the usual gate). Open
-  follow-up if "latest numpy" is required.
+- **numpy:** raised to `>=2,<2.5` → installs **2.4.6**. Verified in the image: pip installing
+  `numpy>=2` first pulled **2.5.1**, which broke `numba`/`shap` (`numba 0.66.0 requires numpy
+  <2.5`); capping at `<2.5` gives numpy 2.4.6, and the WHOLE ML stack + PySpark Arrow bridge then
+  imports/runs cleanly (numpy 2.4.6, numba 0.66.0, shap 0.49.1, tensorflow 2.21.0, xgboost 3.3.0,
+  lightgbm 4.3.0, sklearn 1.9.0, scipy 1.17.1, pandas 2.3.3, pyarrow 25.0.0 → all OK, toPandas OK).
+  So the image is now on numpy 2 (the latest numba supports). Raise the cap when a numba release
+  supports numpy 2.5+.
 
 ## Notes / handoff
 
