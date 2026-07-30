@@ -450,7 +450,8 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "spark",
     "risk": "High",
     "effort_days": 9,
-    "status": "todo"
+    "status": "partial",
+    "notes": "COMPILE-CLEAN against Spark 4.2.0 on JDK 17: api + deeplang (and the whole dep chain: commons/reportlib/graph/sparkutils4.0.x/csv4_0) compile with 0 errors (2 [success]; deeplang = 1678 classes). The 400 warnings are ALL Scala 2.13 deprecations (copyArrayToImmutableIndexedSeq, explicit-array varargs, zipped, toStream, mapValues, filterKeys, replaceAllLiterally) - NONE are Spark-4 API removals. So there is essentially no compile-time Spark-4 breakage in deeplang: the 3.4.4 migration already moved its Spark usage onto public/stable APIs. NO source changes were needed. Marked partial (not completed) because the RUNTIME half of 'resolve breaking changes' - ANSI SQL default (T43), model persistence (T23), behavioral changes - is validated by running the suite (T43 spike + T42 green + golden output), which is the concrete remainder. See migration/T41-spark4-deeplang.md."
   },
   {
     "id": "T42",
