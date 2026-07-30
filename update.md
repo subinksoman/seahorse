@@ -657,7 +657,8 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "build",
     "risk": "Low",
     "effort_days": 1,
-    "status": "todo"
+    "status": "completed",
+    "notes": "Made the build/ shell wrappers invoke the Python helpers explicitly via python3 instead of relying on the scripts' shebangs (which resolve to python2 on some runners). build_all.sh, e2e_tests.sh (5 call sites: 2 cleanup docker-compose.py, manage-docker.py, generate + up docker-compose.py), build_docker_compose_internal.sh (generate-only), build_vagrant_with_docker.sh (proxy_on_any_interface.py + manage-docker.py) all now prefix python3. build_spark_docker_mesos.sh invokes no Python helper (only git/sed/docker build) so it needed no change. No bare python/pip calls exist in these wrappers, and manage-docker.py drives docker via subprocess (docker CLI) rather than the docker SDK, so no pip3/venv bootstrap was required. Out of scope (separate testing-cluster backlog): the docker-compose v1-binary calls for the mesos/yarn test clusters and the stale SPARK_VERSION=2.1.1 / scala-2.11 sdk-example path in e2e_tests.sh. Verified: bash -n clean on all five; grep confirms zero remaining bare .py helper invocations."
   }
 ]
 ```

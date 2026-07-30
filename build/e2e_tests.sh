@@ -78,8 +78,8 @@ function cleanup {
   $SPARK_STANDALONE_MANAGEMENT down $SPARK_VERSION
   docker-compose -f $MESOS_SPARK_DOCKER_COMPOSE down
   docker-compose -f $YARN_SPARK_DOCKER_COMPOSE down
-  deployment/docker-compose/docker-compose.py -f $GIT_TAG -b $GIT_TAG -p $RUN_ID logs > docker-compose.log
-  deployment/docker-compose/docker-compose.py -f $GIT_TAG -b $GIT_TAG -p $RUN_ID down
+  python3 deployment/docker-compose/docker-compose.py -f $GIT_TAG -b $GIT_TAG -p $RUN_ID logs > docker-compose.log
+  python3 deployment/docker-compose/docker-compose.py -f $GIT_TAG -b $GIT_TAG -p $RUN_ID down
 }
 
 cleanup
@@ -89,7 +89,7 @@ fi
 
 trap cleanup EXIT
 
-./build/manage-docker.py -b --all
+python3 ./build/manage-docker.py -b --all
 
 ## Start Seahorse dockers
 (
@@ -104,8 +104,8 @@ trap cleanup EXIT
  mkdir -p jars
  cp -r ../../seahorse-sdk-example/target/scala-2.11/*.jar jars
 
- ./docker-compose.py -f $GIT_TAG -b $GIT_TAG --generate-only --yaml-file docker-compose.yml
- ./docker-compose.py -f $GIT_TAG -b $GIT_TAG -p $RUN_ID up -d
+ python3 ./docker-compose.py -f $GIT_TAG -b $GIT_TAG --generate-only --yaml-file docker-compose.yml
+ python3 ./docker-compose.py -f $GIT_TAG -b $GIT_TAG -p $RUN_ID up -d
 )
 
 ### TODO Revive standalone tests

@@ -44,9 +44,9 @@ mv $ROOT_DIR/docker-compose.yml $ARTIFACT_NAME
 # Inside Vagrant we need Seahorse to listen on 0.0.0.0,
 # so that Vagrant's port forwarding works. So, let's replace the host which
 # proxy listens on.
-"$ROOT_DIR/build/scripts/proxy_on_any_interface.py" $ARTIFACT_NAME
+python3 "$ROOT_DIR/build/scripts/proxy_on_any_interface.py" $ARTIFACT_NAME
 
-"$ROOT_DIR/build/manage-docker.py" -b --all
+python3 "$ROOT_DIR/build/manage-docker.py" -b --all
 
 echo "Save docker images to files"
 DOCKER_IMAGES=(`cat $ARTIFACT_NAME | grep image: | cut -d" " -f 6 | tr " " "\n"`)
