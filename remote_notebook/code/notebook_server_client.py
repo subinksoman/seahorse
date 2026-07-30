@@ -57,7 +57,9 @@ class NotebookServerClient(Logging):
 
     def restart_kernel(self):
         try:
-            urlopen("http://{}/jupyter/api/kernels/{}/restart".format(self._notebook_server_location, self._kernel_id), "")
+            # POST data must be bytes on Python 3 (was "" -> "POST data should be bytes ... not str");
+            # b"" makes an empty-body POST to the kernel restart endpoint.
+            urlopen("http://{}/jupyter/api/kernels/{}/restart".format(self._notebook_server_location, self._kernel_id), b"")
         except Exception as e:
             self.logger.error("Error restarting kernel: {}".format(e))
             raise
