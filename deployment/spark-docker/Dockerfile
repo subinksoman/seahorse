@@ -27,7 +27,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # R custom-code executor: r_executor.R runs via Rscript (r-base above) and loads SparkR
-# from $SPARK_HOME/R/lib (shipped in the Spark 3.4.4 binary tarball). It installs any extra
+# from $SPARK_HOME/R/lib (shipped in the Spark binary tarball). It installs any extra
 # R packages into /opt/R_Libs (its first .libPaths() entry) — create it so the mount/write works.
 RUN mkdir -p /opt/R_Libs
 
@@ -35,13 +35,14 @@ RUN mkdir -p /opt/R_Libs
 RUN ssh-keygen -q -N "" -t rsa -f /root/.ssh/id_rsa
 RUN cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
 
-# Install Spark. Use the Scala 2.13 distribution: the whole project is built with Scala
-# 2.13, so the workflow-executor (we.jar) carries the 2.13 Scala library. The default
-# spark-<ver>-bin-hadoop<h>.tgz is Scala 2.12 and mixing it with a 2.13 executor throws
-# at runtime (NoSuchMethodError scala.util.matching.Regex.<init>(String, scala.collection.Seq)
-# in org.apache.spark.util.Utils$.<init> — the 2.12 vs 2.13 Seq/varargs signature change).
-# SPARK_HOME stays /opt/spark-<ver>; only the extracted package dir carries the -scala2.13 suffix.
-ENV SPARK_PACKAGE=spark-$SPARK_VERSION-bin-hadoop$HADOOP_VERSION-scala2.13
+# Install Spark on the Scala 2.13 distribution (the whole project is built with Scala 2.13, so
+# the workflow-executor we.jar carries the 2.13 Scala library; a 2.12 Spark throws at runtime:
+# NoSuchMethodError scala.util.matching.Regex.<init>(String, scala.collection.Seq)). The package
+# name differs by Spark major, so it is computed in the RUN below (not a fixed ENV):
+#   * Spark 4.x is Scala 2.13 ONLY -> spark-<ver>-bin-hadoop<h>.tgz  (no -scala2.13 suffix; the
+#     -scala2.13 variant 404s for 4.x).
+#   * Spark <= 3.4.x ships both -> use the explicit -scala2.13 variant.
+# SPARK_HOME stays /opt/spark-<ver>.
 ENV SPARK_HOME=/opt/spark-$SPARK_VERSION
 ENV PATH=$PATH:$SPARK_HOME/bin
 ENV LOG4J2_VERSION=2.17.2
@@ -51,16 +52,27 @@ ENV LOG4J2_VERSION=2.17.2
 # calls onto the Log4j 2 backend. Finally write a native log4j2.properties that
 # mirrors Spark 3.0.0's default console logging so output is unchanged after the
 # swap (single-quoted echoes keep the %-conversion pattern literal).
-RUN wget -O - \
-  "https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/$SPARK_PACKAGE.tgz" \
-  | tar -xz -C /tmp/ \
+RUN set -e \
+  && case "$SPARK_VERSION" in \
+       4.*) SPARK_PACKAGE="spark-$SPARK_VERSION-bin-hadoop$HADOOP_VERSION" ;; \
+       *)   SPARK_PACKAGE="spark-$SPARK_VERSION-bin-hadoop$HADOOP_VERSION-scala2.13" ;; \
+     esac \
+  && { wget -q -O /tmp/$SPARK_PACKAGE.tgz \
+         "https://dlcdn.apache.org/spark/spark-$SPARK_VERSION/$SPARK_PACKAGE.tgz" \
+       || wget -O /tmp/$SPARK_PACKAGE.tgz \
+         "https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/$SPARK_PACKAGE.tgz"; } \
+  && tar -xzf /tmp/$SPARK_PACKAGE.tgz -C /tmp/ \
+  && rm -f /tmp/$SPARK_PACKAGE.tgz \
   && mv /tmp/$SPARK_PACKAGE $SPARK_HOME \
   && rm -rf $SPARK_HOME/examples $SPARK_HOME/ec2 \
   && rm -rf $SPARK_HOME/lib/spark-examples*.jar \
-  && rm -f $SPARK_HOME/jars/log4j-1.2*.jar $SPARK_HOME/jars/slf4j-log4j12-*.jar \
-  && for m in log4j-api log4j-core log4j-slf4j-impl log4j-1.2-api; do \
-       wget -q "https://repo1.maven.org/maven2/org/apache/logging/log4j/$m/$LOG4J2_VERSION/$m-$LOG4J2_VERSION.jar" -P $SPARK_HOME/jars/; \
-     done \
+  && case "$SPARK_VERSION" in \
+       4.*) : "Spark 4.x already bundles a patched Log4j 2.x - keep it (no 1.x to strip)" ;; \
+       *) rm -f $SPARK_HOME/jars/log4j-1.2*.jar $SPARK_HOME/jars/slf4j-log4j12-*.jar; \
+          for m in log4j-api log4j-core log4j-slf4j-impl log4j-1.2-api; do \
+            wget -q "https://repo1.maven.org/maven2/org/apache/logging/log4j/$m/$LOG4J2_VERSION/$m-$LOG4J2_VERSION.jar" -P $SPARK_HOME/jars/; \
+          done ;; \
+     esac \
   && { \
        echo 'rootLogger.level = info'; \
        echo 'rootLogger.appenderRef.stdout.ref = console'; \
