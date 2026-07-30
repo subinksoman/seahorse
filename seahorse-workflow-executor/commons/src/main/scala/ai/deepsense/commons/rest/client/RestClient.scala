@@ -56,8 +56,13 @@ trait RestClient extends RestClientImplicits {
     Http()(as).singleRequest(decorate(req))
   }
 
+  // Pekko HTTP's Http().singleRequest requires an ABSOLUTE request URI (scheme+authority),
+  // unlike Spray's host-connector pipeline which accepted a bare path. Callers pass the
+  // result of endpointPath directly as the request URI, so return the fully-resolved URL
+  // (was .getFile, which yielded only the path and triggered
+  // "IllegalUriException: ... doesn't have an absolute URI").
   def endpointPath(endpoint: String): String = {
-    new URL(apiUrl, endpoint).getFile
+    new URL(apiUrl, endpoint).toExternalForm
   }
 }
 
