@@ -425,7 +425,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
   {
     "id": "T40",
     "phase": "4 - Spark 4.0",
-    "title": "Create sparkutils4.0.x shim + feature modules; add 4.0.0 arms",
+    "title": "Create sparkutils4.0.x shim + feature modules; add Spark 4.x arms (whole 4.x series)",
     "description": "Add a sparkutils4.0.x shim + csv4.0/readjson4.0 feature modules: clone the active 3.4.x arm and re-implement the internal CSV/catalyst classes (DataframeToDriverCsvFileWriter, RawCsvRDDToDataframe, DateTimeUtils usage) against Spark 4.0 internals. Add '4.0.0' case arms (scala 2.13, hadoop 3, pekko) in BOTH builds' Dependencies.scala + build.sbt match blocks. Never edit the 3.4.x shim in place, so SPARK_VERSION=3.4.4 remains an instant rollback.",
     "area": "seahorse-workflow-executor/sparkutils4.0.x, sparkutilsfeatures/*, build.sbt, Dependencies.scala",
     "depends_on": [
@@ -434,7 +434,8 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "spark",
     "risk": "High",
     "effort_days": 7,
-    "status": "todo"
+    "status": "completed",
+    "notes": "Supports the WHOLE Spark 4.x series (4.0.x/4.1.x/4.2.x) via a `case v if v.startsWith(\"4.\")` guard, not a single pinned version. Pinned Scala 2.13.18 (4.2.0's build scala; 2.13.x is binary-compatible across the 4.x line) / Hadoop carried at 3.3.x / JDK 17. Cloned sparkutils3.0.x -> sparkutils4.0.x and csv3_0 -> csv4_0 (never edited the 3.x shim; SPARK_VERSION=3.4.4 stays rollback). Added 4.x guard arms in both Dependencies.scala tuples and the build.sbt sparkUtils/csvlib/readjson matches (readjson reuses readjsondataset). VERIFIED: csv4_0 + sparkutils4.0.x compile clean on JDK 17 against BOTH Spark 4.0.0 and 4.2.0 (all [success], 0 errors). Zero source edits needed - SparkRBackend's api.r.RBackend is unchanged 3.x->4.x and the CSV shim was already public-API. Full root/deeplang compile deferred to T41 (expected API removals); hadoop 3.5.0 runtime skew deferred to T44. See migration/T40-spark4-shim.md."
   },
   {
     "id": "T41",

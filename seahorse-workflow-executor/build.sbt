@@ -45,6 +45,10 @@ lazy val sparkUtils = sparkVersion match {
     // Fork sparkutils3.4.x only if a 3.4.4 compile reveals version-specific breakage.
     val sparkUtils3_4_4 = project in file("sparkutils3.0.x") settings settingsForPublished
     sparkUtils3_4_4
+  case v if v.startsWith("4.") =>
+    // T40: forked shim for the whole Spark 4.x line (verified against 4.0.0 and 4.2.0).
+    val sparkUtils4_0_x = project in file("sparkutils4.0.x") settings settingsForPublished
+    sparkUtils4_0_x
 }
 
 //lazy val sparkUtils2_x = project in file(s"sparkutils2.x") dependsOn (csvlib, sparkUtils) settings settingsForPublished
@@ -53,6 +57,7 @@ lazy val sparkUtils2_x = project in file(s"sparkutils_test") dependsOn (csvlib, 
 
 
 lazy val csv3_0 = project in file(s"sparkutilsfeatures/csv3_0") settings settingsForPublished
+lazy val csv4_0 = project in file(s"sparkutilsfeatures/csv4_0") settings settingsForPublished
 lazy val csv2_4 = project in file(s"sparkutilsfeatures/csv2_4") settings settingsForPublished
 lazy val csv2_2 = project in file(s"sparkutilsfeatures/csv2_2") settings settingsForPublished
 lazy val csv2_0 = project in file(s"sparkutilsfeatures/csv2_0") dependsOn sparkUtils settings settingsForPublished
@@ -70,6 +75,8 @@ lazy val csvlib = sparkVersion match {
     csv3_0
   case "3.4.4" =>
     csv3_0
+  case v if v.startsWith("4.") =>
+    csv4_0
 }
 
 lazy val readjsondataset = project in file(s"sparkutilsfeatures/readjsondataset") dependsOn sparkUtils2_x settings settingsForPublished
@@ -82,6 +89,7 @@ lazy val readjson = sparkVersion match {
   case "2.4.8" => readjsondataset
   case "3.0.0" => readjsondataset
   case "3.4.4" => readjsondataset
+  case v if v.startsWith("4.") => readjsondataset
 }
 
 lazy val rootProject = project

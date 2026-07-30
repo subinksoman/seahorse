@@ -38,6 +38,10 @@ object Version {
 
   val spark = sys.props.getOrElse("SPARK_VERSION", "3.0.0")
   val (scala, hadoop, akka, sprayRoutingLib) = spark match {
+    // T40: the whole Spark 4.x series on Scala 2.13.18 (matches the workflow-executor build;
+    // 2.13.x is binary-compatible across 4.0.x/4.1.x/4.2.x). hadoop kept at "3.3" for now
+    // (Spark 4.x pulls its own Hadoop transitively) — revisit at T44.
+    case v if v.startsWith("4.") => ("2.13.18", "3.3", "2.4.13", "routing")
     // Step B: Spark 3.4.4 on Scala 2.13.12 (matches the workflow-executor build) / Hadoop 3.
     case "3.4.4"  => ("2.13.12", "3.3", "2.4.13", "routing")
     case "3.0.0"  => ("2.12.10", "2.7", "2.4.13", "routing")

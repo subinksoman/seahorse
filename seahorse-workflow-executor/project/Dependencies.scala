@@ -21,6 +21,12 @@ object Version {
   val spark = sys.props.getOrElse("SPARK_VERSION", "3.0.0")
   println(s"SPARK_VERSION: $spark")
   val (scala, java, hadoop, akka, apacheCommons) = spark match {
+    // T40: the whole Spark 4.x series (4.0.x / 4.1.x / 4.2.x). Pinned to Scala 2.13.18 (4.2.0's
+    // build scala; 2.13.x is binary-compatible across the 4.x line, so one arm compiles against
+    // any 4.x). Bytecode target 17 (Spark 4 requires JDK 17). `akka` is dead after the Pekko
+    // migration (helper unused, carried over harmlessly). `hadoop` kept at 3.3.4 — Spark pulls its
+    // own (3.4.1/3.5.0) transitively; the explicit hadoop dep only needs to resolve (revisit T44).
+    case v if v.startsWith("4.") => ("2.13.18", "17", "3.3.4", "2.4.12", "3.17.0")
     // Step B: Spark 3.4.4 on Scala 2.13.12 (Spark 3.4.4 publishes _2.13 artifacts; 2.13
     // unblocks JDK 17). Bytecode target stays 1.8 for the 2.13 build; JDK 17 comes next.
     case "3.4.4" => ("2.13.12", "1.8", "3.3.4", "2.4.12", "3.17.0")
