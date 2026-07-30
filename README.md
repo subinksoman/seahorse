@@ -316,11 +316,13 @@ docker compose down
 
 ## Notes
 
-- **Spark distribution must be Scala 2.13.** The default `spark-*-bin-hadoop3.tgz`
-  is Scala 2.12 and will fail at runtime against the 2.13 executor
-  (`NoSuchMethodError scala.util.matching.Regex.<init>`). The `seahorse-spark` image
-  uses the `...-scala2.13` tarball.
-- **JDK 17 module access.** The services/executor run with Spark 3.4's `--add-opens`
+- **Spark distribution must be Scala 2.13.** On **3.4.x** the default
+  `spark-*-bin-hadoop3.tgz` is Scala 2.12 and fails at runtime against the 2.13 executor
+  (`NoSuchMethodError scala.util.matching.Regex.<init>`), so the image uses the
+  `...-scala2.13` tarball. On **4.x** there is no 2.12 build — the plain
+  `spark-<ver>-bin-hadoop3.tgz` is already Scala 2.13 (no suffix). `seahorse-spark` picks the
+  right one per version.
+- **JDK 17 module access.** The services/executor run with Spark 3.4/4.x's `--add-opens`
   set plus `--add-opens=java.base/sun.security.ssl=ALL-UNNAMED` (the executor uses an
   HTTPS client).
 - **Build helper scripts are Python 3.** `build/*.py` and
@@ -328,9 +330,20 @@ docker compose down
 
 ## Release History
 
-See [update.md](update.md) for the full modernization tracker. Highlights:
+Full notes in [RELEASE.md](RELEASE.md); the task tracker is in [update.md](update.md).
 
-- Spark 3.0.0 → **3.4.4**, Scala 2.12 → **2.13.12**, JDK 8 → **17**, Akka/Spray → **Pekko**.
-- Python 3.7 → **3.12** (executor + PySpark), Jupyter → **Server 2 / Notebook 7**.
+| Release | Stack | Image tags |
+|---|---|---|
+| **3.0.0.8** (current) | Spark **3.4.4** / Scala 2.13.12 / JDK 17 / Python 3.12 | `subinksoman/ae-<svc>:3.0.0.8` |
+| **Spark 4.2 build** (verified) | Spark **4.2.0** / Scala 2.13.18 / JDK 17 / Python 3.12 (numpy 2.4) | `subinksoman/ae-<svc>:4.2.0` |
+
+Modernization highlights:
+
+- Spark 3.0.0 → **3.4.4** (default), and the full **Spark 4.x line up to 4.2.0** supported +
+  verified end-to-end (see [Spark version support](#spark-version-support)).
+- Scala 2.12 → **2.13** (2.13.12 on 3.4.4, 2.13.18 on 4.x), JDK 8 → **17**, Akka/Spray → **Pekko**.
+- Python 3.7 → **3.12** (executor + PySpark); on the 4.x arm numpy **2.4** / pandas **2.3** /
+  pyarrow **25**. Jupyter → **Server 2 / Notebook 7**.
 - Frontend now **builds from source** (webpack 1 → 2, Node 22).
-- Docker image set rebuilt on the modernized stack; full `docker compose` bring-up verified.
+- Docker image set rebuilt on the modernized stack (3.4.4 and 4.2.0); full `docker compose`
+  bring-up + live workflow execution verified on both.
