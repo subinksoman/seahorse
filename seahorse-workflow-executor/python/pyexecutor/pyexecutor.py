@@ -273,9 +273,10 @@ class PyExecutor(object):
         spark_version = spark_context.version
         spark_session = None
         
-        # For Spark 3.0.0 and later versions
-        if spark_version.startswith("3."):
-            print("DEBUG: Initializing SparkSession for Spark 3.x", file=sys.stderr)
+        # For Spark 3.0.0 and later versions (incl. the Spark 4.x line — the SparkSession
+        # wrapper below reconstructs from the existing JVM session, which is stable across 3.x/4.x).
+        if spark_version.startswith("3.") or spark_version.startswith("4."):
+            print("DEBUG: Initializing SparkSession for Spark 3.x/4.x", file=sys.stderr)
             try:
                 # Get the Java SparkSession from the Java SQL session
                 print("DEBUG: Getting Java SparkSession from JavaSparkSQLSession", file=sys.stderr)
@@ -339,8 +340,8 @@ class PyExecutor(object):
                 print(f"DEBUG: Traceback: {traceback.format_exc()}", file=sys.stderr)
                 raise
         else:
-            log_error("Spark version {} is not supported. This code is for Spark 3.x".format(spark_version))
-            raise ValueError("Spark version {} is not supported. This code is for Spark 3.x".format(spark_version))
+            log_error("Spark version {} is not supported. This code is for Spark 3.x/4.x".format(spark_version))
+            raise ValueError("Spark version {} is not supported. This code is for Spark 3.x/4.x".format(spark_version))
 
         print(f"DEBUG: Successfully initialized contexts", file=sys.stderr)
         return spark_context, spark_session
