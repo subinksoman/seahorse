@@ -120,8 +120,9 @@ COPY spark-defaults.conf $SPARK_HOME/conf/spark-defaults.conf
 # Arrow JAR deletion reverted - using bundled Arrow 0.15.1 compatible with Spark 3.0.0
 
 
-# Install Python packages
-RUN /opt/conda/bin/pip install -r /tmp/requirements.txt && \
+# Install Python packages. Use a long socket timeout + many retries: some wheels are large
+# (e.g. tensorflow) and slow mirrors otherwise trip pip's default 15s read timeout.
+RUN /opt/conda/bin/pip install --timeout 120 --retries 10 -r /tmp/requirements.txt && \
     rm /tmp/requirements.txt
 
 #COPY paths.py /opt/conda/lib/python3.7/site-packages/jupyter_core/
