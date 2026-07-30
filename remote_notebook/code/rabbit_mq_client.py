@@ -144,6 +144,25 @@ class RabbitMQClient(Logging):
             self.logger.error(f"Unexpected error while subscribing to topic {topic}: {e}")
             raise
 
+    def consume(self, inactivity_timeout, handle_message, on_timeout):
+        """
+        Consume from the exchange, invoking handle_message(channel, (method, properties, body))
+        for each delivered message and on_timeout() whenever no message arrives within
+        inactivity_timeout seconds. Blocks forever (used by the HeartbeatHandler in a dedicated
+        daemon thread). Reimplements the pika-0.x consume() the heartbeat handler was written
+        against, using pika 1.x's generator-based channel.consume(inactivity_timeout=...), which
+        yields (None, None, None) on timeout.
+        """
+        queue_name = self._channel_impl.queue_declare(queue='', exclusive=True).method.queue
+        # Heartbeat exchange is a fanout; no routing key needed.
+        self._channel_impl.queue_bind(exchange=self._exchange, queue=queue_name)
+        for method, properties, body in self._channel_impl.consume(
+                queue_name, inactivity_timeout=inactivity_timeout):
+            if method is None:
+                on_timeout()
+            else:
+                handle_message(self._channel_impl, (method, properties, body))
+
     def _declare_exchange_consumer(self):
         try:
             self._channel_impl.exchange_declare(exchange=self._exchange, exchange_type=self._exchange_type)
