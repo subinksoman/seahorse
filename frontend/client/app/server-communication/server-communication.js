@@ -165,9 +165,12 @@ class ServerCommunication {
     this.socket = new WebSocket(wsUrl);
     this.client = Stomp.over(this.socket);
 
+    // Send a STOMP heartbeat every 20s. With the old SockJS transport its own keepalive frames
+    // kept the socket alive; over a raw WebSocket there is none, and RabbitMQ closes the idle
+    // connection after ~60s, making the editor reconnect on a loop. 20s keeps it well under that.
     this.client.heartbeat = {
       incoming: 0,
-      outgoing: 0
+      outgoing: 20000
     };
 
     this.connectionAttemptId = Math.floor(Math.random() * 1000000);
