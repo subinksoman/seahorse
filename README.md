@@ -10,14 +10,6 @@ JDK 8 baseline to a current runtime — see [Technology Stack](#technology-stack
 The ongoing modernization plan and task tracker live in [update.md](update.md);
 per-task notes are in [migration/](migration/).
 
-## Repository Details
-
-| Product Group | Module Name | Name | Description |
-|---------------|-------------|------------------|-------------|
-| magik | ae | ae-seahorse-svc | Seahorse Workflow Execution Service |
-
----
-
 ## Architecture
 
 Seahorse is a multi-service application. A single **proxy** (nginx) is the only
@@ -190,8 +182,9 @@ sbt -DSPARK_VERSION=3.4.4 compile
 All image builds go through [build/manage-docker.py](build/manage-docker.py), which
 knows how to build each image the right way — a plain `docker build` for the
 "simple" images (proxy, rabbitmq, h2, spark, notebooks, mail, frontend) and the
-sbt-docker plugin (`<project>/docker`) for the JVM services. Every image is tagged
-with the current **git HEAD sha**.
+sbt-docker plugin (`<project>/docker`) for the JVM services. Built images are tagged
+internally with the current **git HEAD sha**; the publish step (below) retags them
+to `<repository>/<prefix>-<name>:<version>`.
 
 **Build a single image** (`-i` / `--images`):
 
@@ -215,6 +208,14 @@ python3 ./build/manage-docker.py -b -i seahorse-workflowmanager seahorse-session
 python3 ./build/manage-docker.py -b --all
 ```
 
+**Build against a specific Spark version** — `SPARK_VERSION` selects the arm (the
+build supports the whole Spark 4.x line as well as 3.4.4):
+
+```bash
+SPARK_VERSION=4.2.0 python3 ./build/manage-docker.py -b --all   # Spark 4.x
+# default is 3.4.4 (the shipped 3.0.0.8 stack)
+```
+
 `--all` builds the images defined in `image_confs` in `manage-docker.py`. By
 default that is the 12 locally-built images:
 
@@ -228,6 +229,26 @@ seahorse-notebooks        seahorse-mail            seahorse-frontend
 `seahorse-authorization` and `seahorse-documentation` are commented out of the
 `--all` set and consumed from the prebuilt `quay.io/deepsense_io/...:1.4.3`
 images; re-enable them in `manage-docker.py` to build from source.
+
+**Tag & push to a registry** — `-t/--tag` retags the built images to
+`<repository>/<prefix>-<name>:<version>`, and `-p/--push` pushes them. All three
+parts are variables (CLI flag or env var):
+
+| Part | Flag | Env var | Default |
+|---|---|---|---|
+| repository / namespace | `-r`, `--repository` | `DOCKER_REPOSITORY` | `subinksoman` |
+| image prefix | `--prefix` | `IMAGE_PREFIX` | `ae` |
+| version tag | `-v`, `--version` | `IMAGE_VERSION` | git HEAD sha |
+
+```bash
+# build all, then tag + push subinksoman/ae-<name>:3.0.0.8
+python3 ./build/manage-docker.py -b --all -t -p -v 3.0.0.8
+
+# override repository and prefix -> myorg/engine-<name>:4.2.0
+python3 ./build/manage-docker.py -b --all -t -p -r myorg --prefix engine -v 4.2.0
+```
+
+(Requires `docker login` to the target registry for `--push`.)
 
 > **sbt image tip:** the sbt-docker path batches all requested JVM services into a
 > single `sbt clean ... <proj>/docker` invocation. If you hit a stale
