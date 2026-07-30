@@ -14,6 +14,7 @@
 
 
 import base64
+import hashlib
 from datetime import datetime
 
 from nbformat import reads, writes, from_dict
@@ -87,8 +88,8 @@ class WMContentsManager(ContentsManager):
         req.add_header("X-Seahorse-UserName", "notebook")
         return req
 
-    def create_model(self, content_json, path):
-        return {
+    def create_model(self, content_json, path, require_hash=False):
+        model = {
             "name": "Seahorse Editor Notebook",
             "path": path.serialize(),
             "type": "notebook",
@@ -98,11 +99,15 @@ class WMContentsManager(ContentsManager):
             "content": reads(content_json, NBFORMAT_VERSION) if content_json is not None else None,
             "format": "json" if content_json is not None else None,
             "mimetype": None,
-            # Jupyter Server 2's contents model expects these; newer clients KeyError without them.
-            "size": None,
-            "hash": None,
-            "hash_algorithm": None,
+            "size": len(content_json.encode("utf-8")) if content_json is not None else None,
         }
+        # Only include hash/hash_algorithm when a hash was actually requested and computed.
+        # Jupyter Server's validate_model rejects them being present-but-None when require_hash
+        # is false ("Keys unexpectedly None: ['hash', 'hash_algorithm']").
+        if require_hash:
+            model["hash"] = hashlib.sha256((content_json or "").encode("utf-8")).hexdigest()
+            model["hash_algorithm"] = "sha256"
+        return model
 
     def _create_notebook(self, seahorse_notebook_path):
 
@@ -166,7 +171,8 @@ class WMContentsManager(ContentsManager):
             response = urlopen(self._create_request(self._get_wm_notebook_url(seahorse_notebook_path)))
             if response.getcode() == 200:
                 content_json = response.read().decode("utf-8")
-                return self.create_model(content_json if content else None, seahorse_notebook_path)
+                return self.create_model(content_json if content else None, seahorse_notebook_path,
+                                         require_hash=require_hash)
             else:
                 raise web.HTTPError(response.status, response.msg)
         except web.HTTPError:
