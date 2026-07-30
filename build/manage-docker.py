@@ -95,21 +95,21 @@ def image_component(docker_image_name):
     return docker_image_name[len(prefix):] if docker_image_name.startswith(prefix) else docker_image_name
 
 
-def publish_image_name(docker_image_name, version, repository):
-    # Published name: <repository>/ae-<component>:<version>
-    # e.g. ("seahorse-workflowmanager", "3.0.0.8", "subinksoman")
+def publish_image_name(docker_image_name, version, repository, prefix):
+    # Published name: <repository>/<prefix>-<component>:<version>
+    # e.g. ("seahorse-workflowmanager", "3.0.0.8", "subinksoman", "ae")
     #      -> "subinksoman/ae-workflowmanager:3.0.0.8"
-    return "{}/{}-{}:{}".format(repository, image_prefix, image_component(docker_image_name), version)
+    return "{}/{}-{}:{}".format(repository, prefix, image_component(docker_image_name), version)
 
 
-def tag_and_push_images(docker_configurations, repository, version, push):
+def tag_and_push_images(docker_configurations, repository, version, push, prefix):
     # The build tags each image internally as "<seahorse-name>:<git_sha>" (simple_docker uses
     # git_sha(); the sbt-docker plugin tags gitHeadCommit == git_sha). Retag those to the
-    # published "<repository>/ae-<name>:<version>" and optionally push. Uses build/docker.py
+    # published "<repository>/<prefix>-<name>:<version>" and optionally push. Uses build/docker.py
     # (imported as `docker`), whose tag()/push() shell out to the docker CLI.
     for conf in docker_configurations:
         source = "{}:{}".format(conf.docker_image_name, git_sha())
-        target = publish_image_name(conf.docker_image_name, version, repository)
+        target = publish_image_name(conf.docker_image_name, version, repository, prefix)
         docker.tag(source, target)
         if push:
             docker.push(target)
@@ -151,6 +151,11 @@ def main():
                         default=docker_repository,
                         help='Docker repository/namespace for published images (env DOCKER_REPOSITORY)',
                         action='store')
+    parser.add_argument('--prefix',
+                        default=image_prefix,
+                        help='Image name prefix for published <repository>/<prefix>-<name> images '
+                             '(env IMAGE_PREFIX)',
+                        action='store')
     parser.add_argument('-v', '--version',
                         default=image_version_env,
                         help='Version tag for published <repository>/ae-<name>:<version> images '
@@ -184,8 +189,8 @@ def main():
     if args.tag or args.push:
         version = args.version if args.version else git_sha()
         print("Publishing images as {}/{}-<name>:{}{}".format(
-            args.repository, image_prefix, version, " (push)" if args.push else " (tag only)"))
-        tag_and_push_images(selected_confs, args.repository, version, args.push)
+            args.repository, args.prefix, version, " (push)" if args.push else " (tag only)"))
+        tag_and_push_images(selected_confs, args.repository, version, args.push, args.prefix)
 
 
 def build_dockers(docker_configurations):
