@@ -29,7 +29,9 @@ def tag(image_name, tag):
 def find_image(query):
     image_cmd = 'docker images -q "{}"'.format(query)
     print(image_cmd)
-    image = subprocess.check_output(image_cmd, shell=True, cwd=cwd).strip()
+    # Python 3: check_output returns bytes; decode so the id is a clean str (not b'...')
+    # when formatted into the docker tag/push commands.
+    image = subprocess.check_output(image_cmd, shell=True, cwd=cwd).decode("utf-8").strip()
     if not image:
         raise ValueError('There is no image for query "{}"'.format(query))
     return image

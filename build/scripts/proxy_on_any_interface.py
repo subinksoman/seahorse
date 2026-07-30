@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2017 deepsense.ai (CodiLime, Inc)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,8 @@ import sys
 
 def load_compose(filename):
     with open(filename) as f:
-        return yaml.load(f)
+        # PyYAML 5.1+ requires an explicit Loader; safe_load is fine for a compose file.
+        return yaml.safe_load(f)
 
 
 # taken from docker-compose.py
@@ -39,8 +40,9 @@ def local_to_any_in_port_mapping(mapping):
 
 
 def update_proxy_port_mapping(yaml):
+    # Python 3: map() is a lazy iterator; wrap in list() so the ports serialize back to YAML.
     yaml['services']['proxy']['ports'] = \
-        map(local_to_any_in_port_mapping, yaml['services']['proxy']['ports'])
+        list(map(local_to_any_in_port_mapping, yaml['services']['proxy']['ports']))
 
 
 def main():

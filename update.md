@@ -626,7 +626,8 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "build",
     "risk": "Low",
     "effort_days": 2,
-    "status": "todo"
+    "status": "completed",
+    "notes": "build/manage-docker.py + build/scripts/proxy_on_any_interface.py shebangs #!/usr/bin/env python -> python3. build/docker.py find_image: subprocess.check_output(...).strip() -> .decode('utf-8').strip() (was formatting bytes b'...' into docker tag/push commands). proxy_on_any_interface.py: yaml.load(f) -> yaml.safe_load(f) (PyYAML 5.1+ needs an explicit Loader) and map(...) -> list(map(...)) (Py3 map is a lazy iterator that would not serialize back to YAML). Removed the stray build/docker.pyc (untracked; .gitignore already ignores *.pyc + __pycache__/). manage-docker.py git_sha bytes fix already landed in T70. Verified: python -m py_compile clean on all three; python3 build/manage-docker.py --help runs (argcomplete optional, handled); docker.py imports with find_image/push/tag. (Full e2e via manage-docker/docker.py needs the docker SDK on the build host.)"
   },
   {
     "id": "T75",
