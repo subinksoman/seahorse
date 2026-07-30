@@ -98,6 +98,10 @@ class WMContentsManager(ContentsManager):
             "content": reads(content_json, NBFORMAT_VERSION) if content_json is not None else None,
             "format": "json" if content_json is not None else None,
             "mimetype": None,
+            # Jupyter Server 2's contents model expects these; newer clients KeyError without them.
+            "size": None,
+            "hash": None,
+            "hash_algorithm": None,
         }
 
     def _create_notebook(self, seahorse_notebook_path):
@@ -133,8 +137,26 @@ class WMContentsManager(ContentsManager):
         except Exception as e:
             raise web.HTTPError(500, str(e))
 
-    def get(self, path, content=True, type=None, format=None):
+    def get(self, path, content=True, type=None, format=None, require_hash=False, **kwargs):
+        # Jupyter Server 2.11+ passes require_hash (and may pass further kwargs); accept and
+        # ignore them so the signature stays forward-compatible.
         assert isinstance(path, str)
+        # The Jupyter file browser polls the root path (''/'/'); the Seahorse manager only
+        # serves concrete workflow/node notebook paths, so return an empty directory model
+        # for the root instead of failing SeahorseNotebookPath.deserialize with a 400.
+        if path in ('', '/'):
+            return {
+                "name": "",
+                "path": "",
+                "type": "directory",
+                "writable": False,
+                "last_modified": DUMMY_CREATED_DATE,
+                "created": DUMMY_CREATED_DATE,
+                "content": [] if content else None,
+                "format": "json" if content else None,
+                "mimetype": None,
+                "size": None,
+            }
         try:
             seahorse_notebook_path = SeahorseNotebookPath.deserialize(path)
         except SeahorseNotebookPath.DeserializationFailed as e:
