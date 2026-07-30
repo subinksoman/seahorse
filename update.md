@@ -451,7 +451,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "risk": "High",
     "effort_days": 9,
     "status": "partial",
-    "notes": "COMPILE-CLEAN against Spark 4.2.0 on JDK 17: api + deeplang (and the whole dep chain: commons/reportlib/graph/sparkutils4.0.x/csv4_0) compile with 0 errors (2 [success]; deeplang = 1678 classes). The 400 warnings are ALL Scala 2.13 deprecations (copyArrayToImmutableIndexedSeq, explicit-array varargs, zipped, toStream, mapValues, filterKeys, replaceAllLiterally) - NONE are Spark-4 API removals. So there is essentially no compile-time Spark-4 breakage in deeplang: the 3.4.4 migration already moved its Spark usage onto public/stable APIs. NO source changes were needed. Marked partial (not completed) because the RUNTIME half of 'resolve breaking changes' - ANSI SQL default (T43), model persistence (T23), behavioral changes - is validated by running the suite (T43 spike + T42 green + golden output), which is the concrete remainder. See migration/T41-spark4-deeplang.md."
+    "notes": "COMPILE-CLEAN against Spark 4.2.0 on JDK 17: api + deeplang (and the whole dep chain: commons/reportlib/graph/sparkutils4.0.x/csv4_0) compile with 0 errors (2 [success]; deeplang = 1678 classes). The 400 warnings are ALL Scala 2.13 deprecations (copyArrayToImmutableIndexedSeq, explicit-array varargs, zipped, toStream, mapValues, filterKeys, replaceAllLiterally) - NONE are Spark-4 API removals. So there is essentially no compile-time Spark-4 breakage in deeplang: the 3.4.4 migration already moved its Spark usage onto public/stable APIs. NO source changes were needed. Marked partial (not completed) because the RUNTIME half of 'resolve breaking changes' - ANSI SQL default (T43), model persistence (T23), behavioral changes - is validated by running the suite (T43 spike + T42 green + golden output), which is the concrete remainder. See migration/T41-spark4-deeplang.md. UPDATE: the deeplang runtime unit suite (345 tests / 65 suites) also PASSES on Spark 4.2.0 under ANSI-default (see T43), so both the compile and unit-test halves are green; remaining is the golden-output/e2e gate (T42)."
   },
   {
     "id": "T42",
@@ -483,7 +483,8 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "migration",
     "risk": "High",
     "effort_days": 5,
-    "status": "todo"
+    "status": "completed",
+    "notes": "SPIKE DONE. Ran the full deeplang test suite against Spark 4.2.0 (JDK 17) with Spark 4.x defaults (ANSI SQL ON, no spark.sql.ansi.enabled=false override): 345 tests / 65 suites, 0 failed, 0 aborted, 'All tests passed' in 67s. The ANSI default did NOT regress deeplang's operation tests. POLICY: keep ANSI enabled (the Spark 4 default); do NOT globally disable it; handle any specific legacy-lenient-cast dependency narrowly at the operation if T42 golden-output/e2e surfaces one. Caveat: unit suite is strong but not exhaustive - ANSI edge cases are data-value-specific, so T42 (golden-output + e2e on real workflows) is the confirmatory gate. See migration/T43-spark4-ansi.md."
   },
   {
     "id": "T44",
