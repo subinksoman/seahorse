@@ -212,10 +212,10 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "id": "T23",
     "phase": "2 - Spark 3.5",
     "title": "Fix Spark serialization / model persistence formats",
-    "description": "Validate DefaultMLWriter/reader and saved-model compatibility; handle sparkVersion metadata and any format changes between 3.0 and 3.5.",
+    "description": "Validate model persistence on Spark 4.0: DefaultMLWriter/reader, the private[ml] ml.util MLWriter/MLReader/DefaultParamWriter internals, sparkVersion metadata, and on-disk model format changes 3.4->4.0. Confirm models saved on 3.4.4 still load (or provide a migration) on 4.0.",
     "area": "seahorse-workflow-executor/deeplang/.../serialization/",
     "depends_on": [
-      "T22"
+      "T41"
     ],
     "category": "spark",
     "risk": "Med",
@@ -226,10 +226,10 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "id": "T24",
     "phase": "2 - Spark 3.5",
     "title": "Update sessionmanager Spark launcher & download URLs",
-    "description": "Mesos/YARN/standalone launchers reference spark-$version-bin-hadoop tarballs and cloudfront URLs; point to archive.apache.org bin-hadoop3, verify spark-submit args on 3.5.",
+    "description": "Point the Mesos/YARN/standalone launchers and download URLs at the Spark 4.0 bin-hadoop3 SCALA-2.13 tarball on archive.apache.org (the 2.12 default breaks the 2.13 executor), and verify spark-submit arguments / configs on 4.0.",
     "area": "sessionmanager/.../sparklauncher/, e2etests BatchTestSupport",
     "depends_on": [
-      "T21"
+      "T40"
     ],
     "category": "spark",
     "risk": "Med",
@@ -411,7 +411,7 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "id": "T32",
     "phase": "3 - Scala 2.13",
     "title": "Green build + tests on Scala 2.13 / JDK 17 / Spark 3.5",
-    "description": "Full suite passes on the new toolchain before touching Spark 4.0.",
+    "description": "Full backend + workflow-executor suite passes on the new toolchain before touching Spark 4.0. Landed on Spark 3.4.4 (not 3.5) with Scala 2.13.12 / JDK 17 / Pekko; whole suite green (see T31).",
     "area": "all modules",
     "depends_on": [
       "T31"
@@ -419,48 +419,110 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "category": "testing",
     "risk": "Med",
     "effort_days": 3,
-    "status": "todo"
+    "status": "completed",
+    "notes": "Satisfied by the 3.4.4 + Scala 2.13.12 + JDK 17 migration (T31): both builds compile and the full Test suites run green on the modernized toolchain. The Spark-4 hop (T40+) starts from this 3.4.4/2.13/JDK17 baseline."
   },
   {
     "id": "T40",
     "phase": "4 - Spark 4.0",
     "title": "Create sparkutils4.0.x shim + feature modules; add 4.0.0 arms",
-    "description": "Clone 3.5 shim to 4.0.x, adapt to Spark 4.0 API removals; add '4.0.0' case arms (scala 2.13, hadoop 3, akka/pekko) in Dependencies.scala and build.sbt matches.",
+    "description": "Add a sparkutils4.0.x shim + csv4.0/readjson4.0 feature modules: clone the active 3.4.x arm and re-implement the internal CSV/catalyst classes (DataframeToDriverCsvFileWriter, RawCsvRDDToDataframe, DateTimeUtils usage) against Spark 4.0 internals. Add '4.0.0' case arms (scala 2.13, hadoop 3, pekko) in BOTH builds' Dependencies.scala + build.sbt match blocks. Never edit the 3.4.x shim in place, so SPARK_VERSION=3.4.4 remains an instant rollback.",
     "area": "seahorse-workflow-executor/sparkutils4.0.x, sparkutilsfeatures/*, build.sbt, Dependencies.scala",
     "depends_on": [
       "T32"
     ],
     "category": "spark",
     "risk": "High",
-    "effort_days": 6,
+    "effort_days": 7,
     "status": "todo"
   },
   {
     "id": "T41",
     "phase": "4 - Spark 4.0",
     "title": "Resolve Spark 4.0 breaking changes in deeplang",
-    "description": "Address 3.5->4.0 removals (deprecated ML APIs, ANSI SQL defaults, datasource behavior, removed configs). Re-run golden-output comparison.",
+    "description": "Apply the T00 checklist for 3.4->4.0 across the 133 deeplang operations / 195 doperables: removed/renamed ML & SQL APIs, ml.util persistence internals, removed spark.sql.legacy.* configs, DataSourceV2 / CSV / JSON reader-option changes. (The ANSI-SQL default is handled separately in T43.)",
     "area": "seahorse-workflow-executor/deeplang/",
     "depends_on": [
-      "T40"
+      "T40",
+      "T43"
     ],
     "category": "spark",
     "risk": "High",
-    "effort_days": 8,
+    "effort_days": 9,
     "status": "todo"
   },
   {
     "id": "T42",
     "phase": "4 - Spark 4.0",
     "title": "Green backend + e2e on Spark 4.0 / Scala 2.13 / JDK 17",
-    "description": "Full suite + e2e pass on final target stack.",
+    "description": "Completion gate for Spark 4 support: full backend + deeplang suite AND e2e pass on Spark 4.0 / Scala 2.13 / JDK 17 / Python 3.12, with a golden-output regression comparison against the T02 baseline.",
     "area": "all modules, e2etests/",
     "depends_on": [
-      "T41"
+      "T41",
+      "T23",
+      "T24",
+      "T44",
+      "T45"
     ],
     "category": "testing",
     "risk": "High",
+    "effort_days": 5,
+    "status": "todo"
+  },
+  {
+    "id": "T43",
+    "phase": "4 - Spark 4.0",
+    "title": "Spark 4.0 ANSI SQL default: spike + remediation policy",
+    "description": "Spark 4.0 enables ANSI SQL mode by default: casts that used to return null now throw and string<->number/date parsing is stricter. Spike against the current 3.4.4 code to quantify the blast radius across deeplang casting/parsing/SQL operations, decide a policy (global spark.sql.ansi.enabled=false vs targeted per-operation fixes), and implement it. This is the single biggest behavioral-regression risk of the hop and should be scoped before T41.",
+    "area": "seahorse-workflow-executor/deeplang/",
+    "depends_on": [
+      "T40"
+    ],
+    "category": "migration",
+    "risk": "High",
+    "effort_days": 5,
+    "status": "todo"
+  },
+  {
+    "id": "T44",
+    "phase": "4 - Spark 4.0",
+    "title": "Spark 4.0 runtime image + PySpark/Arrow alignment",
+    "description": "Point the ae-spark (seahorse-spark) image at the Spark 4.0 bin-hadoop3 SCALA-2.13 distribution; re-apply the Log4j2 + JDK 17 add-opens layers (incl. sun.security.ssl); align pyarrow/pandas to Spark 4.0's expected versions and re-verify the PySpark bridge (pyexecutor) + Arrow IPC; repack we-deps for the executor.",
+    "area": "deployment/spark-docker/, sessionmanager/, seahorse-workflow-executor/workflowexecutor/",
+    "depends_on": [
+      "T40"
+    ],
+    "category": "build",
+    "risk": "Med",
     "effort_days": 4,
+    "status": "todo"
+  },
+  {
+    "id": "T45",
+    "phase": "4 - Spark 4.0",
+    "title": "Restore SparkR / R executor on Spark 4.0",
+    "description": "Re-verify the R executor and SparkR backend shim (RExecutionCaretaker, r_executor.R, sparkr_kernel/kernel_init.R version gate) against Spark 4.0's R package; broaden the version gate if needed.",
+    "area": "seahorse-workflow-executor/workflowexecutor/rexecutor/, remote_notebook/code/sparkr_kernel/",
+    "depends_on": [
+      "T44"
+    ],
+    "category": "migration",
+    "risk": "Med",
+    "effort_days": 2,
+    "status": "todo"
+  },
+  {
+    "id": "T46",
+    "phase": "4 - Spark 4.0",
+    "title": "Rebuild & publish the ae-* image set on Spark 4.0",
+    "description": "Rebuild the full Docker image set on Spark 4.0 (manage-docker.py -b --all), regenerate docker-compose, verify a full compose bring-up, and publish subinksoman/ae-*:<next-version> to Docker Hub with repo descriptions. Release deliverable for Spark 4 support.",
+    "area": "build/manage-docker.py, deployment/docker-compose/",
+    "depends_on": [
+      "T42"
+    ],
+    "category": "build",
+    "risk": "Low",
+    "effort_days": 2,
     "status": "todo"
   },
   {
