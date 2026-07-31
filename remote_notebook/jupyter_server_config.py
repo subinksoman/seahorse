@@ -30,7 +30,15 @@ c.ServerApp.base_url = '/jupyter/'
 c.ServerApp.tornado_settings = {
     'headers': {
         'Content-Security-Policy': "frame-ancestors 'self' *"
-    }
+    },
+    # Keep the browser<->server kernel WebSocket alive. Jupyter's Tornado websocket handlers
+    # (kernel channels) read these from the settings: with no ping the connection has no
+    # heartbeat, so after a long idle it silently dies through the proxy and neither side
+    # notices -> the frontend shows the kernel as "unknown". Sending a ping every 30s keeps
+    # the connection warm and detects a dead peer within ping_timeout (Tornado then closes it
+    # cleanly so the client reconnects instead of hanging in "unknown").
+    'websocket_ping_interval': 30,
+    'websocket_ping_timeout': 60,
 }
 
 c.ServerApp.contents_manager_class = WMContentsManager
