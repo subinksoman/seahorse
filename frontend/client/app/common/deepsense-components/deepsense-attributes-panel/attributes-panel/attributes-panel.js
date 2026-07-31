@@ -96,7 +96,13 @@ function OperationAttributes($rootScope, AttributesPanelService, config, version
         // notebooks URL gets the extension.
         const extension = $scope.disabledMode ? '' : '.ipynb';
 
-        const url = `${config.notebookHost}/${onlineUrlPart}/${$scope.workflowId}/${$scope.node.id}/${encodedParams}${extension}`;
+        // Append a readable last path segment so the Jupyter notebook tab/header shows a name
+        // (e.g. "Python_Notebook") instead of the base64 params blob. It is a safe, char-restricted
+        // literal (no spaces/dots/slashes); SeahorseNotebookPath treats this 4th segment as a
+        // display-only name and ignores it for identity.
+        const readableName = notebookParams.language === 'r' ? 'R_Notebook' : 'Python_Notebook';
+
+        const url = `${config.notebookHost}/${onlineUrlPart}/${$scope.workflowId}/${$scope.node.id}/${encodedParams}/${readableName}${extension}`;
 
         return $sce.trustAsResourceUrl(url);
       };

@@ -94,16 +94,15 @@ class WMContentsManager(ContentsManager):
         # plain-text editor (which showed the raw notebook JSON). The extension is stripped again
         # by SeahorseNotebookPath.deserialize.
         serialized = path.serialize()
-        # Friendly display name shown in Jupyter's file browser / API (e.g. "Python Notebook").
-        # Was "Analytical engine <workflow-uuid> <node-uuid>", which read as gibberish. Keep the
-        # .ipynb suffix so JupyterLab still recognises it as a notebook.
-        # NOTE: the notebook *tab/header* title in Notebook 7 comes from the URL path basename
-        # (the base64 params blob), not this name — making that readable needs a path restructure
-        # (frontend + serialize/deserialize), tracked separately.
+        # Notebook tab/header title = the Jupyter path basename. When the path carries a readable
+        # display segment (SeahorseNotebookPath.display_name, sent by the frontend), the basename is
+        # that name (e.g. "Python_Notebook") instead of the base64 params blob. Set the model name to
+        # match the basename; fall back to a friendly language-based name for legacy 3-segment paths.
         lang_label = {"python": "Python", "r": "R"}.get(getattr(path, "language", "") or "", "")
-        display_name = ("{} Notebook".format(lang_label) if lang_label else "Notebook") + ".ipynb"
+        friendly = "{} Notebook".format(lang_label) if lang_label else "Notebook"
+        base_name = getattr(path, "display_name", None) or friendly
         model = {
-            "name": display_name,
+            "name": base_name + ".ipynb",
             "path": serialized + ".ipynb",
             "type": "notebook",
             "writable": True,

@@ -23,15 +23,24 @@ class SeahorseNotebookPath(object):
             super(SeahorseNotebookPath.DeserializationFailed, self).__init__(
                     "Deserialization of Path '{}' failed".format(path))
 
-    def __init__(self, workflow_id, node_id, language, datasource_node_id=None, datasource_node_port=None):
+    def __init__(self, workflow_id, node_id, language, datasource_node_id=None, datasource_node_port=None,
+                 display_name=None):
         self.workflow_id = workflow_id
         self.node_id = node_id
         self.language = language
         self.datasource_node_id = datasource_node_id
         self.datasource_node_port = datasource_node_port
+        # Optional human-readable last path segment (e.g. "Python_Notebook"). It is NOT part of the
+        # Seahorse identity — it exists only so the Jupyter path basename (and therefore the Notebook
+        # tab/header title) is readable instead of the base64 params blob. Round-tripped by
+        # serialize/deserialize; None keeps the legacy 3-segment path.
+        self.display_name = display_name
 
     def serialize(self):
-        return '/'.join([self.workflow_id, self.node_id, self.params()])
+        segments = [self.workflow_id, self.node_id, self.params()]
+        if self.display_name:
+            segments.append(self.display_name)
+        return '/'.join(segments)
 
     @classmethod
     def deserialize(cls, seahorse_notebook_path):
@@ -43,7 +52,14 @@ class SeahorseNotebookPath(object):
         if seahorse_notebook_path.endswith('.ipynb'):
             seahorse_notebook_path = seahorse_notebook_path[:-len('.ipynb')]
         try:
-            workflow_id, node_id, params = seahorse_notebook_path.split('/')
+            parts = seahorse_notebook_path.split('/')
+            if len(parts) < 3:
+                raise ValueError("expected at least workflow_id/node_id/params")
+            # workflow_id and node_id are UUIDs; params is base64 (assumed '/'-free, as before).
+            # A 4th segment, if present, is the readable display name (see __init__) and is ignored
+            # for identity but preserved so serialize() reproduces the same path.
+            workflow_id, node_id, params = parts[0], parts[1], parts[2]
+            display_name = parts[3] if len(parts) > 3 else None
             # base64.decodestring was removed in Python 3.9; decodebytes is the replacement.
             deserialized_params = json.loads(base64.decodebytes(params.encode()).decode('utf-8'))
             # If nothing is connected to the Notebook node, we don't expect a source
@@ -54,7 +70,7 @@ class SeahorseNotebookPath(object):
                 dataframe_owner_node_id = None
                 output_port_number = None
             return cls(workflow_id, node_id, deserialized_params['language'], dataframe_owner_node_id,
-                       output_port_number)
+                       output_port_number, display_name)
         except ValueError:
             raise cls.DeserializationFailed(seahorse_notebook_path)
 
