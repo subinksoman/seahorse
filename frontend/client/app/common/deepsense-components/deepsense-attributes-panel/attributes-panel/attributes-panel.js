@@ -97,10 +97,18 @@ function OperationAttributes($rootScope, AttributesPanelService, config, version
         const extension = $scope.disabledMode ? '' : '.ipynb';
 
         // Append a readable last path segment so the Jupyter notebook tab/header shows a name
-        // (e.g. "Python_Notebook") instead of the base64 params blob. It is a safe, char-restricted
-        // literal (no spaces/dots/slashes); SeahorseNotebookPath treats this 4th segment as a
-        // display-only name and ignores it for identity.
-        const readableName = notebookParams.language === 'r' ? 'R_Notebook' : 'Python_Notebook';
+        // instead of the base64 params blob. Use the node's own name (uiName) so multiple notebooks
+        // are distinguishable, falling back to the operation name and then a language label. The
+        // full path stays unique per node (workflowId/nodeId/...), so identical names never collide
+        // functionally — this only affects the displayed title. Sanitize to a URL/path-safe token
+        // (SeahorseNotebookPath treats this 4th segment as display-only and the offline route
+        // forbids dots), so strip anything but [A-Za-z0-9_-].
+        const languageLabel = notebookParams.language === 'r' ? 'R_Notebook' : 'Python_Notebook';
+        const rawName = $scope.node.uiName || $scope.node.name || languageLabel;
+        const readableName = String(rawName)
+          .replace(/[^a-zA-Z0-9_-]/g, '_')
+          .replace(/_+/g, '_')
+          .replace(/^_+|_+$/g, '') || languageLabel;
 
         const url = `${config.notebookHost}/${onlineUrlPart}/${$scope.workflowId}/${$scope.node.id}/${encodedParams}/${readableName}${extension}`;
 
