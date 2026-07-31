@@ -288,50 +288,20 @@ class PyExecutor(object):
                     print("DEBUG: Using existing SparkSession", file=sys.stderr)
                     spark_session = SparkSession._instantiatedSession
                 else:
-                    # Create Python wrapper for the existing SparkSession
-                    print("DEBUG: Creating new Python SparkSession wrapper", file=sys.stderr)
-                    # In Spark 3.x, we can create the wrapper directly
-                    spark_session = object.__new__(SparkSession)
-                    spark_session._sc = spark_context
-                    spark_session._jsparkSession = java_spark_session
-                    spark_session._jvm = gateway.jvm
-                    # Add _wrapped attribute which should be the Java session's wrapped object
-                    spark_session._wrapped = java_spark_session
-                    
-                    # For Spark 3.x compatibility, set up the internal SQLContext
-                    print("DEBUG: Setting up internal SQLContext", file=sys.stderr)
-                    # Get the Java SQLContext from the SparkSession
-                    java_sql_context = java_spark_session.sqlContext()
-                    # Create a minimal SQLContext wrapper
-                    class SQLContextWrapper:
-                        def __init__(self, java_sql_context):
-                            self._jsqlContext = java_sql_context
-                        def read(self):
-                            return self._jsqlContext.read()
-                    
-                    spark_session._ssql_ctx = SQLContextWrapper(java_sql_context)
-                    
-                    # Initialize other required internal attributes
-                    spark_session._instantiatedSession = spark_session
-                    spark_session._activeSession = spark_session
-                    
-                    # Set the shared state and session state from Java session
-                    spark_session._jsparkSession = java_spark_session
-                    spark_session._jwrapped = java_spark_session
-                    
-                    class WrappedHelper:
-                        def __init__(self, java_spark_session, spark_context):
-                            self._jsparkSession = java_spark_session
-                            self._sc = spark_context
-                        
-                        @property
-                        def _conf(self):
-                            return self._jsparkSession.sessionState().conf()
-
-                    spark_session._wrapped = WrappedHelper(java_spark_session, spark_context)
-
+                    # Bind a Python SparkSession to the existing JVM session using PySpark's
+                    # SUPPORTED constructor — exactly what the notebook kernel does and what makes
+                    # .toPandas() work there (kernel_init.py: SparkSession(sc, jsparkSession=...)).
+                    # It wires up _jconf, _jsparkSession, _wrapped, etc. correctly for the installed
+                    # PySpark (3.x and 4.x). The previous hand-built object.__new__(SparkSession)
+                    # wrapper set a WrappedHelper that lacked _jconf, so on PySpark 4.x
+                    # df.toPandas() failed with:
+                    #   AttributeError: 'WrappedHelper' object has no attribute '_jconf'
+                    # (PySpark 4's _to_pandas reads self.sparkSession._jconf.getConfs(...)).
+                    print("DEBUG: Creating SparkSession via supported constructor", file=sys.stderr)
+                    spark_session = SparkSession(spark_context, jsparkSession=java_spark_session)
                     SparkSession._instantiatedSession = spark_session
-                    print("DEBUG: SparkSession wrapper created successfully", file=sys.stderr)
+                    SparkSession._activeSession = spark_session
+                    print("DEBUG: SparkSession created successfully", file=sys.stderr)
                 
             except Exception as e:
                 print(f"DEBUG: Error creating SparkSession: {str(e)}", file=sys.stderr)

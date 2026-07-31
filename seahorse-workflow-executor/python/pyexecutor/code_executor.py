@@ -16,7 +16,7 @@
 import ast
 import sys
 import traceback
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.types import *
 from threading import Thread
@@ -222,62 +222,30 @@ class CodeExecutor(object):
         log_debug("Enabling Arrow optimization")
         new_spark_session.conf.set("spark.sql.execution.arrow.pyspark.enabled", "true")
         
-        # Ensure the new session has all required attributes
-        if not hasattr(new_spark_session, '_wrapped'):
-            log_debug(f"{workflow_id}_{node_id}-Setting _wrapped attribute on new session")
-            class WrappedHelper:
-                def __init__(self, java_spark_session, spark_context):
-                    log_debug("Wrapped helper for _wrapped in new session initialized")
-                    self._jsparkSession = java_spark_session
-                    self._sc = spark_context
-                        
-                @property
-                def _conf(self):
-                    return self._jsparkSession.sessionState().conf()
-            new_spark_session._wrapped = WrappedHelper(new_spark_session._jsparkSession, self.spark_context)
-            
-        if not hasattr(new_spark_session, '_ssql_ctx'):
-            log_debug(f"{workflow_id}_{node_id}-Setting _ssql_ctx attribute on new session")
-            # Create a minimal SQLContext wrapper for the new session
-            java_sql_context = new_spark_session._jsparkSession.sqlContext()
-            class SQLContextWrapper:
-                def __init__(self, java_sql_context):
-                    self._jsqlContext = java_sql_context
-                def read(self):
-                    return self._jsqlContext.read()
-            new_spark_session._ssql_ctx = SQLContextWrapper(java_sql_context)
-
         spark_version = self.spark_context.version
         log_debug(f"{workflow_id}_{node_id}-Spark version: {spark_version}")
-        
-        # Spark 3.x/4.x use SparkSession (no SQLContext). Accept both so the executor
-        # generalizes across Spark 3.4+ and a future 4.0.
         if not (spark_version.startswith("3.") or spark_version.startswith("4.")):
             log_debug("Spark version {} is not supported".format(spark_version))
             raise ValueError(
                 "Spark version {} is not supported. This code is for Spark 3.x/4.x".format(spark_version))
 
+        # Build a REAL SQLContext tied to the same JVM SQLContext + the (real) session — exactly
+        # what the working notebook kernel does. Wrapping the input DataFrame with this SQLContext
+        # gives it a real .sparkSession (with _jconf), so user code calling df.toPandas() works on
+        # PySpark 3.x/4.x. The previous code stubbed new_spark_session._wrapped with a WrappedHelper
+        # that lacked _jconf, which broke toPandas on PySpark 4.x:
+        #   AttributeError: 'WrappedHelper' object has no attribute '_jconf'
+        java_sql_context = new_spark_session._jsparkSession.sqlContext()
+        sql_context = SQLContext(self.spark_context,
+                                 sparkSession=new_spark_session,
+                                 jsqlContext=java_sql_context)
+
         log_debug(f"{workflow_id}_{node_id}-Retrieving input DataFrame from Java")
-        raw_input_data_frame = DataFrame(
+        input_data_frame = DataFrame(
             jdf=self.entry_point.retrieveInputDataFrame(workflow_id,
                                                         node_id,
                                                         CodeExecutor.INPUT_PORT_NUMBER),
-            sql_ctx=new_spark_session._wrapped)  # In Spark 3.x, use _wrapped instead of sql_ctx
-        
-        log_debug(f"{workflow_id}_{node_id}-Creating DataFrame in new session")
-        # For Spark 3.x, we can use the Java DataFrame directly in the new session
-        # Instead of going through RDD, which causes serialization issues
-        try:
-            # Register the DataFrame as a temp view and recreate it
-            temp_view_name = f"temp_input_{workflow_id}_{node_id}".replace("-", "_")
-            raw_input_data_frame.createOrReplaceTempView(temp_view_name)
-            input_data_frame = new_spark_session.sql(f"SELECT * FROM {temp_view_name}")
-            # Clean up the temp view
-            new_spark_session.catalog.dropTempView(temp_view_name)
-        except Exception as e:
-            log_error(f"{workflow_id}_{node_id}-Error with temp view approach: {e}")
-            # Fallback: try to create directly from Java DataFrame
-            input_data_frame = DataFrame(raw_input_data_frame._jdf, new_spark_session._wrapped)
+            sql_ctx=sql_context)
 
         # For Spark 3.x, we provide the SparkSession as 'spark' and don't need sqlContext
         context = {
