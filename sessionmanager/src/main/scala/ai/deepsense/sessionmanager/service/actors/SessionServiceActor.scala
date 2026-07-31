@@ -104,9 +104,11 @@ class SessionServiceActor @Inject()(
     subsribeForWorkflowEvents(workflowId)
     val session = sessionStateByWorkflowId.get(workflowId) match {
       case Some(existingSession) =>
-        logger.warn(s"Session id=$workflowId already exists. Ignoring in the sake of idempotency.")
+        logger.warn(s"Workflow $workflowId: session already exists, ignoring duplicate create (idempotency)")
         existingSession
-      case None => sessionSpawner.createSession(sessionConfig, clusterDetails)
+      case None =>
+        logger.info(s"Workflow $workflowId: session created, launching executor")
+        sessionSpawner.createSession(sessionConfig, clusterDetails)
     }
     sessionStateByWorkflowId(workflowId) = session
     session.sessionForApi()

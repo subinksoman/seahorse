@@ -57,7 +57,8 @@ class SessionService @Inject() (
   def createSession(
       sessionConfig: SessionConfig,
       clusterConfig: ClusterDetails): Future[Session] = {
-    logger.info(s"Creating session with config $sessionConfig")
+    logger.info(s"Workflow ${sessionConfig.workflowId}: creating session " +
+      s"(user=${sessionConfig.userId}, cluster=${clusterConfig.clusterType})")
     (serviceActor ? SessionServiceActor.CreateRequest(sessionConfig, clusterConfig)).mapTo[Session]
   }
 
@@ -72,14 +73,14 @@ class SessionService @Inject() (
   def killSession(callerId: String, workflowId: Id): FutureOpt[Unit] =
     getSessionImpl(callerId, workflowId)
       .map { _ =>
-        logger.info(s"Killing session '$workflowId'")
+        logger.info(s"Workflow $workflowId: killing session")
         (serviceActor ? SessionServiceActor.KillRequest(workflowId)).mapTo[Unit]
       }
 
   def launchSession(callerId: String, workflowId: Id): FutureOpt[Unit] =
     getSessionImpl(callerId, workflowId)
       .map { _ =>
-        logger.info(s"Launching nodes in session '$workflowId'")
+        logger.info(s"Workflow $workflowId: launching execution")
         (serviceActor ? SessionServiceActor.LaunchRequest(workflowId))
           .mapTo[Try[Unit]]
           .flatMap(ScalaUtils.futureFromTry)
