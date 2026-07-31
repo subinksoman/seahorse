@@ -35,8 +35,12 @@ sbt_type = 'sbt'
 #hadoop_version = "2.7"
 
 
-spark_version = "3.4.4"
-hadoop_version = "3"
+# Spark/Hadoop version for the build. Read from the environment so
+# `SPARK_VERSION=4.2.0 manage-docker.py -b --all` actually builds on Spark 4.x — this feeds BOTH
+# the seahorse-spark image build-arg AND the sbt-docker command (sbt -DSPARK_VERSION=...).
+# Default stays 3.4.4 (the shipped stack). SPARK_VERSION selects the arm; 4.x uses Hadoop 3.
+spark_version = os.environ.get("SPARK_VERSION", "3.4.4")
+hadoop_version = os.environ.get("HADOOP_VERSION", "3")
 
 # --- Published image naming: <repository>/ae-<component>:<version> ---
 # The repository (Docker Hub namespace) is a VARIABLE: override with the DOCKER_REPOSITORY
