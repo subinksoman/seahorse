@@ -218,6 +218,11 @@ object WorkflowExecutorApp extends Logging {
     val paramsOpt = parser.parse(args, ExecutionParams())
     val params = paramsOpt.getOrElse(sys.exit(1))
 
+    // The executor runs a single workflow, so stamp its id into a system property and prefix every
+    // log line with it via the log4j2 pattern ($${sys:workflowId}). Makes the whole run greppable
+    // by workflow id (Spark's own log lines included).
+    params.workflowId.foreach(id => System.setProperty("workflowId", id))
+
     if (params.interactiveMode) {
       // Interactive mode (SessionExecutor)
       SessionExecutor(

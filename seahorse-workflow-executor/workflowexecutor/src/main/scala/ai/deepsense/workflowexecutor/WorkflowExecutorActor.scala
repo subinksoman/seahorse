@@ -279,13 +279,18 @@ class GraphNodeExecutorFactoryImpl extends GraphNodeExecutorFactory {
 case class WorkflowProgress() extends Logging {
   def logProgress(execution: Execution): Unit = {
     val states = execution.graph.states.values
+    val total = states.size
     val completed = states.count(_.isCompleted)
+    val running = states.count(_.isRunning)
+    val queued = states.count(_.isQueued)
+    val failed = states.count(_.isFailed)
+    val aborted = states.count(_.isAborted)
+    // "which step": completed/total, plus what is running/queued (and failures if any).
     logger.info(
-      s"$completed ${if (completed == 1) "node" else "nodes"} successfully completed, " +
-      s"${states.count(_.isFailed)} failed, " +
-      s"${states.count(_.isAborted)} aborted, " +
-      s"${states.count(_.isRunning)} running, " +
-      s"${states.count(_.isQueued)} queued.")
+      s"Workflow progress: $completed/$total nodes done" +
+      s" ($running running, $queued queued" +
+      (if (failed > 0) s", $failed failed" else "") +
+      (if (aborted > 0) s", $aborted aborted" else "") + ")")
   }
 }
 

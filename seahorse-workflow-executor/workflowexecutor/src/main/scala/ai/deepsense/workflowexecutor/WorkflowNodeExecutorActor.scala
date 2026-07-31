@@ -47,7 +47,7 @@ class WorkflowNodeExecutorActor(
   override def receive: Receive = {
     case Start() =>
       executionStart = System.currentTimeMillis()
-      logger.info(s"Starting execution of node $nodeDescription")
+      logger.info(s"Executing node: ${node.value.name} (id=${node.id})")
       sendStarted()
       try {
         asSparkJobGroup {
@@ -66,7 +66,7 @@ class WorkflowNodeExecutorActor(
       } finally {
         // Exception thrown here could result in slightly delayed graph execution
         val duration = (System.currentTimeMillis() - executionStart) / 1000.0
-        logger.info(s"Ending execution of node $nodeDescription (duration: $duration seconds)")
+        logger.info(s"Finished node: ${node.value.name} (id=${node.id}) in $duration s")
         self ! PoisonPill
       }
     case Delete() =>

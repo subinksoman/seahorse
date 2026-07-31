@@ -80,7 +80,7 @@ RUN set -e \
        echo 'appender.console.name = console'; \
        echo 'appender.console.target = SYSTEM_ERR'; \
        echo 'appender.console.layout.type = PatternLayout'; \
-       echo 'appender.console.layout.pattern = %d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n'; \
+       echo 'appender.console.layout.pattern = %d{yy/MM/dd HH:mm:ss} %p [wf:$${sys:workflowId:-}] %c{1}: %m%n'; \
        echo 'logger.repl.name = org.apache.spark.repl.Main'; \
        echo 'logger.repl.level = warn'; \
        echo 'logger.jetty1.name = org.sparkproject.jetty'; \
