@@ -66,13 +66,19 @@ class ServiceGeneration(object):
             repository_prefix = "{}/".format(generation_config.docker_repository)
         else:
             repository_prefix = ''
+        # Log level, controllable from the compose/shell env on every service: set LOG_LEVEL (or a
+        # .env file) at `docker compose up`, default INFO. Honored by the JVM services (log4j2
+        # ${env:LOG_LEVEL}), the PyExecutor (simple_logging) and the notebook kernels (utils.py);
+        # ignored harmlessly by the rest.
+        environment = self.service.environment().to_dict()
+        environment.setdefault('LOG_LEVEL', '${LOG_LEVEL:-INFO}')
         properties = {
             'image': '{}seahorse-{}:{}'.format(
                 repository_prefix,
                 self.service.image_name(),
                 generation_config.tag(self.service.repository())),
             'network_mode': self.service.network_mode or None,
-            'environment': self.service.environment().to_dict() or None,
+            'environment': environment or None,
             'depends_on': [c.name() for c in self.service.depends_on()] or None,
             'links': [c.name() for c in self.service.links()] or None,
             'volumes': self.service.volumes() or None,
