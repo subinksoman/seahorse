@@ -23,6 +23,12 @@ class RabbitMQClient(Logging):
         self._connection = None
         self._publisher=None
         self._consumer_thread = None
+        # Subscriptions (topic, handler) are tracked so they can be REPLAYED after a reconnect:
+        # if the broker closes the consumer channel (e.g. consumer_timeout, or a network blip) the
+        # consumer thread reconnects and re-declares/re-binds/re-consumes them, so the kernel
+        # recovers on its own and "restart kernel" works instead of hanging on a dead channel.
+        self._subscriptions = []
+        self._closed = False
         # pika's BlockingConnection is NOT thread-safe. The forwarding/executing kernels publish
         # from several SocketForwarder threads (shell/iopub/control/stdin) through one client, which
         # interleaves AMQP frames and makes RabbitMQ drop the connection ("unexpected_frame",
@@ -138,10 +144,9 @@ class RabbitMQClient(Logging):
 
     def subscribe(self, topic, handler):
         try:
-            #self._reconnect()
-            queue_name = self._channel_impl.queue_declare(queue='', exclusive=True).method.queue
-            self._channel_impl.queue_bind(exchange=self._exchange, queue=queue_name, routing_key=topic)
-            self._channel_impl.basic_consume(queue=queue_name, on_message_callback=handler)
+            queue_name = self._bind_and_consume(topic, handler)
+            # Remember the subscription so it can be replayed if the channel is reconnected.
+            self._subscriptions.append((topic, handler))
 
             if not self._consumer_thread or not self._consumer_thread.is_alive():
                 self._reset_consumer_thread(start=True)
@@ -154,6 +159,43 @@ class RabbitMQClient(Logging):
         except Exception as e:
             self.logger.error(f"Unexpected error while subscribing to topic {topic}: {e}")
             raise
+
+    def _bind_and_consume(self, topic, handler):
+        """Declare an exclusive queue, bind it to `topic` and start consuming with `handler`."""
+        queue_name = self._channel_impl.queue_declare(queue='', exclusive=True).method.queue
+        self._channel_impl.queue_bind(exchange=self._exchange, queue=queue_name, routing_key=topic)
+        self._channel_impl.basic_consume(queue=queue_name, on_message_callback=handler)
+        return queue_name
+
+    def _resubscribe_all(self):
+        """After a reconnect the old exclusive queues are gone — re-establish every subscription."""
+        for topic, handler in list(self._subscriptions):
+            self._bind_and_consume(topic, handler)
+        self.logger.info(f"Re-subscribed {len(self._subscriptions)} topic(s) after reconnect")
+
+    def _consume_forever(self):
+        """Resilient consume loop (runs in the consumer thread). If the broker closes the channel
+        or connection — e.g. the consumer_timeout PRECONDITION_FAILED (406), or a network blip —
+        reconnect, replay all subscriptions and resume, instead of letting the thread die (which
+        left the kernel unreachable and un-restartable)."""
+        while not self._closed:
+            try:
+                self._channel_impl.start_consuming()
+                return  # clean stop (stop_consuming) -> exit
+            except (ChannelClosed, ConnectionClosed, StreamLostError, AMQPError) as e:
+                if self._closed:
+                    return
+                self.logger.warning(f"Consumer channel closed ({e}); reconnecting + resubscribing")
+                try:
+                    self._reconnect_consumer()
+                    self._resubscribe_all()
+                except Exception as reconnect_error:
+                    self.logger.error(
+                        f"Consumer reconnect failed: {reconnect_error}; retrying in {self._retry_delay}s")
+                    time.sleep(self._retry_delay)
+            except Exception as e:
+                self.logger.error(f"Consumer thread stopped on unexpected error: {e}")
+                return
 
     def consume(self, inactivity_timeout, handle_message, on_timeout):
         """
@@ -203,7 +245,7 @@ class RabbitMQClient(Logging):
                 self._channel_impl.stop_consuming()
                 self._consumer_thread.join(timeout=5)
 
-            self._consumer_thread = Thread(target=self._channel_impl.start_consuming)
+            self._consumer_thread = Thread(target=self._consume_forever)
             self._consumer_thread.daemon = True
             if start:
                 self._consumer_thread.start()
@@ -213,6 +255,8 @@ class RabbitMQClient(Logging):
             raise
 
     def close(self):
+        # Signal the resilient consume loop to stop reconnecting.
+        self._closed = True
         try:
             if self._channel_impl and self._channel_impl.is_open:
                 self._channel_impl.close()
