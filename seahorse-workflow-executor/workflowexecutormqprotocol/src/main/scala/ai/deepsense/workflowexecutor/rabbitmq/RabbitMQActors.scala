@@ -104,7 +104,34 @@ class ConnectionActor(factory: ConnectionFactory) extends Actor with ActorLoggin
   private var connection: Connection = _
 
   override def preStart(): Unit = {
-    connection = factory.newConnection()
+    // Retry the INITIAL connection: on a cold `docker compose up` RabbitMQ can take ~10s to boot
+    // (broker + management + stomp plugins), and this actor otherwise raced it — a first-attempt
+    // "Connection refused" threw out of preStart, terminated the actor and crashed the whole app
+    // (only `restart: always` recovered it). automaticRecovery only kicks in AFTER a connection
+    // exists, so it does not cover this. Retry until the broker is up (or a real, lasting failure).
+    connection = openConnectionWithRetry()
+  }
+
+  private def openConnectionWithRetry(): Connection = {
+    val maxAttempts = 60
+    val delayMs = 1000L
+    var attempt = 1
+    var conn: Connection = null
+    while (conn == null) {
+      try {
+        conn = factory.newConnection()
+      } catch {
+        // Keep retrying while the broker is still coming up; a lasting failure (attempt exhausted)
+        // is not caught here and propagates, so a genuine misconfiguration still fails fast enough.
+        case e: Exception if attempt < maxAttempts =>
+          log.warning(
+            s"RabbitMQ not reachable yet (attempt $attempt/$maxAttempts: ${e.getMessage}); " +
+              s"retrying in ${delayMs}ms")
+          Thread.sleep(delayMs)
+          attempt += 1
+      }
+    }
+    conn
   }
 
   override def postStop(): Unit = {
