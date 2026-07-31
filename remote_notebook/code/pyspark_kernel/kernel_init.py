@@ -142,8 +142,13 @@ def dataframe():
     except Py4JJavaError:
         raise Exception("Input operation is not yet executed")
 
-    # IMPORTANT: pass a SQLContext here (DataFrame.toPandas expects df.sql_ctx._conf)
-    return DataFrame(jdf=java_df, sql_ctx=sqlContext)
+    # IMPORTANT: pass a SQLContext here (DataFrame.toPandas expects df.sql_ctx._conf).
+    # Suppress the benign "DataFrame constructor is internal" UserWarning AT THE CALL SITE:
+    # IPython resets warning registries per cell, so a module-level filter can still let it show
+    # in a notebook cell — catch_warnings here guarantees the user never sees it.
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="DataFrame constructor is internal")
+        return DataFrame(jdf=java_df, sql_ctx=sqlContext)
 
 
 def move_to_local_sqlContext(df):
