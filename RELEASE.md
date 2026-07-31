@@ -1,3 +1,54 @@
+# Seahorse Release 4.2.0.1
+
+| | |
+|---|---|
+| **Tag** | `v4.2.0.1` |
+| **Release date** | 2026-07-31 |
+| **Previous tag** | `v3.0.0.8` |
+| **Type** | Apache Spark 4.x support (feature) |
+| **Spark** | **4.2.0** (bin-hadoop3, Scala **2.13.18**) on **JDK 17** |
+| **Images** | `subinksoman/ae-<svc>:4.2.0.1` |
+
+## Summary
+Adds support for the **Apache Spark 4.x line (verified up to 4.2.0)** on top of the
+3.0.0.8 modernization, and ships it end-to-end verified: both sbt builds compile,
+the deeplang unit suite is green under Spark 4's ANSI-SQL default, and a full
+workflow (Read → Python Transformation w/ `toPandas` → Write, plus a notebook)
+runs on a live Spark 4.2 stack. `SPARK_VERSION` still selects the arm — `3.4.4`
+remains the rollback; `4.2.0` is the new default target for this image set.
+
+## Highlights
+- **Spark 4.x arm** — `sparkutils4.0.x` shim + `csv4_0`/readjson feature modules and
+  new build arms (`case v if v.startsWith("4.")`) across both `Dependencies.scala`
+  files and `build.sbt`; the whole 4.x line (4.0.0–4.2.0) is covered.
+- **Scala 2.13.18 / Hadoop 3 / JDK 17**; the executor & services run with the Spark-4
+  `--add-opens` set (incl. `sun.security.ssl`).
+- **Backend on Spark 4** — aligned json4s to **4.0.7** and scalatra to **2.8.4**
+  (Spark 4 bundles json4s 4.x); a build-time patch fixes the swagger-generated
+  json4s-3 idioms in `schedulingmanager`/`datasourcemanager` so all backend modules
+  compile.
+- **PySpark 4.2** — `pyexecutor`/`code_executor` now build the SparkSession/SQLContext
+  the supported way, so custom-code `df.toPandas()` works (fixes the
+  `'WrappedHelper' has no attribute '_jconf'` error); the executor's Spark-version
+  gate accepts 4.x.
+- **Python/ML stack bumped** — pandas **2.3** (`>=2.2`), pyarrow **25** (`>=18`),
+  numpy **2.4.6** (`>=2,<2.5`, the newest the ML stack supports).
+- **SparkR** verified on 4.2; **ML model persistence** (save/load) verified on 4.2.
+- **Reliability** — RabbitMQ initial-connection retry (no more sessionmanager
+  boot-race crash); Spark tarball download falls back archive→dlcdn with timeouts;
+  pip install uses longer timeouts/retries.
+- **Notebook** — kernel WebSocket keepalive ping (fixes the idle "kernel unknown");
+  readable notebook display name.
+- **Logging** — standardized around a single `LOG_LEVEL` env var (settable from
+  docker-compose); executor logs are prefixed with the workflow id and log each
+  step (`Executing node …` / `Workflow progress: N/total`); PyExecutor lifecycle
+  and sessionmanager session lifecycle logs cleaned up.
+- **Build/publish** — `manage-docker.py` honors `SPARK_VERSION`/`HADOOP_VERSION`
+  and publishes `<repository>/<prefix>-<name>:<version>` (all three configurable);
+  the 4.2.0.1 image set is published to Docker Hub.
+
+---
+
 # Seahorse Release 3.0.0.8
 
 | | |

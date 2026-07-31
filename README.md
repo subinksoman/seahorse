@@ -361,8 +361,8 @@ Full notes in [RELEASE.md](RELEASE.md); the task tracker is in [update.md](updat
 
 | Release | Stack | Image tags |
 |---|---|---|
-| **3.0.0.8** (current) | Spark **3.4.4** / Scala 2.13.12 / JDK 17 / Python 3.12 | `subinksoman/ae-<svc>:3.0.0.8` |
-| **Spark 4.2 build** (verified) | Spark **4.2.0** / Scala 2.13.18 / JDK 17 / Python 3.12 (numpy 2.4) | `subinksoman/ae-<svc>:4.2.0` |
+| **4.2.0.1** (latest) | Spark **4.2.0** / Scala 2.13.18 / JDK 17 / Python 3.12 (numpy 2.4 · pandas 2.3 · pyarrow 25) | `subinksoman/ae-<svc>:4.2.0.1` |
+| **3.0.0.8** | Spark **3.4.4** / Scala 2.13.12 / JDK 17 / Python 3.12 | `subinksoman/ae-<svc>:3.0.0.8` |
 
 Modernization highlights:
 
