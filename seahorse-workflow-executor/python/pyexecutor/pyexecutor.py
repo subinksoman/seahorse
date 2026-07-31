@@ -30,7 +30,7 @@ class PyExecutor(object):
         self.gateway_address = gateway_address
 
     def run(self):
-        log_debug("Starting PyExecutor initialization")
+        log_info("PyExecutor: starting")
         gateway = self._initialize_gateway(self.gateway_address)
         if not gateway:
             log_error('Failed to initialize java gateway')
@@ -56,14 +56,14 @@ class PyExecutor(object):
 
         # Wait for the end of the world or being orphaned
         try:
-            log_debug("Entering main loop")
+            log_info("PyExecutor: ready (session running)")
             while True:
                 if os.getppid() == 1:
-                    log_debug("I am an orphan - stopping")
+                    log_info("PyExecutor: parent gone, stopping session")
                     break
                 time.sleep(1)
         except KeyboardInterrupt:
-            log_debug('Exiting on user\'s request')
+            log_info("PyExecutor: stopping session")
 
         gateway.close()
 
@@ -264,7 +264,7 @@ class PyExecutor(object):
             log_debug(f"Traceback: {traceback.format_exc()}")
             raise
         
-        log_debug(f"SparkContext ready, version: {spark_context.version}")
+        log_info(f"PyExecutor: Spark {spark_context.version} context ready")
 
         log_debug("About to call getSparkSQLSession")
         java_spark_sql_session = gateway.entry_point.getSparkSQLSession()

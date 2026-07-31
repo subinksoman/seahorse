@@ -15,12 +15,13 @@
 
 import ast
 import sys
+import time
 import traceback
 from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.types import *
 from threading import Thread
-from simple_logging import log_debug, log_error
+from simple_logging import log_debug, log_info, log_error
 
 class CodeExecutor(object):
     """
@@ -53,15 +54,16 @@ class CodeExecutor(object):
 
     def _supervised_execution(self, workflow_id, node_id, custom_operation_code):
         # noinspection PyBroadException
+        started = time.time()
+        log_info("Custom-code node {} started".format(node_id))
         try:
-
-            log_debug(f"{workflow_id}_{node_id}-python tranformation job exicution starts-Beginning supervised execution")
             self._run_custom_code(workflow_id, node_id, custom_operation_code)
             self.entry_point.executionCompleted(workflow_id, node_id)
-            log_debug(f"{workflow_id}_{node_id}-python tranformation job exicution completed successfully")
+            log_info("Custom-code node {} finished in {:.2f}s".format(node_id, time.time() - started))
         except Exception as e:
             stacktrace = traceback.format_exc()
-            log_error(f"{workflow_id}_{node_id}-Execution failed: {str(e)}\\n{stacktrace}")
+            log_error("Custom-code node {} failed after {:.2f}s: {}\n{}".format(
+                node_id, time.time() - started, str(e), stacktrace))
             self.entry_point.executionFailed(workflow_id, node_id, stacktrace)
 
     def _convert_data_to_data_frame(self, data_wrapper, workflow_id, node_id):
