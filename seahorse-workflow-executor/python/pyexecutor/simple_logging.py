@@ -14,19 +14,35 @@
 
 from __future__ import print_function
 
+import os
 import sys
+
+# Level-gated logging for the PyExecutor. The level is read from the LOG_LEVEL env var
+# (DEBUG/INFO/WARN/ERROR), default INFO — so DEBUG output is hidden unless explicitly enabled.
+# Non-error levels go to STDOUT; only ERROR goes to STDERR. This matters because the JVM
+# PythonExecutionCaretaker captures the executor's STDERR and logs it at ERROR level — previously
+# every raw `print('DEBUG: ...', file=sys.stderr)` showed up as a fake ERROR in the service logs.
+_LEVELS = {'DEBUG': 10, 'INFO': 20, 'WARN': 30, 'WARNING': 30, 'ERROR': 40}
+_threshold = _LEVELS.get(os.environ.get('LOG_LEVEL', 'INFO').upper(), 20)
+
+
+def _emit(level_name, level_value, stream, s):
+    if level_value >= _threshold:
+        print('[PyExecutor {}] {}'.format(level_name, s), file=stream)
+        stream.flush()
 
 
 def log_debug(s):
-    print('[PyExecutor DEBUG] {}'.format(s), file=sys.stdout)
-    sys.stdout.flush()
-
-
-def log_error(s):
-    print('[PyExecutor ERROR] {}'.format(s), file=sys.stderr)
-    sys.stderr.flush()
+    _emit('DEBUG', 10, sys.stdout, s)
 
 
 def log_info(s):
-    print('[PyExecutor INFO] {}'.format(s), file=sys.stdout)
-    sys.stdout.flush()
+    _emit('INFO', 20, sys.stdout, s)
+
+
+def log_warn(s):
+    _emit('WARN', 30, sys.stdout, s)
+
+
+def log_error(s):
+    _emit('ERROR', 40, sys.stderr, s)

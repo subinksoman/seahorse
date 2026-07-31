@@ -22,7 +22,7 @@ from pyspark import SparkContext, SparkConf
 from pyspark.sql import SparkSession
 
 from code_executor import CodeExecutor
-from simple_logging import log_debug, log_error
+from simple_logging import log_debug, log_info, log_warn, log_error
 
 
 class PyExecutor(object):
@@ -30,7 +30,7 @@ class PyExecutor(object):
         self.gateway_address = gateway_address
 
     def run(self):
-        print("DEBUG: Starting PyExecutor initialization", file=sys.stderr)
+        log_debug("Starting PyExecutor initialization")
         gateway = self._initialize_gateway(self.gateway_address)
         if not gateway:
             log_error('Failed to initialize java gateway')
@@ -38,17 +38,17 @@ class PyExecutor(object):
 
         # noinspection PyProtectedMember
         callback_server_port = gateway._callback_server.server_socket.getsockname()[1]
-        print(f"DEBUG: Callback server port: {callback_server_port}", file=sys.stderr)
+        log_debug(f"Callback server port: {callback_server_port}")
         
         spark_context, spark_session = self._initialize_spark_contexts(gateway)
         code_executor = CodeExecutor(spark_context, spark_session, gateway.entry_point)
 
         try:
-            print("DEBUG: Registering callback server port", file=sys.stderr)
+            log_debug("Registering callback server port")
             gateway.entry_point.registerCallbackServerPort(callback_server_port)
-            print("DEBUG: Registering code executor", file=sys.stderr)
+            log_debug("Registering code executor")
             gateway.entry_point.registerCodeExecutor(code_executor)
-            print("DEBUG: Registration complete", file=sys.stderr)
+            log_debug("Registration complete")
         except Py4JError as e:
             log_error('Exception while registering codeExecutor, or callback server port: {}'.format(e))
             gateway.close()
@@ -56,7 +56,7 @@ class PyExecutor(object):
 
         # Wait for the end of the world or being orphaned
         try:
-            print("DEBUG: Entering main loop", file=sys.stderr)
+            log_debug("Entering main loop")
             while True:
                 if os.getppid() == 1:
                     log_debug("I am an orphan - stopping")
@@ -69,31 +69,31 @@ class PyExecutor(object):
 
     @staticmethod
     def _initialize_spark_contexts(gateway):
-        print("DEBUG: About to call getSparkContext", file=sys.stderr)
+        log_debug("About to call getSparkContext")
         java_spark_context = gateway.entry_point.getSparkContext()
-        print("DEBUG: Got JavaSparkContext", file=sys.stderr)
+        log_debug("Got JavaSparkContext")
         
         java_spark_conf = java_spark_context.getConf()
-        print("DEBUG: Got JavaSparkConf", file=sys.stderr)
+        log_debug("Got JavaSparkConf")
 
         # For Spark 3.x, we need to handle the security check
-        print("DEBUG: Setting up PySpark with existing Java context", file=sys.stderr)
+        log_debug("Setting up PySpark with existing Java context")
         
         try:
             # First, we need to set up the environment to bypass the security check
             # This is done by setting the gateway as authorized
-            print("DEBUG: Setting up authorized gateway", file=sys.stderr)
+            log_debug("Setting up authorized gateway")
             
             # Set environment variable to mark this as an authorized gateway
             os.environ["PYSPARK_GATEWAY_ENABLED"] = "1"
             
             # Initialize PySpark internals
-            print("DEBUG: Initializing PySpark internals", file=sys.stderr)
+            log_debug("Initializing PySpark internals")
             SparkContext._ensure_initialized(gateway=gateway)
             
             # Check if there's already an active context
             if SparkContext._active_spark_context is None:
-                print("DEBUG: No active SparkContext, creating wrapper", file=sys.stderr)
+                log_debug("No active SparkContext, creating wrapper")
                 
                 # For Spark 3.x with existing Java context, we need to use a different approach
                 # We'll create the context without initializing a new Java context
@@ -103,13 +103,13 @@ class PyExecutor(object):
                 spark_context._gateway = gateway
                 
                 # Get the accumulator server port
-                print("DEBUG: Getting accumulator server port", file=sys.stderr)
+                log_debug("Getting accumulator server port")
                 spark_context._accumulatorServer = None
                 
                 # Set up the Python accumulator server if needed
                 try:
                     from pyspark.accumulators import _start_update_server
-                    print("DEBUG: Starting accumulator server", file=sys.stderr)
+                    log_debug("Starting accumulator server")
                     # For Spark 3.x, we need to provide an auth token
                     auth_token = None
                     if hasattr(spark_context._jsc, "authHelper"):
@@ -120,7 +120,7 @@ class PyExecutor(object):
                         str(spark_context._accumulatorServer.port)
                     )
                 except Exception as e:
-                    print(f"DEBUG: Could not start accumulator server: {e}", file=sys.stderr)
+                    log_debug(f"Could not start accumulator server: {e}")
                 
                 # Initialize other SparkContext attributes
                 spark_context._conf = SparkConf(_jvm=gateway.jvm, _jconf=java_spark_conf)
@@ -150,7 +150,7 @@ class PyExecutor(object):
                                                       timeout=5)
                                 if result.returncode == 0:
                                     pyspark_python = python_path
-                                    print(f"DEBUG: Found Python at {python_path}", file=sys.stderr)
+                                    log_debug(f"Found Python at {python_path}")
                                     break
                             except:
                                 continue
@@ -158,7 +158,7 @@ class PyExecutor(object):
                     if not pyspark_python:
                         # Fallback to current Python
                         pyspark_python = sys.executable
-                        print(f"WARNING: Using driver Python {pyspark_python}, may not exist on executors", file=sys.stderr)
+                        log_warn(f"Using driver Python {pyspark_python}, may not exist on executors")
                     
                     spark_context.pythonExec = pyspark_python
                     spark_context._pythonExec = pyspark_python
@@ -166,10 +166,10 @@ class PyExecutor(object):
                     # Also set the environment variable
                     os.environ['PYSPARK_PYTHON'] = pyspark_python
                     
-                    print(f"DEBUG: Set Python executable to {pyspark_python}", file=sys.stderr)
+                    log_debug(f"Set Python executable to {pyspark_python}")
                     
                 except Exception as e:
-                    print(f"DEBUG: Error setting Python executable: {e}", file=sys.stderr)
+                    log_debug(f"Error setting Python executable: {e}")
                     spark_context.pythonExec = sys.executable
                     spark_context._pythonExec = sys.executable
                 
@@ -186,10 +186,10 @@ class PyExecutor(object):
                         if key.startswith('PYSPARK_'):
                             spark_context.environment[key] = value
                 except Exception as e:
-                    print(f"DEBUG: Error setting environment: {e}", file=sys.stderr)
+                    log_debug(f"Error setting environment: {e}")
                 
                 # Initialize serializers - CRITICAL for RDD operations
-                print("DEBUG: Initializing serializers", file=sys.stderr)
+                log_debug("Initializing serializers")
                 from pyspark.serializers import PickleSerializer, BatchedSerializer
                 spark_context._unbatched_serializer = PickleSerializer()
                 spark_context._serializer = BatchedSerializer(spark_context._unbatched_serializer,
@@ -200,15 +200,15 @@ class PyExecutor(object):
                 try:
                     spark_context._encryption_enabled = spark_context._jsc.sc().isEncryptionEnabled()
                 except Exception as e:
-                    print(f"DEBUG: Could not get encryption status: {e}, defaulting to False", file=sys.stderr)
+                    log_debug(f"Could not get encryption status: {e}, defaulting to False")
                     spark_context._encryption_enabled = False
                 
                 # Initialize Python server if needed
-                print("DEBUG: Setting up Python server", file=sys.stderr)
+                log_debug("Setting up Python server")
                 spark_context._python_includes = []
                 
                 # Initialize temp directory for RDD operations
-                print("DEBUG: Setting up temp directory", file=sys.stderr)
+                log_debug("Setting up temp directory")
                 import tempfile
                 import atexit
                 import shutil
@@ -225,14 +225,14 @@ class PyExecutor(object):
                 try:
                     spark_context.master = spark_context._conf.get("spark.master", "unknown")
                 except Exception as e:
-                    print(f"DEBUG: Could not get master: {e}", file=sys.stderr)
+                    log_debug(f"Could not get master: {e}")
                     spark_context.master = "unknown"
                 
                 # Set application ID
                 try:
                     spark_context._jsc_application_id = spark_context._jsc.sc().applicationId()
                 except Exception as e:
-                    print(f"DEBUG: Could not get application ID: {e}", file=sys.stderr)
+                    log_debug(f"Could not get application ID: {e}")
                     spark_context._jsc_application_id = None
                     
                 # Initialize profiler settings
@@ -253,22 +253,22 @@ class PyExecutor(object):
                 spark_context._stopped = False
                 spark_context._default_parallelism = None
                 
-                print("DEBUG: SparkContext wrapper created", file=sys.stderr)
+                log_debug("SparkContext wrapper created")
             else:
-                print("DEBUG: Using existing active SparkContext", file=sys.stderr)
+                log_debug("Using existing active SparkContext")
                 spark_context = SparkContext._active_spark_context
                 
         except Exception as e:
-            print(f"DEBUG: Error creating SparkContext: {str(e)}", file=sys.stderr)
+            log_debug(f"Error creating SparkContext: {str(e)}")
             import traceback
-            print(f"DEBUG: Traceback: {traceback.format_exc()}", file=sys.stderr)
+            log_debug(f"Traceback: {traceback.format_exc()}")
             raise
         
-        print(f"DEBUG: SparkContext ready, version: {spark_context.version}", file=sys.stderr)
+        log_debug(f"SparkContext ready, version: {spark_context.version}")
 
-        print("DEBUG: About to call getSparkSQLSession", file=sys.stderr)
+        log_debug("About to call getSparkSQLSession")
         java_spark_sql_session = gateway.entry_point.getSparkSQLSession()
-        print("DEBUG: Got JavaSparkSQLSession", file=sys.stderr)
+        log_debug("Got JavaSparkSQLSession")
         
         spark_version = spark_context.version
         spark_session = None
@@ -276,16 +276,16 @@ class PyExecutor(object):
         # For Spark 3.0.0 and later versions (incl. the Spark 4.x line — the SparkSession
         # wrapper below reconstructs from the existing JVM session, which is stable across 3.x/4.x).
         if spark_version.startswith("3.") or spark_version.startswith("4."):
-            print("DEBUG: Initializing SparkSession for Spark 3.x/4.x", file=sys.stderr)
+            log_debug("Initializing SparkSession for Spark 3.x/4.x")
             try:
                 # Get the Java SparkSession from the Java SQL session
-                print("DEBUG: Getting Java SparkSession from JavaSparkSQLSession", file=sys.stderr)
+                log_debug("Getting Java SparkSession from JavaSparkSQLSession")
                 java_spark_session = java_spark_sql_session.getSparkSession()
-                print("DEBUG: Got Java SparkSession object", file=sys.stderr)
+                log_debug("Got Java SparkSession object")
                 
                 # Check if SparkSession already exists
                 if hasattr(SparkSession, "_instantiatedSession") and SparkSession._instantiatedSession is not None:
-                    print("DEBUG: Using existing SparkSession", file=sys.stderr)
+                    log_debug("Using existing SparkSession")
                     spark_session = SparkSession._instantiatedSession
                 else:
                     # Bind a Python SparkSession to the existing JVM session using PySpark's
@@ -297,29 +297,29 @@ class PyExecutor(object):
                     # df.toPandas() failed with:
                     #   AttributeError: 'WrappedHelper' object has no attribute '_jconf'
                     # (PySpark 4's _to_pandas reads self.sparkSession._jconf.getConfs(...)).
-                    print("DEBUG: Creating SparkSession via supported constructor", file=sys.stderr)
+                    log_debug("Creating SparkSession via supported constructor")
                     spark_session = SparkSession(spark_context, jsparkSession=java_spark_session)
                     SparkSession._instantiatedSession = spark_session
                     SparkSession._activeSession = spark_session
-                    print("DEBUG: SparkSession created successfully", file=sys.stderr)
+                    log_debug("SparkSession created successfully")
                 
             except Exception as e:
-                print(f"DEBUG: Error creating SparkSession: {str(e)}", file=sys.stderr)
-                print(f"DEBUG: Error type: {type(e).__name__}", file=sys.stderr)
+                log_debug(f"Error creating SparkSession: {str(e)}")
+                log_debug(f"Error type: {type(e).__name__}")
                 import traceback
-                print(f"DEBUG: Traceback: {traceback.format_exc()}", file=sys.stderr)
+                log_debug(f"Traceback: {traceback.format_exc()}")
                 raise
         else:
             log_error("Spark version {} is not supported. This code is for Spark 3.x/4.x".format(spark_version))
             raise ValueError("Spark version {} is not supported. This code is for Spark 3.x/4.x".format(spark_version))
 
-        print(f"DEBUG: Successfully initialized contexts", file=sys.stderr)
+        log_debug(f"Successfully initialized contexts")
         return spark_context, spark_session
 
     @staticmethod
     def _initialize_gateway(gateway_address):
         (host, port) = gateway_address
-        print(f"DEBUG: Initializing gateway at {host}:{port}", file=sys.stderr)
+        log_debug(f"Initializing gateway at {host}:{port}")
 
         callback_params = CallbackServerParameters(address=host, port=0)
 
@@ -328,7 +328,7 @@ class PyExecutor(object):
                               auto_convert=True,
                               callback_server_parameters=callback_params)
         try:
-            print("DEBUG: Importing Java classes", file=sys.stderr)
+            log_debug("Importing Java classes")
             java_import(gateway.jvm, "org.apache.spark.SparkEnv")
             java_import(gateway.jvm, "org.apache.spark.SparkConf")
             java_import(gateway.jvm, "org.apache.spark.api.java.*")
@@ -338,7 +338,7 @@ class PyExecutor(object):
             java_import(gateway.jvm, "org.apache.spark.sql.hive.*")
             java_import(gateway.jvm, "scala.Tuple2")
             java_import(gateway.jvm, "scala.collection.immutable.List")
-            print("DEBUG: Java imports completed", file=sys.stderr)
+            log_debug("Java imports completed")
         except Py4JError as e:
             log_error('Error while initializing java gateway: {}'.format(e))
             gateway.close()
@@ -357,7 +357,7 @@ def main():
     gateway_address = (gateway_address[0], int(gateway_address[1]))
 
     log_debug('Initializing PyExecutor at {}'.format(gateway_address))
-    print(f"DEBUG: Starting PyExecutor with gateway address: {gateway_address}", file=sys.stderr)
+    log_debug(f"Starting PyExecutor with gateway address: {gateway_address}")
     
     py_executor = PyExecutor(gateway_address=gateway_address)
     py_executor.run()

@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Standardized Seahorse logging (shared across all JVM services).
+     Root stays WARN to keep third-party libraries quiet; the application logger (ai.deepsense) is
+     driven by the LOG_LEVEL env var (DEBUG/INFO/WARN/ERROR, default INFO) so verbosity can be
+     raised without a rebuild: `docker compose ... -e LOG_LEVEL=DEBUG`. Pekko (which replaced Akka)
+     is pinned to WARN so actor-system chatter — including dead-letters on the RabbitMQ startup
+     race — does not spam the logs. -->
 <Configuration status="WARN">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
@@ -6,24 +12,33 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="akka" level="${env:LOG_LEVEL:-WARN}"/>
-        <Logger name="com.datastax" level="${env:LOG_LEVEL:-WARN}"/>
-        <Logger name="io.netty" level="${env:LOG_LEVEL:-WARN}"/>
-        <Logger name="org.apache.cassandra" level="${env:LOG_LEVEL:-WARN}"/>
-        <Logger name="org.apache.hadoop" level="${env:LOG_LEVEL:-WARN}"/>
-        <Logger name="org.apache.spark" level="${env:LOG_LEVEL:-WARN}"/>
-        <Logger name="org.cassandraunit" level="${env:LOG_LEVEL:-WARN}"/>
-        <Logger name="org.spark-project" level="${env:LOG_LEVEL:-WARN}"/>
-        <Logger name="org.apache.spark.api.r" level="${env:LOG_LEVEL:-INFO}"/>
-        <Logger name="org.reflections" level="${env:LOG_LEVEL:-WARN}"/>
-        <Logger name="parquet.hadoop" level="${env:LOG_LEVEL:-WARN}"/>
-        <Logger name="slick" level="${env:LOG_LEVEL:-INFO}"/>
-        <Logger name="ai.deepsense" level="${env:LOG_LEVEL:-DEBUG}"/>
-        <Logger name="org.spark_project.jetty" level="${env:LOG_LEVEL:-WARN}"/>
-        <Logger name="DataNucleus" level="${env:LOG_LEVEL:-WARN}"/>
-        <Logger name="com.jolbox" level="${env:LOG_LEVEL:-WARN}"/>
-        
-        <Root level="${env:LOG_LEVEL:-WARN}">
+        <!-- application: controlled by the LOG_LEVEL env var (default INFO) -->
+        <Logger name="ai.deepsense" level="${env:LOG_LEVEL:-INFO}"/>
+
+        <!-- actor/HTTP stack: Pekko replaced Akka; keep both quiet -->
+        <Logger name="org.apache.pekko" level="WARN"/>
+        <Logger name="akka" level="WARN"/>
+
+        <!-- third-party libraries -->
+        <Logger name="org.apache.spark" level="WARN"/>
+        <Logger name="org.apache.spark.api.r" level="INFO"/>
+        <Logger name="org.spark-project" level="WARN"/>
+        <Logger name="org.spark_project.jetty" level="WARN"/>
+        <Logger name="org.sparkproject.jetty" level="WARN"/>
+        <Logger name="org.apache.hadoop" level="WARN"/>
+        <Logger name="org.apache.parquet" level="WARN"/>
+        <Logger name="parquet.hadoop" level="WARN"/>
+        <Logger name="org.eclipse.jetty" level="WARN"/>
+        <Logger name="io.netty" level="WARN"/>
+        <Logger name="org.reflections" level="WARN"/>
+        <Logger name="com.datastax" level="WARN"/>
+        <Logger name="org.apache.cassandra" level="WARN"/>
+        <Logger name="org.cassandraunit" level="WARN"/>
+        <Logger name="DataNucleus" level="WARN"/>
+        <Logger name="com.jolbox" level="WARN"/>
+        <Logger name="slick" level="INFO"/>
+
+        <Root level="WARN">
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>

@@ -33,9 +33,12 @@ def setup_logging(logfile, prefix=''):
         else:
             raise
 
+    # Level from the LOG_LEVEL env var (DEBUG/INFO/WARN/ERROR), default INFO — consistent with the
+    # JVM services (log4j2 ${env:LOG_LEVEL}) and the PyExecutor (simple_logging). Was hardcoded DEBUG.
+    level = getattr(logging, os.environ.get('LOG_LEVEL', 'INFO').upper(), logging.INFO)
     logging.basicConfig(filename=logfile,
                         format='{} %(asctime)s | %(name)s | %(levelname)s | %(filename)s:%(lineno)d | %(message)s'.format(prefix),
-                        level=logging.DEBUG)
+                        level=level)
 
 
 class Logging(object):

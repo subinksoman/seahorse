@@ -30,8 +30,22 @@ const basicAuthCredentials = new Buffer(
 
 const httpProxy = require('http-proxy');
 const proxy = httpProxy.createProxyServer({ ws : true });
+
+// Log upstream connection failures concisely. ECONNREFUSED/ECONNRESET are transient during startup
+// and restarts (a backend isn't listening yet) — log a single line, not a full stack trace, so the
+// logs stay readable. Unexpected errors are still logged in full.
+function logProxyError(err, context) {
+  const transient = err && (err.code === 'ECONNREFUSED' || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT');
+  const where = context ? ' (' + context + ')' : '';
+  if (transient) {
+    console.warn('[proxy] upstream not ready: ' + err.code + ' ' + (err.address || '') + ':' + (err.port || '') + where);
+  } else {
+    console.error(err, context || '');
+  }
+}
+
 proxy.on('error', function(err, req) {
-  console.error(err, req.url);
+  logProxyError(err, req && req.url);
 });
 
 function getTargetHost(req, res) {
@@ -77,7 +91,7 @@ function forward(req, res) {
   }
 
   proxy.web(req, res, options, function (e) {
-        console.error(e);
+        logProxyError(e, req && req.url);
         if (!_.isUndefined(service.timeoutRedirectionPage)) {
           const waitPage = url.format({protocol: req.protocol, host: req.get("host"), pathname: service.timeoutRedirectionPage});
           res.writeHead(302, {'Location': waitPage});

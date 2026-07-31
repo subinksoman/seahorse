@@ -328,6 +328,33 @@ docker compose down
 - **Build helper scripts are Python 3.** `build/*.py` and
   `deployment/docker-compose/docker-compose.py` target `python3`.
 
+## Logging
+
+Logging is standardized around a single **`LOG_LEVEL`** environment variable (`DEBUG` / `INFO` /
+`WARN` / `ERROR`, default **`INFO`**) honored consistently across every component:
+
+| Component | Mechanism | Level source |
+|---|---|---|
+| JVM services (workflowmanager, sessionmanager, …) | shared `log4j2.xml` (uniform pattern) | `ai.deepsense` logger = `${env:LOG_LEVEL:-INFO}`; root + third-party pinned `WARN` |
+| PyExecutor (custom-code transforms) | `pyexecutor/simple_logging.py` | `LOG_LEVEL` env (default INFO); `log_debug/info/warn` → stdout, `log_error` → stderr |
+| Notebook kernels | `remote_notebook/code/utils.py` | `LOG_LEVEL` env (default INFO) |
+| Proxy | Node `reverse-proxy.js` | transient upstream `ECONNREFUSED` logged as one line, not a stack trace |
+
+Raise verbosity without a rebuild by setting the env var, e.g.:
+
+```bash
+docker compose ... up -d   # then, to debug one service:
+docker compose exec -e LOG_LEVEL=DEBUG workflowmanager ...   # or set LOG_LEVEL in the compose env
+```
+
+Notes:
+- **Pekko** (the actor/HTTP stack) is pinned to `WARN` and dead-letter logging is disabled
+  (`pekko.log-dead-letters = 0`), so transient actor churn — e.g. the RabbitMQ startup race — no
+  longer spams the logs.
+- The PyExecutor previously emitted ~50 raw `print("DEBUG: …", file=sys.stderr)` lines that the JVM
+  caretaker logged **as ERROR**; these now go through the level-gated logger and are hidden at the
+  default `INFO`.
+
 ## Release History
 
 Full notes in [RELEASE.md](RELEASE.md); the task tracker is in [update.md](update.md).
