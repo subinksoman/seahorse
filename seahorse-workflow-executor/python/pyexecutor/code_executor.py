@@ -17,9 +17,16 @@ import ast
 import sys
 import time
 import traceback
+import warnings
 from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.types import *
+
+# We intentionally wrap an existing JVM DataFrame with the internal DataFrame(jdf, sql_ctx)
+# constructor (there is no public API for that). PySpark 3.4+/4.x warns "DataFrame constructor is
+# internal" on every such call; silence just that message so it doesn't spam the executor logs
+# (the caretaker captures stderr as ERROR).
+warnings.filterwarnings("ignore", message="DataFrame constructor is internal", category=UserWarning)
 from threading import Thread
 from simple_logging import log_debug, log_info, log_error
 

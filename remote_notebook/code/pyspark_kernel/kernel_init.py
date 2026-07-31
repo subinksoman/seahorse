@@ -13,11 +13,17 @@
 import os
 import sys
 import tempfile
+import warnings
 
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import SQLContext, DataFrame
 from py4j.java_gateway import JavaGateway, GatewayParameters, java_import
 from py4j.protocol import Py4JJavaError
+
+# dataframe() wraps an existing JVM DataFrame with the internal DataFrame(jdf, sql_ctx) constructor
+# (no public API for that). PySpark 3.4+/4.x warns "DataFrame constructor is internal" each time;
+# silence just that message so notebook cells and logs aren't polluted by it.
+warnings.filterwarnings("ignore", message="DataFrame constructor is internal", category=UserWarning)
 
 # ------------------------------------------------------------------------------
 # The kernel injects these:
