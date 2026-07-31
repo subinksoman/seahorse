@@ -361,8 +361,14 @@ Full notes in [RELEASE.md](RELEASE.md); the task tracker is in [update.md](updat
 
 | Release | Stack | Image tags |
 |---|---|---|
-| **4.2.0.1** (latest) | Spark **4.2.0** / Scala 2.13.18 / JDK 17 / Python 3.12 (numpy 2.4 · pandas 2.3 · pyarrow 25) | `subinksoman/ae-<svc>:4.2.0.1` |
+| **4.2.0.2** (latest) | Spark **4.2.0** / Scala 2.13.18 / JDK 17 / Python 3.12 (numpy 2.4 · pandas 2.3 · pyarrow 25) | `subinksoman/ae-<svc>:4.2.0.2` |
+| **4.2.0.1** | Spark **4.2.0** / Scala 2.13.18 / JDK 17 / Python 3.12 (numpy 2.4 · pandas 2.3 · pyarrow 25) | `subinksoman/ae-<svc>:4.2.0.1` |
 | **3.0.0.8** | Spark **3.4.4** / Scala 2.13.12 / JDK 17 / Python 3.12 | `subinksoman/ae-<svc>:3.0.0.8` |
+
+`4.2.0.2` is a patch over `4.2.0.1` — interactive-notebook reliability (RabbitMQ
+`consumer_timeout`, kernel auto-reconnect on restart), readable per-node notebook
+tab names, and suppression of the benign "DataFrame constructor is internal"
+warning. Same Spark/Scala/JDK/Python stack.
 
 Modernization highlights:
 

@@ -1,3 +1,45 @@
+# Seahorse Release 4.2.0.2
+
+| | |
+|---|---|
+| **Tag** | `v4.2.0.2` |
+| **Release date** | 2026-07-31 |
+| **Previous tag** | `v4.2.0.1` |
+| **Type** | Notebook / messaging / logging fixes (patch) |
+| **Spark** | **4.2.0** (bin-hadoop3, Scala **2.13.18**) on **JDK 17** |
+| **Images** | `subinksoman/ae-<svc>:4.2.0.2` |
+
+## Summary
+A patch on top of 4.2.0.1 — same Spark 4.2.0 / Scala 2.13.18 / JDK 17 / Python 3.12
+stack — that hardens the interactive notebook path and cleans up notebook naming and
+custom-code logs. No API, build-arm, or dependency changes; a straight image bump
+from 4.2.0.1.
+
+## Fixes
+- **Interactive kernels stay connected** — raised RabbitMQ `consumer_timeout` to
+  7 days so long-lived, unacked kernel delivery channels are no longer force-closed
+  (the RabbitMQ 4.x 30-min default was killing idle PySpark kernels with a 406
+  `PRECONDITION_FAILED`).
+- **Kernel restart recovers** — the notebook's RabbitMQ client now auto-reconnects
+  and replays its subscriptions on a dropped channel/connection, so "Restart kernel"
+  works again after a broker-side close instead of hanging.
+- **Readable notebook tab/header** — the Jupyter tab/header showed the base64 params
+  blob (Notebook 7 titles from the path basename). Notebooks now carry a readable
+  last path segment derived from the **node's own name** (falling back to a language
+  label), so each notebook is titled and distinguishable. The full path stays unique
+  per node, so identical display names never collide.
+- **Quieter custom code & cells** — the benign "DataFrame constructor is internal"
+  `UserWarning` (from wrapping a JVM DataFrame, the supported toPandas path) is now
+  suppressed both in the executor (Python Transformation) and at the notebook cell
+  call site.
+
+## Upgrade
+Image-only bump. Pull/redeploy `subinksoman/ae-<svc>:4.2.0.2` (frontend, notebooks,
+rabbitmq, sessionmanager carry changes; the rest are 4.2.0.1 rebuilt/retagged). No
+config migration.
+
+---
+
 # Seahorse Release 4.2.0.1
 
 | | |
