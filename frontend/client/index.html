@@ -5,11 +5,9 @@
   <title ng-bind="pageTitle"></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- Deploy-time config (window.dockerConfig); loaded before the webpack bundles, which
+       html-webpack-plugin injects at the end of <body>. -->
   <script src="docker-config.js"></script>
-
-  {% for (var chunk in o.htmlWebpackPlugin.files.chunks) { %}
-  <script src="{%=o.htmlWebpackPlugin.files.chunks[chunk].entry %}"></script>
-  {% } %}
 </head>
 <body>
 <loading-mask
@@ -29,7 +27,6 @@
 <deepsense-loading-spinner-processing ng-if="!stateData.dataIsLoaded">
   Loading
 </deepsense-loading-spinner-processing>
-<!-- git-hash: {%=o.htmlWebpackPlugin.options.gitHash.replace(/\"/g,"") %} -->
 
 </body>
 </html>

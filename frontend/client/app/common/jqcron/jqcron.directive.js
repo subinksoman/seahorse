@@ -16,7 +16,7 @@
 
 'use strict';
 
-import 'imports?$=jquery!VENDOR/jqcron/jqCron';
+import 'imports-loader?wrapper=window!VENDOR/jqcron/jqCron';
 import 'VENDOR/jqcron/jqCron.css';
 
 

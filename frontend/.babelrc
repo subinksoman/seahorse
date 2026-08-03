@@ -1,6 +1,9 @@
 {
   "presets": [
-    "es2017",
-    "angular"
+    ["@babel/preset-env", { "modules": "commonjs", "targets": { "ie": "11" }, "loose": true }]
+  ],
+  "plugins": [
+    "add-module-exports",
+    "@babel/plugin-transform-runtime"
   ]
 }
