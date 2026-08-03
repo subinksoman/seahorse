@@ -20,7 +20,7 @@ import angular from 'angular';
 
 import OperationsCatalogueModule from '../operations-catalogue/operations-catalogue.module.js';
 
-import CanvasToolbarComponent from './canvas-toolbar/canvas-toolbar.component.js';
+// canvas-toolbar migrated to Angular (ng2/canvas-toolbar.component.ts) — downgraded as directive 'canvasToolbar'.
 import CanvasComponent from './core-canvas/canvas.component.js';
 // new-node migrated to Angular (ng2/new-node.component.ts) — downgraded as directive 'newNode'.
 import EditorComponent from './editor.component.js';
@@ -39,7 +39,6 @@ const appModule = angular
   .service('CanvasService', CanvasService)
   .service('AdapterService', AdapterService)
   .service('GraphStyleService', GraphStyleService)
-  .component('canvasToolbar', CanvasToolbarComponent)
   .component('coreCanvas', CanvasComponent)
   .component('editor', EditorComponent)
   // graphNode + statusIcon + portStatusTooltip + createNodeInvitation migrated to Angular — registered as downgraded directives in ng2/bootstrap.ts.
