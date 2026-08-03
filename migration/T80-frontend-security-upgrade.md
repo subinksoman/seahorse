@@ -124,3 +124,37 @@ re-implementation), tracked as its own epic. **Not attempted in T80.**
 Dominant risks: the **jQuery 2→3** and **AngularJS 1.5→1.8** behavior changes in Phase A,
 and the **webpack 2→5 + babel 6→7** config rewrite in Phase B. Both are de-risked by the
 one-cluster-per-commit cadence and the mandatory live-editor smoke.
+
+## 7. Diagnostics log (findings during T81, incl. non-issues)
+
+### 7.1 AngularJS 1.7 binding-in-constructor regressions (fixed)
+1.7 removed `preAssignBindingsEnabled`, so component/directive bindings are no longer
+assigned before the controller constructor runs. Every controller that read a binding during
+instantiation broke (empty render or a throw). All sites found via a read-before-assign
+scanner over class / function / string-named controllers (inlining immediately-invoked
+helpers) and fixed by moving the read to `$onInit`:
+`editor.controller.js` (empty canvas), `graph-node.component.js`, `status-icon.component.js`,
+`distribution-continuous-chart.js`, `report-table.controller.js` (reports blank),
+`reports.controller.js`. Also removed the now-invalid
+`$compileProvider.preAssignBindingsEnabled(true)` (threw `$injector:modulerr`); kept
+`$locationProvider.hashPrefix('')`. Other categories swept clean: `$http .success()/.error()`
+(0), removed globals `angular.lowercase/uppercase` (0), `$cookies` direct property access (0),
+`ng-bind-html` (2 static app-defined strings, safe).
+
+### 7.2 Report distribution charts "not showing" — NOT a bug, NOT frontend
+Confirmed the chart components render correctly (compiled `distribution-categorical-chart`
+and `distribution-continuous-chart` against the built bundle with mock data → SVG + marks,
+0 errors). Charts are absent because of an existing **backend** rule in
+`deeplang/.../report/DataFrameReportGenerator.scala`:
+
+```
+val ColumnNumberToGenerateSimplerReportThreshold = 20
+def report(df) = if (df.schema.length >= 20) simplifiedReport(df) else fullReport(df)
+```
+
+A DataFrame with **≥ 20 columns** gets a `DataFrameSimplified` report (schema + size + sample
+tables only) whose distributions are all `NoDistribution(SimplifiedReport)` → the chart modal's
+`ng-switch` on `distObject.subtype` (`discrete`/`continuous`) matches nothing → no charts. The
+observed report had 25 columns. To get charts: use a DataFrame with < 20 columns, or raise the
+threshold and rebuild the executor/sessionmanager (distribution stats on very wide DataFrames
+are expensive — the threshold is a deliberate perf guard). Unrelated to the AngularJS upgrade.
