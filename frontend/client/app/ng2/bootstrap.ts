@@ -49,6 +49,9 @@ import { FileListComponent } from './file-list.component';
 import { RecentFilesIndicatorComponent } from './recent-files-indicator.component';
 import { StatusIconComponent } from './status-icon.component';
 import { GraphNodeComponent } from './graph-node.component';
+import { SearchOperationComponent } from './search-operation.component';
+import { OperationsListComponent } from './operations-list.component';
+import { OperationsCatalogueComponent } from './operations-catalogue.component';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -100,12 +103,15 @@ angular.module('ds.lab')
   .directive('fileList', downgradeComponent({ component: FileListComponent }) as any)
   .directive('recentFilesIndicator', downgradeComponent({ component: RecentFilesIndicatorComponent }) as any)
   .directive('statusIcon', downgradeComponent({ component: StatusIconComponent }) as any)
-  .directive('graphNode', downgradeComponent({ component: GraphNodeComponent }) as any);
+  .directive('graphNode', downgradeComponent({ component: GraphNodeComponent }) as any)
+  // operations-catalogue cluster: only the cap (operationCatalogue) is used from an AngularJS template
+  // (new-node.html); its children operations-list / search-operation live only inside Angular templates.
+  .directive('operationCatalogue', downgradeComponent({ component: OperationsCatalogueComponent }) as any);
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],
   // Angular components used from AngularJS (via downgradeComponent) must be declared here.
-  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent],
+  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
   // migrated services can inject them by string token. See upgraded-providers.ts.
   providers: [...upgradedProviders]

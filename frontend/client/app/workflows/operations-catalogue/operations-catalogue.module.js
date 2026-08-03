@@ -15,17 +15,13 @@
  */
 
 import angular from 'angular';
-import OperationCatalogue from './operations-catalogue.component';
-import OperationsList from './operations-list/operations-list.component';
-import SearchOperation from './search-operation/search-operation.component';
-import OperationsCatalogueService from './operations-catalogue.service.js';
 
+// operations-catalogue cluster fully migrated to Angular (ng2/operations-catalogue.component.ts,
+// operations-list.component.ts, search-operation.component.ts, operations-catalogue.service.ts) —
+// operationCatalogue is downgraded as a directive in ng2/bootstrap.ts; its children + the service are
+// Angular-only. This module is kept (empty) because editor.module.js lists it as a dependency.
 const Operations = angular
   .module('operations-catalogue', [])
-  .component('operationCatalogue', OperationCatalogue)
-  .component('operationsList', OperationsList)
-  .component('searchOperation', SearchOperation)
-  .service('OperationsCatalogueService', OperationsCatalogueService)
   .name;
 
 export default Operations;

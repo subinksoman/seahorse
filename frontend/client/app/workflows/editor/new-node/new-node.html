@@ -7,9 +7,9 @@
 </div>
 <operation-catalogue
   class="new-node__catalogue"
-  query="$ctrl.operationSearchQuery"
-  select-operation="$ctrl.onSelect({operationId: operationId})"
-  containment="$ctrl.containment"
-  categories="$ctrl.categories"
+  [query]="$ctrl.operationSearchQuery"
+  (select-operation)="$ctrl.onSelect({operationId: $event})"
+  [containment]="$ctrl.containment"
+  [categories]="$ctrl.categories"
 >
 </operation-catalogue>
