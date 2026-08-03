@@ -13,5 +13,12 @@
     "sourceMap": true,
     "strict": false,
     "types": ["angular"]
-  }
+  },
+  "include": [
+    "client/app/ng2/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
