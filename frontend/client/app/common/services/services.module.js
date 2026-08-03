@@ -17,8 +17,6 @@
 'use strict';
 
 exports.inject = function(module) {
-  // events.service + mouse-event.service + notification.service migrated to Angular 18 (ng2/) —
-  // registered as downgraded factories in ng2/bootstrap.ts, so their legacy registrations are gone.
-  require('./library-data-converter.service.js').inject(module);
-  require('./library.service.js').inject(module);
+  // All of common/services/ migrated to Angular 18 (ng2/) and downgraded in ng2/bootstrap.ts:
+  // events, mouse-event, notification, library-data-converter, library. Nothing left to register here.
 };

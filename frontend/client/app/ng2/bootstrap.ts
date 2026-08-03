@@ -36,6 +36,10 @@ import { WorkflowService } from './workflow.service';
 import { WorkflowStatusBarService } from './workflow-status-bar.service';
 import { NodeCopyPasteVisitorService } from './node-copy-paste-visitor.service';
 import { CopyPasteService } from './copy-paste.service';
+import { LibraryApi } from './library-api.service';
+import { LibraryDataConverter } from './library-data-converter.service';
+import { LibraryService } from './library.service';
+import { WorkflowsEditorService } from './workflows-editor.service';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -73,7 +77,11 @@ angular.module('ds.lab')
   .factory('WorkflowService', downgradeInjectable(WorkflowService) as any) // Phase C-1: migrated to Angular 18 (the central editor hub)
   .factory('WorkflowStatusBarService', downgradeInjectable(WorkflowStatusBarService) as any) // Phase C-1: migrated to Angular 18
   .factory('NodeCopyPasteVisitorService', downgradeInjectable(NodeCopyPasteVisitorService) as any) // Phase C-1: migrated to Angular 18
-  .factory('CopyPasteService', downgradeInjectable(CopyPasteService) as any); // Phase C-1: migrated to Angular 18
+  .factory('CopyPasteService', downgradeInjectable(CopyPasteService) as any) // Phase C-1: migrated to Angular 18
+  .factory('LibraryApiService', downgradeInjectable(LibraryApi) as any) // Phase C-1: migrated to Angular 18
+  .factory('LibraryDataConverterService', downgradeInjectable(LibraryDataConverter) as any) // Phase C-1: migrated to Angular 18
+  .factory('LibraryService', downgradeInjectable(LibraryService) as any) // Phase C-1: migrated to Angular 18
+  .factory('WorkflowsEditorService', downgradeInjectable(WorkflowsEditorService) as any); // Phase C-1: migrated to Angular 18
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],

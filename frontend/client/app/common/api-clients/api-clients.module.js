@@ -16,13 +16,9 @@
 
 'use strict';
 
-import LibraryApi from './library-api.service';
-
 exports.inject = function(module) {
   // The whole api-client cluster migrated to Angular 18 (ng2/), downgraded in ng2/bootstrap.ts:
   // BaseApiClient (Angular base class, not downgraded), OperationsApiClient, WorkflowsApiClient,
-  // SessionManagerApi, OperationsHierarchyService, and Operations (operations.factory). Only the
-  // LibraryApiService remains registered here (still AngularJS).
-  module
-    .service('LibraryApiService', LibraryApi);
+  // SessionManagerApi, OperationsHierarchyService, Operations, and LibraryApiService (library-api).
+  // Nothing left to register here.
 };
