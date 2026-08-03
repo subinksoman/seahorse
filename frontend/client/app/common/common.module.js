@@ -34,7 +34,6 @@ require('./resizable/resizable.js').inject(common);
 require('./resizable/resizable-listener.js').inject(common);
 require('./services/services.module.js').inject(common);
 require('./services/preset.service.js').inject(common);
-require('./services/uuid-generator.js').inject(common);
 
 common
   .directive('jqCron', jqCronDirective);

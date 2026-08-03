@@ -7,6 +7,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { UpgradeModule, downgradeInjectable } from '@angular/upgrade/static';
 import { HelloAngularService } from './hello.service';
 import { UserService } from './user.service';
+import { UUIDGenerator } from './uuid-generator.service';
 
 declare const angular: any;
 
@@ -14,7 +15,8 @@ declare const angular: any;
 // downgraded service replaces its legacy AngularJS registration; consumers are unchanged.
 angular.module('ds.lab')
   .factory('helloAngular', downgradeInjectable(HelloAngularService) as any)
-  .factory('UserService', downgradeInjectable(UserService) as any); // Phase C-1: migrated to Angular 18
+  .factory('UserService', downgradeInjectable(UserService) as any) // Phase C-1: migrated to Angular 18
+  .factory('UUIDGenerator', downgradeInjectable(UUIDGenerator) as any); // Phase C-1: migrated to Angular 18
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule]
