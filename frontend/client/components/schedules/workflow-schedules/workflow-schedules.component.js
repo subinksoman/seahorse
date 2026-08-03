@@ -48,11 +48,18 @@ export const WorkflowSchedulesComponent = {
       this.workflowSchedules = WorkflowSchedulesService;
       this.addingSchedule = false;
       this.schedules = [];
-      this.getSchedules();
 
       $scope.$watch(() => PresetService.getAll(), (newValue) => {
         this.presets = newValue;
       });
+    }
+
+    $onInit() {
+      // `workflow` is a '<' binding — undefined in the constructor under AngularJS 1.7+
+      // (bindings are assigned after construction — see T81). getSchedules() reads
+      // this.workflow.id, so it threw in the constructor, leaving the component (and the
+      // "Add schedule" button, which also reads this.workflow.id) broken. Load here instead.
+      this.getSchedules();
     }
 
 
