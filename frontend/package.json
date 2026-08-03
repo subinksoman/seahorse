@@ -47,7 +47,6 @@
     "font-awesome": "~4.5.0",
     "font-awesome-webpack": "0.0.4",
     "jquery": "3.7.1",
-    "jsen": "~0.6.1",
     "jsplumb": "~2.2.6",
     "lodash": "4.17.21",
     "malihu-custom-scrollbar-plugin": "~3.1.3",
@@ -57,7 +56,8 @@
     "ng-switchery": "^1.0.1",
     "nvd3": "~1.8.2",
     "sockjs-client": "1.6.1",
-    "stompjs": "^2.3.3"
+    "stompjs": "^2.3.3",
+    "ajv": "^6.12.6"
   },
   "devDependencies": {
     "assets-webpack-plugin": "^3.2.0",
