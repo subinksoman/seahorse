@@ -100,7 +100,21 @@ module.exports = function (_path) {
         },
         // Expose the single shared angular/jquery instances as globals for legacy code + plugins.
         { test: require.resolve('angular'), loader: 'expose-loader', options: { exposes: 'angular' } },
-        { test: require.resolve('jquery'), loader: 'expose-loader', options: { exposes: ['$', 'jQuery'] } }
+        { test: require.resolve('jquery'), loader: 'expose-loader', options: { exposes: ['$', 'jQuery'] } },
+        // ng-switchery is a self-contained UMD that bundles `switchery` and, in its GLOBAL/script
+        // branch, sets window.Switchery + registers angular.module('NgSwitchery'). Under a plain
+        // commonjs wrap it takes the CommonJS branch and does require('switchery') (not a node dep in
+        // this project) -> window.Switchery undefined -> "Switchery is not a constructor" on any toggle.
+        // Shadow module/exports/define so the UMD falls to its global branch (restores the pre-webpack-5
+        // `script!` behaviour); wrapper=window because it references window for the toggle DOM.
+        {
+          test: /[\\/]ng-switchery[\\/]dist[\\/]ng-switchery\.js$/,
+          loader: 'imports-loader',
+          options: {
+            wrapper: 'window',
+            additionalCode: 'var module = undefined; var exports = undefined; var define = undefined;'
+          }
+        }
       ]
     },
 

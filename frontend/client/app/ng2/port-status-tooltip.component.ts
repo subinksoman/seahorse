@@ -3,7 +3,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, DoCheck } from '@angular/core';
 import * as _ from 'lodash';
 import '../workflows/editor/port-status-tooltip/port-status-tooltip.less';
 
@@ -26,19 +26,28 @@ import '../workflows/editor/port-status-tooltip/port-status-tooltip.less';
     </div>
   `
 })
-export class PortStatusTooltipComponent implements OnChanges {
+export class PortStatusTooltipComponent implements DoCheck {
   @Input() portObject: any;
   outputTypes: string[] = [];
 
-  ngOnChanges(): void {
-    if (!this.portObject) {
-      this.outputTypes = [];
+  // Recompute each change-detection (like the legacy getTypes() called each digest from ng-repeat), so
+  // a portObject bound slightly after creation (downgradeComponent + ng-if hover) still populates the
+  // tooltip. Guard portObject/typeQualifier — both are transiently undefined before/without a hovered port.
+  ngDoCheck(): void {
+    const tq = this.portObject && this.portObject.typeQualifier;
+    if (!tq || !tq.length) {
+      if (this.outputTypes.length) { this.outputTypes = []; }
       return;
     }
-    this.outputTypes = this.portObject.typeQualifier.map((typeQualifier: string) => _.last(typeQualifier.split('.')));
-    if (this.outputTypes.length > 3) {
-      this.outputTypes = this.outputTypes.slice(0, 3);
-      this.outputTypes.push('...');
+    let types = tq.map((typeQualifier: string) => _.last(typeQualifier.split('.')));
+    if (types.length > 3) {
+      types = types.slice(0, 3);
+      types.push('...');
+    }
+    // Only replace the array when the content actually changed (avoids needless *ngFor churn /
+    // Angular dev-mode ExpressionChanged noise).
+    if (types.join('|') !== this.outputTypes.join('|')) {
+      this.outputTypes = types;
     }
   }
 }
