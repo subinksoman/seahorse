@@ -29,9 +29,6 @@ export function $documentFactory(i: any): any { return i.get('$document'); }
 // Editor canvas service still AngularJS (migrate later); bridged for the copy/paste visitor.
 export function canvasServiceFactory(i: any): any { return i.get('CanvasService'); }
 // deepsense-* node-parameters factory stays AngularJS (deepsense-* migrates late); bridged for GraphNodesService.
-export function graphStyleServiceFactory(i: any): any { return i.get('GraphStyleService'); }
-export function datasourcesServiceFactory(i: any): any { return i.get('datasourcesService'); }
-export function datasourcesPanelServiceFactory(i: any): any { return i.get('DatasourcesPanelService'); }
 export function deepsenseNodeParametersFactory(i: any): any { return i.get('DeepsenseNodeParameters'); }
 
 export const upgradedProviders: any[] = [
@@ -51,8 +48,5 @@ export const upgradedProviders: any[] = [
   { provide: 'debounce', useFactory: debounceFactory, deps: ['$injector'] },
   { provide: '$document', useFactory: $documentFactory, deps: ['$injector'] },
   { provide: 'CanvasService', useFactory: canvasServiceFactory, deps: ['$injector'] },
-  { provide: 'DeepsenseNodeParameters', useFactory: deepsenseNodeParametersFactory, deps: ['$injector'] },
-  { provide: 'GraphStyleService', useFactory: graphStyleServiceFactory, deps: ['$injector'] },
-  { provide: 'datasourcesService', useFactory: datasourcesServiceFactory, deps: ['$injector'] },
-  { provide: 'DatasourcesPanelService', useFactory: datasourcesPanelServiceFactory, deps: ['$injector'] }
+  { provide: 'DeepsenseNodeParameters', useFactory: deepsenseNodeParametersFactory, deps: ['$injector'] }
 ];
