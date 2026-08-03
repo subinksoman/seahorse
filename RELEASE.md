@@ -1,3 +1,61 @@
+# Seahorse Release 4.2.0.3
+
+| | |
+|---|---|
+| **Tag** | `v4.2.0.3` |
+| **Release date** | 2026-08-03 |
+| **Previous tag** | `v4.2.0.2` |
+| **Type** | Frontend dependency security upgrade (patch) |
+| **Stack** | Unchanged — Spark **4.2.0** / Scala 2.13.18 / JDK 17 / Python 3.12 |
+| **Frontend** | **AngularJS 1.5.11 → 1.8.3** |
+| **Images** | Only `seahorse-frontend` changes; all other services identical to 4.2.0.2 |
+
+## Summary
+A **frontend-only** security patch: upgrades the AngularJS runtime from the unpatched
+**1.5.11** to **1.8.3** — the final AngularJS release, which carries the `$sce`/`ngSanitize`
+XSS and prototype-pollution fixes 1.5.11 lacks. No backend, Spark, notebook, or Python
+changes; those images are identical to 4.2.0.2. This is the first execution cluster of the
+frontend-security initiative tracked as **T80/T81** (see `migration/T80-frontend-security-upgrade.md`).
+
+> **Note:** AngularJS is end-of-life (last release 1.8.3, support ended Jan 2022). This
+> removes the known CVEs in 1.5.11 but AngularJS itself remains EOL; the durable fix is a
+> framework migration, tracked separately (T80 Phase C).
+
+## What changed
+- **`angular` + `angular-cookies` + `angular-sanitize` + `angular-mocks` → 1.8.3** (bumped in
+  lockstep; `package-lock.json` regenerated). `angular-ui-router` 0.2.18 and
+  `angular-ui-bootstrap` 1.1.2 verified to bootstrap on 1.8.
+- Fixed **four AngularJS 1.7 binding-migration regressions** (Angular 1.7 removed
+  `preAssignBindingsEnabled`, so component/directive bindings are no longer assigned before
+  the controller constructor — code reading a binding in its constructor now breaks):
+  - `editor.controller.js` — `$scope.$watch(this.workflow.getNodes, …)` in the constructor
+    threw and left the **editor canvas empty (no nodes)**; moved to `$onInit`.
+  - `graph-node.component.js` / `status-icon.component.js` — read `this.node` in the
+    constructor (node internals); moved to `$onInit`.
+  - `distribution-continuous-chart.js` — read `this.data` in the constructor (box-plot
+    option silently dropped); moved to `$onInit`.
+- `app.config.js` — removed the now-invalid `$compileProvider.preAssignBindingsEnabled(true)`
+  call (removed in Angular 1.7; it threw `$injector:modulerr` and killed bootstrap); kept
+  `$locationProvider.hashPrefix('')` so `#/…` URLs are unchanged.
+
+## Verification
+Headless-Chrome smoke against a live 4.2.0.x stack: the app bootstraps under `ng-strict-di`,
+`ui-router` routes, and the **workflow editor renders the full graph** (a 5-node workflow —
+Read DataFrame → Python Transformation → Write DataFrame plus two Python Notebooks — with
+jsPlumb edges); STOMP connects to RabbitMQ, subscribes, and syncs with the executor.
+
+## Known issues
+- One **single-fire `reading 'id'`** console error during editor init — non-blocking (nodes
+  render correctly).
+- Full-run smoke (execute a workflow end-to-end, notebook `toPandas`, report charts, file
+  upload) is recommended before treating T81 as fully closed.
+
+## Upgrade
+Rebuild/redeploy **`seahorse-frontend`** only; all other 4.2.0.2 images are unchanged. No
+config migration. A browser hard-refresh is required to drop the cached old bundle.
+
+---
+
 # Seahorse Release 4.2.0.2
 
 | | |
