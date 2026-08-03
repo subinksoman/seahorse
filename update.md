@@ -760,6 +760,21 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "effort_days": 22,
     "status": "pending",
     "notes": "Plan only. Deliverable doc: migration/T80-frontend-security-upgrade.md. Baseline audit captured 2026-08-03: 223 vulns (10 low / 58 moderate / 74 high / 81 critical), 41 direct. Runtime attack surface (ships to browser): angular, angular-sanitize, angular-ui-router, jquery, lodash, moment, bootstrap, sockjs-client, jsen(no fix->replace), ace-webapp(no fix->replace), d3/nvd3(defer). Build-toolchain criticals (webpack/babel/loaders/karma/phantomjs) do not reach the browser - second priority. Do NOT run `npm audit fix --force` (pulls webpack5/bootstrap5 majors that break the build+UI)."
+  },
+  {
+    "id": "T81",
+    "phase": "8 - Frontend Security",
+    "title": "Upgrade AngularJS 1.5.11 -> 1.8.3 (last AngularJS release; XSS/CVE fixes)",
+    "description": "First execution cluster of the T80 Phase A runtime hardening. The app currently resolves angular 1.5.11 (declared ~1.5.7) and bundles `AngularJS v1.5.11`. Bump the AngularJS core and its in-tree companions IN LOCKSTEP to 1.8.3 - the final AngularJS release, which carries $sce/ngSanitize XSS and prototype-pollution fixes that 1.5.11 lacks: angular, angular-cookies, angular-sanitize, angular-mocks all -> 1.8.3 (versions MUST match exactly or Angular throws at bootstrap). Re-evaluate the peer libs that ride on the Angular version: angular-ui-router 0.2.18 (0.2.x officially supports angular<=1.6; verify it still bootstraps on 1.8, otherwise move to 1.0.x - separate task), angular-ui-bootstrap 1.1.2 (BS3-era; may need 2.5.x on 1.8), angular-toastr/xeditable/ui-ace/debounce (smoke-test). Regenerate package-lock.json, `npm run dist`, `npm test`, rebuild seahorse-frontend, and run the mandatory LIVE editor smoke. NOTE: this is EOL->EOL (1.8.3 is still end-of-life); it removes known CVEs but the durable fix remains the T80 Phase C framework migration.",
+    "area": "frontend/package.json, frontend/package-lock.json, frontend/client/** (behaviour-change fixes)",
+    "depends_on": [
+      "T80"
+    ],
+    "category": "security",
+    "risk": "High",
+    "effort_days": 4,
+    "status": "pending",
+    "notes": "Watch the 1.6/1.7/1.8 breaking changes that hit THIS codebase: (1) $http `.success()`/`.error()` removed in 1.6 -> use `.then()`/`.catch()` (grep the client); (2) $compile preAssignBindingsEnabled defaults to false in 1.6 -> component/directive bindings are NOT available in the constructor, must read them in `$onInit` (audit controllers that use bindings in ctor); (3) $location hashPrefix default changed to '!' in 1.6 -> set `$locationProvider.hashPrefix('')` if URLs must stay unchanged; (4) jqLite / input[type=range] / `$interpolate` tweaks. Success: bundle self-reports AngularJS v1.8.3 and the live editor smoke passes (drag/connect nodes, run workflow via STOMP, open .ipynb notebook + toPandas, report charts, file upload)."
   }
 ]
 ```
