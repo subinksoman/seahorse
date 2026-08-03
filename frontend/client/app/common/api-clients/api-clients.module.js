@@ -23,8 +23,8 @@ exports.inject = function(module) {
   // Angular 18 (ng2/): BaseApiClient is now an Angular base class (not downgraded); the three clients
   // are downgraded in ng2/bootstrap.ts. operations.factory + operations-hierarchy stay AngularJS and
   // consume the downgraded OperationsApiClient.
+  // operations-hierarchy.service migrated to Angular 18 (ng2/) — downgraded as 'OperationsHierarchyService'.
   require('./operations.factory.js').inject(module);
-  require('./operations-hierarchy.service.js').inject(module);
 
   module
     .service('LibraryApiService', LibraryApi);

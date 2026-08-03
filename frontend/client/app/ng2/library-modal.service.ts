@@ -15,7 +15,12 @@ export class LibraryModalService {
   private isUploadingFilesPopoverOpen = false;
   private isNewDirectoryInputVisible = false;
 
-  constructor(@Inject('$uibModal') private $uibModal: any) {}
+  constructor(@Inject('$uibModal') private $uibModal: any) {
+    // getUploadingFilesPopoverStatus is passed detached to $scope.$watch (recent-files-indicator);
+    // the legacy service used closures (no `this`), so bind the state getters to keep instance context.
+    this.getUploadingFilesPopoverStatus = this.getUploadingFilesPopoverStatus.bind(this);
+    this.getNewDirectoryInputVisibility = this.getNewDirectoryInputVisibility.bind(this);
+  }
 
   openLibraryModal(mode: any, params: any): any {
     return this.$uibModal.open({

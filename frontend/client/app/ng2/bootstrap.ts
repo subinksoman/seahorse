@@ -28,6 +28,8 @@ import { LibraryModalService } from './library-modal.service';
 import { OperationsApiClient } from './operations-api-client.service';
 import { WorkflowsApiClient } from './workflows-api-client.service';
 import { SessionManagerApi } from './session-manager-api.service';
+import { OperationsHierarchyService } from './operations-hierarchy.service';
+import { WorkflowCloneService } from './workflow-clone.service';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -57,7 +59,9 @@ angular.module('ds.lab')
   .factory('LibraryModalService', downgradeInjectable(LibraryModalService) as any) // Phase C-1: migrated to Angular 18
   .factory('OperationsApiClient', downgradeInjectable(OperationsApiClient) as any) // Phase C-1: migrated to Angular 18
   .factory('WorkflowsApiClient', downgradeInjectable(WorkflowsApiClient) as any) // Phase C-1: migrated to Angular 18
-  .factory('SessionManagerApi', downgradeInjectable(SessionManagerApi) as any); // Phase C-1: migrated to Angular 18
+  .factory('SessionManagerApi', downgradeInjectable(SessionManagerApi) as any) // Phase C-1: migrated to Angular 18
+  .factory('OperationsHierarchyService', downgradeInjectable(OperationsHierarchyService) as any) // Phase C-1: migrated to Angular 18
+  .factory('WorkflowCloneService', downgradeInjectable(WorkflowCloneService) as any); // Phase C-1: migrated to Angular 18
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],

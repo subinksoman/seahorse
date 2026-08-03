@@ -24,6 +24,6 @@ exports.inject = function(module) {
   require('./export-modal/export-modal.ctrl.js').inject(module);
   require('./new-workflow-modal/new-workflow-modal.ctrl.js').inject(module);
   require('./upload-workflow-modal/upload-workflow-modal.ctrl.js').inject(module);
-  require('./workflow-clone-modal/workflow-clone-modal.srv.js').inject(module);
+  // workflow-clone-modal.srv migrated to Angular 18 (ng2/workflow-clone.service.ts) — downgraded as 'WorkflowCloneService'.
   require('./workflow-clone-modal/workflow-clone-modal.ctrl.js').inject(module);
 };
