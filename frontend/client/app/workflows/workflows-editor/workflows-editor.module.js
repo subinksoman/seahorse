@@ -20,6 +20,6 @@ exports.inject = function(module) {
   require('./workflows-editor.controller.js').inject(module);
   require('./workflows-editor.config.js').inject(module);
   require('./graph-nodes.service.js').inject(module);
-  require('./node-copy-paste-visitor.js').inject(module);
+  // node-copy-paste-visitor migrated to Angular 18 (ng2/) — downgraded as 'NodeCopyPasteVisitorService'.
   require('./workflows-editor.service.js').inject(module);
 };

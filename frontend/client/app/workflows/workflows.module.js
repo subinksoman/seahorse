@@ -32,12 +32,12 @@ require('./inner-workflows/public-param/public-params-list.js').inject(workflows
 require('./workflows-editor/workflows-editor.module.js').inject(workflows);
 require('./workflows-status-bar/workflows-status-bar.drv.js').inject(workflows);
 require('./workflows-status-bar/workflows-status-bar.ctrl.js').inject(workflows);
-require('./workflows-status-bar/workflows-editor-status-bar.service.js').inject(workflows);
+// workflows-editor-status-bar.service migrated to Angular 18 (ng2/) — downgraded as 'WorkflowStatusBarService'.
 require('./workflows-status-bar/documentation-link/documentation-link.directive.js').inject(workflows);
 require('./workflows-status-bar/selection-items/selection-items.controller.js').inject(workflows);
 require('./workflows-status-bar/selection-items/selection-items.directive.js').inject(workflows);
 require('./general-data-panel/general-data-panel.module.js').inject(workflows);
-require('./copy-paste/copy-paste.js').inject(workflows);
+// copy-paste migrated to Angular 18 (ng2/copy-paste.service.ts) — downgraded as 'CopyPasteService'.
 require('./workflows-status-bar/menu-item/menu-item.directive.js').inject(workflows);
 require('./workflows-status-bar/menu-item/menu-item.controller.js').inject(workflows);
 require('./workflows-status-bar/additional-html/running-executor-popover.ctrl.js').inject(workflows);
