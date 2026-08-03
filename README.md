@@ -370,6 +370,13 @@ Full notes in [RELEASE.md](RELEASE.md); the task tracker is in [update.md](updat
 tab names, and suppression of the benign "DataFrame constructor is internal"
 warning. Same Spark/Scala/JDK/Python stack.
 
+Later tags `4.2.0.3` and `4.2.0.4` are **frontend/mail source patches** (git tags +
+GitHub releases; the `seahorse-frontend`/`seahorse-mail` images are rebuilt, the rest are
+unchanged from `4.2.0.2`) — see [RELEASE.md](RELEASE.md). `4.2.0.4` upgrades AngularJS to
+1.8.3 and hardens the browser-shipped libraries (runtime `npm audit` **57 → 5, 0 critical**),
+fixes the editor/report/schedule AngularJS-1.8 binding regressions, and repairs scheduled
+report-email delivery (exim authenticated smarthost).
+
 Modernization highlights:
 
 - Spark 3.0.0 → **3.4.4** (default), and the full **Spark 4.x line up to 4.2.0** supported +

@@ -1,3 +1,61 @@
+# Seahorse Release 4.2.0.4
+
+| | |
+|---|---|
+| **Tag** | `v4.2.0.4` |
+| **Release date** | 2026-08-03 |
+| **Previous tag** | `v4.2.0.3` |
+| **Type** | Frontend security hardening + notebook-schedule/mail fixes (patch) |
+| **Stack** | Unchanged — Spark **4.2.0** / Scala 2.13.18 / JDK 17 / Python 3.12 |
+| **Images** | `seahorse-frontend` + `seahorse-mail` change; all others identical to 4.2.0.3 |
+
+## Summary
+A patch over 4.2.0.3 that (1) executes **Phase A** of the frontend security plan — bumping/
+replacing the browser-shipped libraries — cutting the runtime `npm audit` from **57 to 5**
+(**0 critical**, down from 12); (2) fixes the last AngularJS-1.8 binding regression (the
+scheduling UI); and (3) repairs scheduled-workflow **report-email delivery**. No backend,
+Spark, or API changes.
+
+## Frontend security — Phase A (runtime dependency hardening)
+Browser-shipped libraries bumped/replaced, one cluster per commit, each build- and
+smoke-verified (see T83 / `migration/T80-frontend-security-upgrade.md`):
+- **jQuery 2.1.4 → 3.7.1** (XSS CVE-2020-11022/-11023), **lodash → 4.18.1** (prototype
+  pollution + `_.template` injection), **moment → 2.30.1** (ReDoS), **sockjs-client → 1.6.1**,
+  **bootstrap 3.3.4 → 3.4.1** (XSS; v3 retained).
+- **jsen → ajv 6.12.6** (jsen unmaintained/no fix) with an adapter preserving the preset
+  validation error contract; **ace-webapp → ace-builds** (no fix) for the code editor.
+- `font-awesome-webpack` moved to **devDependencies** (it's a build-time webpack loader, never
+  shipped); npm **overrides** pull transitive websocket/debug CVEs to fixed versions.
+- **Result:** runtime (`npm audit --omit=dev`) **57 → 5** — **0 critical, 1 high** (the only
+  remaining crit/high is `angular` itself, EOL, addressed by the T82/Phase C migration).
+- Note: ajv and debug were held at ES5-compatible majors (6.x / 2.6.9) because the legacy
+  webpack-2 + UglifyJS-2 build cannot minify ES2018 — a constraint that motivates Phase B.
+
+## AngularJS 1.8 binding fix
+- **Scheduling "Add schedule" button** — `workflow-schedules.component` read its `workflow`
+  binding during construction (`getSchedules()` → `fetchSchedules(this.workflow.id)`), which is
+  undefined under Angular 1.7+; the button did nothing. Moved to `$onInit`. A comprehensive
+  scan (inline + imported + 27 string-registered controllers, with method-call inlining) now
+  reports **0** controllers reading a binding in the constructor.
+
+## Mail — scheduled report email delivery
+Scheduled workflows ran to completion but their **report emails never arrived**: exim
+delivered directly with a `deepsense.ai` From that Gmail rejected (550-5.7.1) and froze, and
+the compose `SMARTHOST_*` Gmail creds were unused (smarthost commented out). `deployment/exim/
+exim.conf` now routes all non-local mail through the **authenticated Gmail smarthost**
+(STARTTLS + LOGIN on 587) and **rewrites the sender** to the smarthost account. Verified live:
+report emails deliver (`=> R=smarthost A=smarthost_login`, Gmail `250 OK`).
+
+## Also
+- **T82** assessment: AngularJS 1.8.3 → modern Angular framework-migration plan (doc only).
+
+## Upgrade
+Rebuild/redeploy **`seahorse-frontend`** and **`seahorse-mail`**; all other 4.2.0.3 images are
+unchanged. A browser hard-refresh is required to drop the cached old bundle. To enable
+scheduled report emails, set the `SMARTHOST_*` env (already present in the sample compose).
+
+---
+
 # Seahorse Release 4.2.0.3
 
 | | |
