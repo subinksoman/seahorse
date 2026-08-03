@@ -26,7 +26,7 @@ module.exports = function (_path) {
     },
 
     resolve: {
-      extensions: ['.js'],
+      extensions: ['.ts', '.js'], // .ts for the incremental Angular (Phase C hybrid) migration
       modules: [path.join(_path, 'node_modules'), 'node_modules'],
       alias: {
         APP: path.join(_path, 'client', 'app'),
@@ -73,6 +73,12 @@ module.exports = function (_path) {
           test: /\.(woff2?|ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
           type: 'asset',
           parser: { dataUrlCondition: { maxSize: 10000 } }
+        },
+        {
+          // Angular (Phase C hybrid) TypeScript — ts-loader emits decorators + metadata for JIT.
+          test: /\.ts$/,
+          exclude: /node_modules/,
+          use: [{ loader: 'ts-loader', options: { transpileOnly: true } }]
         },
         {
           test: /\.js$/,

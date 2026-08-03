@@ -57,6 +57,9 @@ if (browserValidator.isBrowserSupported()) {
   require('./version.factory.js').inject(lab);
   require('./UserService.js').inject(lab);
   require('./app.run.js').inject(lab);
+
+  // Phase C: boot AngularJS ds.lab through the Angular (ngUpgrade) hybrid instead of ng-app.
+  require('./ng2/bootstrap.ts');
 } else {
   document.addEventListener('DOMContentLoaded', function() {
     document.body.innerHTML = browserValidator.getErrorMessageHTML();
