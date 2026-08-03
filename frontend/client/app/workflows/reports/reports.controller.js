@@ -30,12 +30,16 @@ function ReportCtrl($scope, $uibModal, BottomBarService) {
   let internal = {};
   let obj = {};
 
-  if (this.currentReport) {
-    internal.name = this.currentReport.name;
-    internal.tables = this.currentReport.tables;
-    internal.distributions = this.currentReport.distributions || {};
-    internal.reportId = this.currentReport.reportId;
-  }
+  // `currentReport` is a bindToController binding; under AngularJS 1.7+ it is not assigned until
+  // after construction (see T81), so read it in $onInit rather than the controller body.
+  this.$onInit = () => {
+    if (this.currentReport) {
+      internal.name = this.currentReport.name;
+      internal.tables = this.currentReport.tables;
+      internal.distributions = this.currentReport.distributions || {};
+      internal.reportId = this.currentReport.reportId;
+    }
+  };
 
   internal.checkHeight = () => {
     if (!this.currentReport) {

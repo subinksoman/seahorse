@@ -35,7 +35,11 @@ function ReportTableController($scope, $rootScope, $filter, $uibModal) {
   controller.shortenValues = shortenValues;
   controller.showDistribution = showDistribution;
 
-  activate();
+  // `table` is a bindToController binding. AngularJS 1.7+ assigns bindings AFTER the controller
+  // is constructed (preAssignBindingsEnabled was removed — see T81), so activate() must run in
+  // $onInit; calling it during construction read controller.table.columnNames on undefined and
+  // threw, so report tables never rendered.
+  controller.$onInit = activate;
 
   function activate() {
     controller.reportWidth = window.innerWidth / 2;
