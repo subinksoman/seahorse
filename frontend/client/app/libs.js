@@ -24,7 +24,7 @@ require('angular-ui-router');
 require('angular-ui-bootstrap');
 require('angular-xeditable');
 require('angucomplete-alt');
-require('ace-webapp');
+require('ace-builds/src-min-noconflict/ace.js');
 require('font-awesome-webpack!./font-awesome.config.js');
 require('jquery');
 require('lodash');

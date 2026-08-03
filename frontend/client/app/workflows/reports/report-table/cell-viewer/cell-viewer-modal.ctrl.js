@@ -16,7 +16,7 @@
 
 'use strict';
 
-require('NODE_MODULES/ace-webapp/src-min-noconflict/mode-text.js');
+require('NODE_MODULES/ace-builds/src-min-noconflict/mode-text.js');
 
 
 /* @ngInject */
