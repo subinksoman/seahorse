@@ -16,6 +16,9 @@ export function $timeoutFactory(i: any): any { return i.get('$timeout'); }
 export function $uibModalFactory(i: any): any { return i.get('$uibModal'); } // angular-ui-bootstrap
 export function $cookiesFactory(i: any): any { return i.get('$cookies'); } // ngCookies
 export function $qFactory(i: any): any { return i.get('$q'); }
+export function $httpFactory(i: any): any { return i.get('$http'); }
+// ServerCommunication is a (still-AngularJS) app service; bridge it so migrated api clients can @Inject it.
+export function serverCommunicationFactory(i: any): any { return i.get('ServerCommunication'); }
 
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
@@ -25,5 +28,7 @@ export const upgradedProviders: any[] = [
   { provide: '$timeout', useFactory: $timeoutFactory, deps: ['$injector'] },
   { provide: '$uibModal', useFactory: $uibModalFactory, deps: ['$injector'] },
   { provide: '$cookies', useFactory: $cookiesFactory, deps: ['$injector'] },
-  { provide: '$q', useFactory: $qFactory, deps: ['$injector'] }
+  { provide: '$q', useFactory: $qFactory, deps: ['$injector'] },
+  { provide: '$http', useFactory: $httpFactory, deps: ['$injector'] },
+  { provide: 'ServerCommunication', useFactory: serverCommunicationFactory, deps: ['$injector'] }
 ];

@@ -19,12 +19,12 @@
 import LibraryApi from './library-api.service';
 
 exports.inject = function(module) {
-  require('./base-api-client.factory.js').inject(module);
-  require('./workflows-api-client.factory.js').inject(module);
-  require('./operations-api-client.factory.js').inject(module);
+  // base-api-client + workflows-api-client + operations-api-client + session-manager-api migrated to
+  // Angular 18 (ng2/): BaseApiClient is now an Angular base class (not downgraded); the three clients
+  // are downgraded in ng2/bootstrap.ts. operations.factory + operations-hierarchy stay AngularJS and
+  // consume the downgraded OperationsApiClient.
   require('./operations.factory.js').inject(module);
   require('./operations-hierarchy.service.js').inject(module);
-  require('./session-manager-api.service').inject(module);
 
   module
     .service('LibraryApiService', LibraryApi);
