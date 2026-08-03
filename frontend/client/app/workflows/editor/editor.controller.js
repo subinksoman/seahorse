@@ -32,16 +32,24 @@ class EditorController {
     this.MouseEvent = MouseEvent;
     this.$element = $element;
     this.$rootScope = $rootScope;
+    this.$scope = $scope;
 
     this.categories = Operations.getCatalog();
-
-    $scope.$watch(this.workflow.getNodes, (newValue) => {
-      this.canShowInvitationToCreate = Object.keys(newValue).length === 0;
-    }, true);
 
     this.removeListener = $rootScope.$on('Keyboard.KEY_PRESSED_DEL', () => {
       this.hideTooltip();
     });
+  }
+
+  $onInit() {
+    // `this.workflow` is a '<' binding. AngularJS 1.7+ assigns bindings AFTER the constructor
+    // (binding pre-assignment was removed in 1.7 — see T81), so reading this.workflow.getNodes
+    // in the constructor threw "Cannot read properties of undefined (reading 'getNodes')", which
+    // aborted the editor controller and left the canvas without a workflow (no nodes rendered).
+    // Register the watch here, once the binding is available.
+    this.$scope.$watch(this.workflow.getNodes, (newValue) => {
+      this.canShowInvitationToCreate = Object.keys(newValue).length === 0;
+    }, true);
   }
 
   $postLink() {
