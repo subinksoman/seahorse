@@ -7,6 +7,7 @@ import { Injectable, Inject } from '@angular/core';
 import * as _ from 'lodash';
 import { MultiSelectionService } from './multi-selection.service';
 import { WorkflowService } from './workflow.service';
+import { GraphNodesService } from './graph-nodes.service';
 
 declare const $: any; // jQuery global (expose-loader)
 
@@ -21,7 +22,7 @@ export class NodeCopyPasteVisitorService {
     @Inject('$rootScope') private $rootScope: any,
     private multiSelectionService: MultiSelectionService,
     private workflowService: WorkflowService,
-    @Inject('GraphNodesService') private graphNodesService: any,
+    private graphNodesService: GraphNodesService,
     @Inject('CanvasService') private canvasService: any
   ) {}
 

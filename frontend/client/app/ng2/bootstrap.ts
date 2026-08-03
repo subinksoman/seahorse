@@ -40,6 +40,7 @@ import { LibraryApi } from './library-api.service';
 import { LibraryDataConverter } from './library-data-converter.service';
 import { LibraryService } from './library.service';
 import { WorkflowsEditorService } from './workflows-editor.service';
+import { GraphNodesService } from './graph-nodes.service';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -81,7 +82,8 @@ angular.module('ds.lab')
   .factory('LibraryApiService', downgradeInjectable(LibraryApi) as any) // Phase C-1: migrated to Angular 18
   .factory('LibraryDataConverterService', downgradeInjectable(LibraryDataConverter) as any) // Phase C-1: migrated to Angular 18
   .factory('LibraryService', downgradeInjectable(LibraryService) as any) // Phase C-1: migrated to Angular 18
-  .factory('WorkflowsEditorService', downgradeInjectable(WorkflowsEditorService) as any); // Phase C-1: migrated to Angular 18
+  .factory('WorkflowsEditorService', downgradeInjectable(WorkflowsEditorService) as any) // Phase C-1: migrated to Angular 18
+  .factory('GraphNodesService', downgradeInjectable(GraphNodesService) as any); // Phase C-1: migrated to Angular 18
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],

@@ -19,6 +19,5 @@
 exports.inject = function(module) {
   require('./workflows-editor.controller.js').inject(module);
   require('./workflows-editor.config.js').inject(module);
-  require('./graph-nodes.service.js').inject(module);
-  // node-copy-paste-visitor + workflows-editor.service migrated to Angular 18 (ng2/) — downgraded in bootstrap.ts.
+  // graph-nodes.service + node-copy-paste-visitor + workflows-editor.service migrated to Angular 18 (ng2/) — downgraded in bootstrap.ts.
 };
