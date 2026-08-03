@@ -24,7 +24,7 @@ let workflows = angular.module('ds.workflows', [
 ]);
 
 require('./workflows.config.js').inject(workflows);
-require('./workflows.service.js').inject(workflows);
+// workflows.service (WorkflowService hub) migrated to Angular 18 (ng2/workflow.service.ts) — downgraded as 'WorkflowService'.
 require('./common-behaviours/common-behaviours.module.js').inject(workflows);
 require('./graph-panel/graph-panel.module.js').inject(workflows);
 require('./inner-workflows/public-param/public-params-list.js').inject(workflows);
