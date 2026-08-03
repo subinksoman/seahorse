@@ -6,11 +6,15 @@ import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { UpgradeModule, downgradeInjectable } from '@angular/upgrade/static';
 import { HelloAngularService } from './hello.service';
+import { UserService } from './user.service';
 
 declare const angular: any;
 
-// Expose the Angular service to AngularJS DI (proof the two frameworks share one injector tree).
-angular.module('ds.lab').factory('helloAngular', downgradeInjectable(HelloAngularService) as any);
+// Expose Angular services to AngularJS DI (the two frameworks share one injector tree). Each
+// downgraded service replaces its legacy AngularJS registration; consumers are unchanged.
+angular.module('ds.lab')
+  .factory('helloAngular', downgradeInjectable(HelloAngularService) as any)
+  .factory('UserService', downgradeInjectable(UserService) as any); // Phase C-1: migrated to Angular 18
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule]

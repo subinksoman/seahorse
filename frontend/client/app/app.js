@@ -55,7 +55,6 @@ if (browserValidator.isBrowserSupported()) {
   ]);
   require('./app.config.js').inject(lab);
   require('./version.factory.js').inject(lab);
-  require('./UserService.js').inject(lab);
   require('./app.run.js').inject(lab);
 
   // Phase C: boot AngularJS ds.lab through the Angular (ngUpgrade) hybrid instead of ng-app.
