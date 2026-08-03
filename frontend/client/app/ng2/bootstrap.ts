@@ -42,6 +42,7 @@ import { LibraryService } from './library.service';
 import { WorkflowsEditorService } from './workflows-editor.service';
 import { GraphNodesService } from './graph-nodes.service';
 import { CreateNodeInvitationComponent } from './create-node-invitation.component';
+import { PortStatusTooltipComponent } from './port-status-tooltip.component';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -86,12 +87,13 @@ angular.module('ds.lab')
   .factory('WorkflowsEditorService', downgradeInjectable(WorkflowsEditorService) as any) // Phase C-1: migrated to Angular 18
   .factory('GraphNodesService', downgradeInjectable(GraphNodesService) as any) // Phase C-1: migrated to Angular 18
   // Phase C-2 (UI layer): downgraded Angular COMPONENTS registered as AngularJS directives.
-  .directive('createNodeInvitation', downgradeComponent({ component: CreateNodeInvitationComponent }) as any);
+  .directive('createNodeInvitation', downgradeComponent({ component: CreateNodeInvitationComponent }) as any)
+  .directive('portStatusTooltip', downgradeComponent({ component: PortStatusTooltipComponent }) as any);
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],
   // Angular components used from AngularJS (via downgradeComponent) must be declared here.
-  declarations: [CreateNodeInvitationComponent],
+  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
   // migrated services can inject them by string token. See upgraded-providers.ts.
   providers: [...upgradedProviders]
