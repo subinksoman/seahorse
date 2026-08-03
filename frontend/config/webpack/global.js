@@ -11,6 +11,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const NODE_ENV = process.env.NODE_ENV || 'production';
 
+// Local dev-server backend to proxy API/websocket calls to (the running docker-compose stack).
+const BACKEND = process.env.SEAHORSE_BACKEND || 'http://192.168.1.42:9093';
+const BACKEND_WS = BACKEND.replace(/^http/, 'ws');
+
 module.exports = function (_path) {
   return {
     entry: {
@@ -125,6 +129,38 @@ module.exports = function (_path) {
         template: path.join(_path, 'client', 'index.html'),
         inject: 'body'
       })
-    ]
+    ],
+
+    // Dev server (used by `npm run serve` / `serve:dist`). Mode-independent so `serve:dist`
+    // (production mode — matches the shipped bundle exactly) also gets the proxy. Forwards the REST +
+    // websocket paths to the running backend so the locally-served app is same-origin with the API.
+    devServer: {
+      static: { directory: path.join(_path, 'dist') },
+      // HMR (hot) injects a runtime that wraps modules and breaks the expose-loader global for angular
+      // (`angular.default.module is not a function`). Use plain live-reload instead — full page reload
+      // on change, and the served bundle matches the shipped/docker bundle so the interop works.
+      hot: false,
+      liveReload: true,
+      port: 3000,
+      host: '0.0.0.0',
+      allowedHosts: 'all',
+      historyApiFallback: true,
+      client: { overlay: { errors: true, warnings: false } },
+      proxy: [
+        {
+          context: ['/v1', '/library', '/jupyter', '/docs', '/mail'],
+          target: BACKEND,
+          changeOrigin: true,
+          secure: false
+        },
+        {
+          context: ['/stomp'],
+          target: BACKEND_WS,
+          ws: true,
+          changeOrigin: true,
+          secure: false
+        }
+      ]
+    }
   };
 };

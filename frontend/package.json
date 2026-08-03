@@ -112,7 +112,7 @@
   "overrides": {
     "websocket-driver": ">=0.7.4",
     "websocket-extensions": ">=0.1.4",
-    "debug": "2.6.9",
+    "debug": "^4.3.4",
     "loader-utils": "^2.0.4",
     "cross-spawn": "^7.0.5",
     "minimist": "^1.2.8"
