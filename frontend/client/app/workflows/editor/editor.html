@@ -14,11 +14,10 @@
   </create-node-invitation>
 
   <core-canvas
-    is-editable="$ctrl.isEditable"
-    new-node-data="$ctrl.newNodeData"
-    selectedNode="$ctrl.selectedNode"
-    workflow="$ctrl.workflow"
-    on-connection-abort="$ctrl.onConnectionAbort(newNodeData)"
+    [is-editable]="$ctrl.isEditable"
+    [new-node-data]="$ctrl.newNodeData"
+    [workflow]="$ctrl.workflow"
+    (on-connection-abort)="$ctrl.onConnectionAbort($event)"
   >
     <new-node
       ng-if="$ctrl.newNodeData"

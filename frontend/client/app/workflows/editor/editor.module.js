@@ -21,7 +21,8 @@ import angular from 'angular';
 import OperationsCatalogueModule from '../operations-catalogue/operations-catalogue.module.js';
 
 // canvas-toolbar migrated to Angular (ng2/canvas-toolbar.component.ts) — downgraded as directive 'canvasToolbar'.
-import CanvasComponent from './core-canvas/canvas.component.js';
+// core-canvas migrated to Angular (ng2/core-canvas.component.ts) — downgraded as directive 'coreCanvas';
+// its keyboard/jsplumb-draggable/multi-selection directives are Angular directives in ng2/.
 // new-node migrated to Angular (ng2/new-node.component.ts) — downgraded as directive 'newNode'.
 import EditorComponent from './editor.component.js';
 // graph-node migrated to Angular (ng2/graph-node.component.ts) — downgraded as directive 'graphNode'.
@@ -39,7 +40,6 @@ const appModule = angular
   .service('CanvasService', CanvasService)
   .service('AdapterService', AdapterService)
   .service('GraphStyleService', GraphStyleService)
-  .component('coreCanvas', CanvasComponent)
   .component('editor', EditorComponent)
   // graphNode + statusIcon + portStatusTooltip + createNodeInvitation migrated to Angular — registered as downgraded directives in ng2/bootstrap.ts.
   .name;

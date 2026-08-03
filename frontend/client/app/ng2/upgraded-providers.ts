@@ -34,6 +34,12 @@ export function deepsenseNodeParametersFactory(i: any): any { return i.get('Deep
 export function graphStyleServiceFactory(i: any): any { return i.get('GraphStyleService'); }
 export function datasourcesServiceFactory(i: any): any { return i.get('datasourcesService'); }
 export function datasourcesPanelServiceFactory(i: any): any { return i.get('DatasourcesPanelService'); }
+// Core-canvas finale: bridged for the migrated core-canvas component + its jsplumb-draggable/keyboard
+// directives (AdapterService = jsPlumb adapter, $uibModalStack = keyboard modal guard, GraphNode = the
+// deepsense graph-node model exposing MOVE event constant).
+export function adapterServiceFactory(i: any): any { return i.get('AdapterService'); }
+export function uibModalStackFactory(i: any): any { return i.get('$uibModalStack'); }
+export function graphNodeFactory(i: any): any { return i.get('GraphNode'); }
 
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
@@ -55,5 +61,8 @@ export const upgradedProviders: any[] = [
   { provide: 'DeepsenseNodeParameters', useFactory: deepsenseNodeParametersFactory, deps: ['$injector'] },
   { provide: 'GraphStyleService', useFactory: graphStyleServiceFactory, deps: ['$injector'] },
   { provide: 'datasourcesService', useFactory: datasourcesServiceFactory, deps: ['$injector'] },
-  { provide: 'DatasourcesPanelService', useFactory: datasourcesPanelServiceFactory, deps: ['$injector'] }
+  { provide: 'DatasourcesPanelService', useFactory: datasourcesPanelServiceFactory, deps: ['$injector'] },
+  { provide: 'AdapterService', useFactory: adapterServiceFactory, deps: ['$injector'] },
+  { provide: '$uibModalStack', useFactory: uibModalStackFactory, deps: ['$injector'] },
+  { provide: 'GraphNode', useFactory: graphNodeFactory, deps: ['$injector'] }
 ];
