@@ -17,7 +17,16 @@
 'use strict';
 
 /* @ngInject */
-function AppConfig($urlRouterProvider, toastrConfig, $cookiesProvider) {
+function AppConfig($urlRouterProvider, toastrConfig, $cookiesProvider, $locationProvider) {
+  // AngularJS 1.6 compatibility (upgraded 1.5.11 -> 1.8.3, T81): 1.6 changed the default hash
+  // prefix from '' to '!'. Keep '#/...' URLs (not '#!/...') so existing links, bookmarks and
+  // proxy routes are unaffected.
+  // NOTE: there is deliberately no preAssignBindingsEnabled() call here — that toggle was
+  // REMOVED in Angular 1.7 (calling it throws $injector:modulerr). Under 1.7+ bindings are
+  // never pre-assigned, so any controller that reads its bindings in the constructor must read
+  // them in $onInit instead (see T81 notes).
+  $locationProvider.hashPrefix('');
+
   angular.extend(toastrConfig, {
     'allowHtml': true,
     'newestOnTop': false,

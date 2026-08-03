@@ -41,16 +41,23 @@ function DistributionContinuousChart() {
       /*
        * The box plot can be displayed on the given data if and only if
        * there have been provided such values like median and quartiles.
+       *
+       * AngularJS 1.7+ no longer pre-assigns bindToController bindings before the
+       * constructor runs (preAssignBindingsEnabled was removed in 1.7 — see T81), so
+       * `this.data` is not available here. Read it in $onInit, which runs after the
+       * bindings are assigned.
        */
-      if (this.data && this.data.statistics && this.data.statistics.median) {
-        this.plots.push({
-          name: 'Box plot',
-          type: 'box'
-        });
-      }
+      this.$onInit = () => {
+        if (this.data && this.data.statistics && this.data.statistics.median) {
+          this.plots.push({
+            name: 'Box plot',
+            type: 'box'
+          });
+        }
 
-      // default setting
-      this.chosenPlot.value = this.plots[0].type;
+        // default setting
+        this.chosenPlot.value = this.plots[0].type;
+      };
     },
     controllerAs: 'distributionContinuousChart',
     bindToController: true
