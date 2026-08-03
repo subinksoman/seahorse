@@ -915,6 +915,19 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "effort_days": 5,
     "status": "completed",
     "notes": "Commit fff06fab6. Full npm audit 208 -> 97 (crit 76->23, high 64->47); runtime (--omit=dev) unchanged at 5 (build toolchain is build-time only). VERIFIED live (image fff06fab6): npm run dist green on Node 22; bundle bootstraps ds.lab under ng-strict-di (0 errors, 0 strictdi); editor renders the full 6-node workflow graph with jsPlumb edges; logo/cluster icons render; chunk order docker-config->runtime->common->libs->app. Remaining 97 bulk = the untouched karma/phantomjs/jasmine TEST toolchain (not used by dist) + eslint 3 + cross-env/assets-webpack-plugin + the angular EOL/Phase C runtime deps. Next cluster: drop PhantomJS + modernize karma/jasmine, bump eslint. Only 3 less backtick-JS deprecation warnings remain (cosmetic)."
+  },
+  {
+    "id": "T87",
+    "phase": "8 - Frontend Security",
+    "title": "Phase C-0: AngularJS -> Angular 18 hybrid foundation (ngUpgrade strangler-fig)",
+    "description": "Begin the T82 framework migration off EOL AngularJS. Stood up a working ngUpgrade hybrid: Angular 18 (core/common/compiler/platform-browser(-dynamic)/upgrade), rxjs 7, zone.js, reflect-metadata, tslib + typescript 5.5/ts-loader. tsconfig with experimentalDecorators+emitDecoratorMetadata; webpack .ts rule (ts-loader transpileOnly) + resolve.extensions ['.ts','.js']; JIT (not AoT) so the custom webpack build needs no ngtsc. client/app/ng2/bootstrap.ts: reflect-metadata->zone.js->@angular/compiler, AppModule(BrowserModule,UpgradeModule) ngDoBootstrap -> upgrade.bootstrap(ds.lab, strictDi); ng-app removed from index.html; required at end of app.js. Proof: HelloAngularService (@Injectable) downgradeInjectable-d to AngularJS as `helloAngular`.",
+    "area": "frontend/package.json, frontend/tsconfig.json, frontend/config/webpack/global.js, frontend/client/app/app.js, frontend/client/index.html, frontend/client/app/ng2/*.ts",
+    "depends_on": ["T82","T85"],
+    "category": "migration",
+    "risk": "High",
+    "effort_days": 90,
+    "status": "in_progress",
+    "notes": "Commit ab50c2c2d. Phase 0 (hybrid bootstrap + one downgraded service) DONE + verified live: hybrid boots ('[hybrid] Angular 18 bootstrapped ds.lab; helloAngular = wired'), full editor renders (6-node graph, jsPlumb, logo), 0 errors/strictdi. Bundle ~3.5->4.5MB (Angular+zone+JIT compiler; shrinks as AngularJS retires + build moves to AoT). REMAINING (T82 phases 1-5, multi-month): migrate leaf filters->pipes + pure services (RxJS/HttpClient), then leaf components/directives bottom-up, then ui-router->@angular/router + replace the 8 AngularJS-only 3rd-party libs, then the jsPlumb canvas + deepsense-graph-model as one unit, then remove @angular/upgrade+AngularJS+switch to AoT. This is what finally clears the last audit high (angular EOL) + the AngularJS-ecosystem moderates."
   }
 ]
 ```
