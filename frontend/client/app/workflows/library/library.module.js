@@ -15,7 +15,7 @@
  */
 
 import angular from 'angular';
-import Breadcrumbs from './breadcrumbs/breadcrumbs.component';
+// breadcrumbs migrated to Angular 18 (ng2/breadcrumbs.component.ts) — downgraded as directive 'breadcrumbs'.
 import FileList from './file-list/file-list.component';
 import FileElement from './file-list/file-element/file-element.component';
 import RecentFilesIndicator from './recent-files-indicator/recent-files-indicator.component';
@@ -23,7 +23,7 @@ import FileUploadSection from './file-upload-section/file-upload-section.compone
 
 const Library = angular
   .module('library', [])
-  .component('breadcrumbs', Breadcrumbs)
+  // breadcrumbs migrated to Angular 18 — registered as a downgraded directive in ng2/bootstrap.ts.
   .component('fileList', FileList)
   .component('fileElement', FileElement)
   .component('recentFilesIndicator', RecentFilesIndicator)
