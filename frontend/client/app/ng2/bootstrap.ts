@@ -8,6 +8,8 @@ import { UpgradeModule, downgradeInjectable } from '@angular/upgrade/static';
 import { HelloAngularService } from './hello.service';
 import { UserService } from './user.service';
 import { UUIDGenerator } from './uuid-generator.service';
+import { TimeService } from './time.service';
+import { HelpersService } from './helpers.service';
 
 declare const angular: any;
 
@@ -16,7 +18,9 @@ declare const angular: any;
 angular.module('ds.lab')
   .factory('helloAngular', downgradeInjectable(HelloAngularService) as any)
   .factory('UserService', downgradeInjectable(UserService) as any) // Phase C-1: migrated to Angular 18
-  .factory('UUIDGenerator', downgradeInjectable(UUIDGenerator) as any); // Phase C-1: migrated to Angular 18
+  .factory('UUIDGenerator', downgradeInjectable(UUIDGenerator) as any) // Phase C-1: migrated to Angular 18
+  .factory('TimeService', downgradeInjectable(TimeService) as any) // Phase C-1: migrated to Angular 18
+  .factory('HelpersService', downgradeInjectable(HelpersService) as any); // Phase C-1: migrated to Angular 18
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule]
