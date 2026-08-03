@@ -4,7 +4,7 @@ import '@angular/compiler'; // JIT compiler (no AoT/ngtsc in this custom webpack
 import { NgModule, DoBootstrap } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { UpgradeModule, downgradeInjectable } from '@angular/upgrade/static';
+import { UpgradeModule, downgradeInjectable, downgradeComponent } from '@angular/upgrade/static';
 import { HelloAngularService } from './hello.service';
 import { UserService } from './user.service';
 import { UUIDGenerator } from './uuid-generator.service';
@@ -41,6 +41,7 @@ import { LibraryDataConverter } from './library-data-converter.service';
 import { LibraryService } from './library.service';
 import { WorkflowsEditorService } from './workflows-editor.service';
 import { GraphNodesService } from './graph-nodes.service';
+import { CreateNodeInvitationComponent } from './create-node-invitation.component';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -83,10 +84,14 @@ angular.module('ds.lab')
   .factory('LibraryDataConverterService', downgradeInjectable(LibraryDataConverter) as any) // Phase C-1: migrated to Angular 18
   .factory('LibraryService', downgradeInjectable(LibraryService) as any) // Phase C-1: migrated to Angular 18
   .factory('WorkflowsEditorService', downgradeInjectable(WorkflowsEditorService) as any) // Phase C-1: migrated to Angular 18
-  .factory('GraphNodesService', downgradeInjectable(GraphNodesService) as any); // Phase C-1: migrated to Angular 18
+  .factory('GraphNodesService', downgradeInjectable(GraphNodesService) as any) // Phase C-1: migrated to Angular 18
+  // Phase C-2 (UI layer): downgraded Angular COMPONENTS registered as AngularJS directives.
+  .directive('createNodeInvitation', downgradeComponent({ component: CreateNodeInvitationComponent }) as any);
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],
+  // Angular components used from AngularJS (via downgradeComponent) must be declared here.
+  declarations: [CreateNodeInvitationComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
   // migrated services can inject them by string token. See upgraded-providers.ts.
   providers: [...upgradedProviders]
