@@ -164,6 +164,9 @@ class ServerCommunication {
     const wsUrl = `${this.config.socketConnectionHost.replace(/^http/, 'ws')}stomp`;
     this.socket = new WebSocket(wsUrl);
     this.client = Stomp.over(this.socket);
+    // stompjs logs every frame (>>> CONNECT / <<< CONNECTED / >>> PING ...) via client.debug by
+    // default, flooding the console once/heartbeat. Silence it — errors still surface via errorHandler.
+    this.client.debug = null;
 
     // Send a STOMP heartbeat every 20s. With the old SockJS transport its own keepalive frames
     // kept the socket alive; over a raw WebSocket there is none, and RabbitMQ closes the idle

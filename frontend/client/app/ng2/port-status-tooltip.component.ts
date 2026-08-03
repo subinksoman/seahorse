@@ -29,11 +29,20 @@ import '../workflows/editor/port-status-tooltip/port-status-tooltip.less';
 export class PortStatusTooltipComponent implements DoCheck {
   @Input() portObject: any;
   outputTypes: string[] = [];
+  private _diag = 0;
 
   // Recompute each change-detection (like the legacy getTypes() called each digest from ng-repeat), so
   // a portObject bound slightly after creation (downgradeComponent + ng-if hover) still populates the
   // tooltip. Guard portObject/typeQualifier — both are transiently undefined before/without a hovered port.
   ngDoCheck(): void {
+    // TEMP DIAGNOSTIC (remove after): log the first few CD passes so we can see, from the browser
+    // console, whether the [portObject] binding actually reaches the downgraded component and what
+    // its typeQualifier looks like when a port is hovered.
+    if (this._diag < 4) {
+      this._diag++;
+      console.log('[port-tooltip-diag]', this._diag, 'portObject=', this.portObject,
+        'typeQualifier=', this.portObject && this.portObject.typeQualifier);
+    }
     const tq = this.portObject && this.portObject.typeQualifier;
     if (!tq || !tq.length) {
       if (this.outputTypes.length) { this.outputTypes = []; }

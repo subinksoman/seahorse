@@ -36,7 +36,6 @@ function WorkflowsConfig($stateProvider) {
             const workflowOwnedByCurrentUser = UserService.getSeahorseUser().id === workflow.workflowInfo.ownerId;
             if (workflowOwnedByCurrentUser) {
               /* eslint-disable no-console */
-              console.log('Current user is workflows owner. Registering to topics...');
               /* eslint-enable no-console */
               ServerCommunication.init(workflow.id);
             }

@@ -25,14 +25,12 @@ export class SessionManagerApi {
 
   downloadSessions(config?: any): any {
     return this.$http.get(this.URL, config).then((result: any) => {
-      this.$log.log('SessionManagerApi downloadSessions result', result);
       return result.data.sessions;
     });
   }
 
   downloadSessionByWorkflowId(workflowId: string): any {
     return this.$http.get(`${this.URL}/${workflowId}`).then((result: any) => {
-      this.$log.log('SessionManagerApi downloadSessionById result', result);
       return result.data;
     });
   }
