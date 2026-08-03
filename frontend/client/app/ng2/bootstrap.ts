@@ -58,6 +58,7 @@ import { CoreCanvasComponent } from './core-canvas.component';
 import { KeyboardDirective } from './keyboard.directive';
 import { JsplumbDraggableDirective } from './jsplumb-draggable.directive';
 import { MultiSelectionDirective } from './multi-selection.directive';
+import { EditorComponent } from './editor.component';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -117,12 +118,14 @@ angular.module('ds.lab')
   .directive('canvasToolbar', downgradeComponent({ component: CanvasToolbarComponent }) as any)
   // core-canvas finale: only coreCanvas is downgraded (used from AngularJS editor.html); its
   // keyboard/jsplumb-draggable/multi-selection directives live only in the Angular core-canvas template.
-  .directive('coreCanvas', downgradeComponent({ component: CoreCanvasComponent }) as any);
+  .directive('coreCanvas', downgradeComponent({ component: CoreCanvasComponent }) as any)
+  // editor-view orchestrator: used from workflows-editor.html (still AngularJS); ui-router untouched.
+  .directive('editor', downgradeComponent({ component: EditorComponent }) as any);
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],
   // Angular components used from AngularJS (via downgradeComponent) must be declared here.
-  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective],
+  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
   // migrated services can inject them by string token. See upgraded-providers.ts.
   providers: [...upgradedProviders]

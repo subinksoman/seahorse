@@ -18,9 +18,8 @@
 
     <editor
       class="c-workflow-container__editor"
-      is-editable="workflow.isEditable()"
-      workflow="workflow.getWorkflow()"
-      selectedNode="workflow.getSelectedNode()"
+      [is-editable]="workflow.isEditable()"
+      [workflow]="workflow.getWorkflow()"
     ></editor>
 
     <deepsense-operation-attributes
