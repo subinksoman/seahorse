@@ -889,6 +889,19 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "effort_days": 1,
     "status": "completed",
     "notes": "Subtask of T83. Commit(s): 462812818. Build + bootstrap-smoke green."
+  },
+  {
+    "id": "T84",
+    "phase": "8 - Frontend Security",
+    "title": "Fix scheduled-workflow report email delivery (exim authenticated smarthost)",
+    "description": "Root cause of 'schedule never runs' (user report): the scheduler fires and the workflow runs to completion (verified 6/6 nodes), but the report email - the only user-facing signal - never delivered. exim delivered directly (dnslookup) with From seahorse-scheduler@deepsense.ai, which Gmail rejected (550-5.7.1 non-compliant From) and froze; the compose SMARTHOST_* env (smtp.gmail.com + 16-char app password) was unused because exim.conf's smarthost was commented out. Fix in deployment/exim/exim.conf: keep_environment=^SMARTHOST_; a manualroute `smarthost` router -> ${env{SMARTHOST_ADDRESS}}:587 (skipped when unset); a `smarthost_smtp` STARTTLS+auth transport; a LOGIN authenticator using SMARTHOST_USER/PASSWORD; and a rewrite rule mapping every sender to ${env{SMARTHOST_USER}} (Ffrs) so Gmail accepts the From. Not a code change to schedulingmanager (the exim layer handles both relay + sender rewrite).",
+    "area": "deployment/exim/exim.conf, seahorse-deploy/docker-compose.yml (mail image tag)",
+    "depends_on": [],
+    "category": "deploy",
+    "risk": "Low",
+    "effort_days": 1,
+    "status": "completed",
+    "notes": "Commit de651817f. Verified LIVE: `exim -bV` clean; deployed mail image de651817f; self-test to arjunjoicernd@gmail.com and a test to subin.soman@6dtech.co.in both delivered (=> R=smarthost A=smarthost_login, Gmail 250 OK, queue empty). The scheduler + workflow-execution halves were already verified working; this closes the delivery gap. Known separate item: EmailSenderApi.sendEmail uses `.map(throw _)` (a failed send would crash the job) - defensive best-effort fix recommended but not required now that delivery works. Also: scheduled runs execute on a CLONE not shown in the workflow list, so the email link is the only way to reach results (by design)."
   }
 ]
 ```
