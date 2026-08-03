@@ -25,18 +25,24 @@ frontend-security initiative tracked as **T80/T81** (see `migration/T80-frontend
 - **`angular` + `angular-cookies` + `angular-sanitize` + `angular-mocks` → 1.8.3** (bumped in
   lockstep; `package-lock.json` regenerated). `angular-ui-router` 0.2.18 and
   `angular-ui-bootstrap` 1.1.2 verified to bootstrap on 1.8.
-- Fixed **four AngularJS 1.7 binding-migration regressions** (Angular 1.7 removed
+- Fixed **six AngularJS 1.7 binding-migration regressions** (Angular 1.7 removed
   `preAssignBindingsEnabled`, so component/directive bindings are no longer assigned before
-  the controller constructor — code reading a binding in its constructor now breaks):
+  the controller constructor — code reading a binding in its constructor now breaks). Found
+  via a read-before-assign scanner over class / function / string-named controllers; all
+  fixed by moving the read to `$onInit`:
   - `editor.controller.js` — `$scope.$watch(this.workflow.getNodes, …)` in the constructor
-    threw and left the **editor canvas empty (no nodes)**; moved to `$onInit`.
-  - `graph-node.component.js` / `status-icon.component.js` — read `this.node` in the
-    constructor (node internals); moved to `$onInit`.
-  - `distribution-continuous-chart.js` — read `this.data` in the constructor (box-plot
-    option silently dropped); moved to `$onInit`.
+    threw and left the **editor canvas empty (no nodes)**.
+  - `graph-node.component.js` / `status-icon.component.js` — read `this.node` (node internals).
+  - `distribution-continuous-chart.js` — read `this.data` (box-plot option silently dropped).
+  - `report-table.controller.js` — `activate()` read `this.table.columnNames` at construction
+    and threw, leaving **reports blank**.
+  - `reports.controller.js` — read `this.currentReport` at construction.
 - `app.config.js` — removed the now-invalid `$compileProvider.preAssignBindingsEnabled(true)`
   call (removed in Angular 1.7; it threw `$injector:modulerr` and killed bootstrap); kept
   `$locationProvider.hashPrefix('')` so `#/…` URLs are unchanged.
+- **Comprehensive controller audit** — other 1.6/1.7/1.8 categories swept clean: `$http`
+  `.success()/.error()` (0), removed globals `angular.lowercase/uppercase` (0), `$cookies`
+  direct property access (0), `ng-bind-html` (2 static app-defined strings, safe).
 
 ## Verification
 Headless-Chrome smoke against a live 4.2.0.x stack: the app bootstraps under `ng-strict-di`,
@@ -44,11 +50,16 @@ Headless-Chrome smoke against a live 4.2.0.x stack: the app bootstraps under `ng
 Read DataFrame → Python Transformation → Write DataFrame plus two Python Notebooks — with
 jsPlumb edges); STOMP connects to RabbitMQ, subscribes, and syncs with the executor.
 
-## Known issues
+## Known issues / notes
 - One **single-fire `reading 'id'`** console error during editor init — non-blocking (nodes
   render correctly).
-- Full-run smoke (execute a workflow end-to-end, notebook `toPandas`, report charts, file
-  upload) is recommended before treating T81 as fully closed.
+- **Report distribution charts** render correctly, but Seahorse emits a *simplified* report
+  (no distributions/charts) for DataFrames with **≥ 20 columns**
+  (`DataFrameReportGenerator.ColumnNumberToGenerateSimplerReportThreshold`) — a backend
+  perf guard, unrelated to this frontend upgrade. Charts appear for DataFrames with < 20
+  columns.
+- Full-run smoke (execute a workflow end-to-end, notebook `toPandas`, file upload) is
+  recommended before treating T81 as fully closed.
 
 ## Upgrade
 Rebuild/redeploy **`seahorse-frontend`** only; all other 4.2.0.2 images are unchanged. No
