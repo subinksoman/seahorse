@@ -54,7 +54,7 @@ if (browserValidator.isBrowserSupported()) {
     require('./workflows/library/library.module.js')
   ]);
   require('./app.config.js').inject(lab);
-  require('./version.factory.js').inject(lab);
+  // version.factory migrated to Angular 18 (ng2/version.service.ts) — downgraded as 'version' in bootstrap.ts.
   require('./app.run.js').inject(lab);
 
   // Phase C: boot AngularJS ds.lab through the Angular (ngUpgrade) hybrid instead of ng-app.

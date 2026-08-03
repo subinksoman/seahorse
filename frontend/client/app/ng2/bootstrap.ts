@@ -10,6 +10,10 @@ import { UserService } from './user.service';
 import { UUIDGenerator } from './uuid-generator.service';
 import { TimeService } from './time.service';
 import { HelpersService } from './helpers.service';
+import { MouseEvent } from './mouse-event.service';
+import { EventsService } from './events.service';
+import { VersionService } from './version.service';
+import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
 
@@ -20,10 +24,16 @@ angular.module('ds.lab')
   .factory('UserService', downgradeInjectable(UserService) as any) // Phase C-1: migrated to Angular 18
   .factory('UUIDGenerator', downgradeInjectable(UUIDGenerator) as any) // Phase C-1: migrated to Angular 18
   .factory('TimeService', downgradeInjectable(TimeService) as any) // Phase C-1: migrated to Angular 18
-  .factory('HelpersService', downgradeInjectable(HelpersService) as any); // Phase C-1: migrated to Angular 18
+  .factory('HelpersService', downgradeInjectable(HelpersService) as any) // Phase C-1: migrated to Angular 18
+  .factory('MouseEvent', downgradeInjectable(MouseEvent) as any) // Phase C-1: migrated to Angular 18
+  .factory('EventsService', downgradeInjectable(EventsService) as any) // Phase C-1: migrated to Angular 18
+  .factory('version', downgradeInjectable(VersionService) as any); // Phase C-1: migrated to Angular 18
 
 @NgModule({
-  imports: [BrowserModule, UpgradeModule]
+  imports: [BrowserModule, UpgradeModule],
+  // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
+  // migrated services can inject them by string token. See upgraded-providers.ts.
+  providers: [...upgradedProviders]
 })
 export class AppModule implements DoBootstrap {
   constructor(private upgrade: UpgradeModule) {}
