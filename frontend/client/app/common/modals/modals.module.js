@@ -17,12 +17,11 @@
 'use strict';
 
 exports.inject = function(module) {
+  // The three modal *services* (confirmation/delete/export) migrated to Angular 18 (ng2/) and are
+  // downgraded in ng2/bootstrap.ts; their AngularJS *controllers* (.ctrl.js) stay and are kept here.
   require('./confirmation-modal/confirmation-modal.ctrl.js').inject(module);
-  require('./confirmation-modal/confirmation-modal.service.js').inject(module);
   require('./delete-modal/delete-modal.ctrl.js').inject(module);
-  require('./delete-modal/delete-modal.service.js').inject(module);
   require('./export-modal/export-modal.ctrl.js').inject(module);
-  require('./export-modal/export-modal.service.js').inject(module);
   require('./new-workflow-modal/new-workflow-modal.ctrl.js').inject(module);
   require('./upload-workflow-modal/upload-workflow-modal.ctrl.js').inject(module);
   require('./workflow-clone-modal/workflow-clone-modal.srv.js').inject(module);

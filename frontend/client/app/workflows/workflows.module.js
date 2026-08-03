@@ -45,7 +45,7 @@ require('./workflows-status-bar/additional-html/starting-popover.ctrl.js').injec
 require('./workflows-status-bar/additional-html/executor-error.ctrl.js').inject(workflows);
 require('./workflows-editor/bottom-bar/bottom-bar.directive.js').inject(workflows);
 require('./workflows-editor/bottom-bar/bottom-bar.controller.js').inject(workflows);
-require('./workflows-editor/bottom-bar/bottom-bar.service.js').inject(workflows);
+// bottom-bar.service migrated to Angular 18 (ng2/bottom-bar.service.ts) — downgraded as 'BottomBarService'.
 require('./session-manager.service.js').inject(workflows);
 require('./navigation-bar/navigation-bar.module.js').inject(workflows);
 require('./cluster-settings-modals/choose-cluster-modal.ctrl.js').inject(workflows);

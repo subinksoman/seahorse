@@ -20,7 +20,7 @@ exports.inject = function(module) {
   require('./common-jsplumb-draggable.js').inject(module);
   require('./common-draggable.js').inject(module);
   require('./common-droppable.js').inject(module);
-  require('./common-drag-and-drop.service.js').inject(module);
+  // common-drag-and-drop.service migrated to Angular 18 (ng2/drag-and-drop.service.ts) — downgraded as 'DragAndDrop'.
   require('./common-keyboard.js').inject(module);
   require('./common-stick-onscroll.js').inject(module);
   require('./common-focused.js').inject(module);
