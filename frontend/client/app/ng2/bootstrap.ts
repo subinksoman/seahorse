@@ -47,6 +47,7 @@ import { BreadcrumbsComponent } from './breadcrumbs.component';
 import { FileElementComponent } from './file-element.component';
 import { FileListComponent } from './file-list.component';
 import { RecentFilesIndicatorComponent } from './recent-files-indicator.component';
+import { StatusIconComponent } from './status-icon.component';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -96,12 +97,13 @@ angular.module('ds.lab')
   .directive('breadcrumbs', downgradeComponent({ component: BreadcrumbsComponent }) as any)
   .directive('fileElement', downgradeComponent({ component: FileElementComponent }) as any)
   .directive('fileList', downgradeComponent({ component: FileListComponent }) as any)
-  .directive('recentFilesIndicator', downgradeComponent({ component: RecentFilesIndicatorComponent }) as any);
+  .directive('recentFilesIndicator', downgradeComponent({ component: RecentFilesIndicatorComponent }) as any)
+  .directive('statusIcon', downgradeComponent({ component: StatusIconComponent }) as any);
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],
   // Angular components used from AngularJS (via downgradeComponent) must be declared here.
-  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent],
+  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
   // migrated services can inject them by string token. See upgraded-providers.ts.
   providers: [...upgradedProviders]

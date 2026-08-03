@@ -25,7 +25,7 @@ import CanvasComponent from './core-canvas/canvas.component.js';
 import NewNodeComponent from './new-node/new-node.component.js';
 import EditorComponent from './editor.component.js';
 import GraphNodeComponent from './core-canvas/graph-node/graph-node.component.js';
-import StatusIconComponent from './core-canvas/graph-node/status-icon/status-icon.component.js';
+// status-icon migrated to Angular (ng2/status-icon.component.ts) — downgraded as directive 'statusIcon'.
 // port-status-tooltip migrated to Angular 18 (ng2/port-status-tooltip.component.ts) — downgraded as directive 'portStatusTooltip'.
 // create-node-invitation migrated to Angular 18 (ng2/create-node-invitation.component.ts) — downgraded as directive 'createNodeInvitation'.
 import AdapterService from './core-canvas/adapter.service.js';
@@ -44,8 +44,7 @@ const appModule = angular
   .component('coreCanvas', CanvasComponent)
   .component('editor', EditorComponent)
   .component('graphNode', GraphNodeComponent)
-  .component('statusIcon', StatusIconComponent)
-  // portStatusTooltip + createNodeInvitation migrated to Angular 18 — registered as downgraded directives in ng2/bootstrap.ts.
+  // statusIcon + portStatusTooltip + createNodeInvitation migrated to Angular — registered as downgraded directives in ng2/bootstrap.ts.
   .name;
 
 export default appModule;

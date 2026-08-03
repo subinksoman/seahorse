@@ -7,6 +7,34 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+
+  // Native CSS-hover tooltip replacing the legacy uib-popover-html (popover-placement="right",
+  // popover-trigger="mouseenter"). Shows the [innerHTML] knowledge-error list to the right of the badge.
+  &__tooltip {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 8px;
+    z-index: 1000;
+    min-width: 160px;
+    max-width: 320px;
+    padding: 8px 10px;
+    background-color: #fff;
+    color: #333;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: left;
+    white-space: normal;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  }
+
+  &:hover &__tooltip {
+    display: block;
+  }
 
   &__icon {
     text-align: center;
