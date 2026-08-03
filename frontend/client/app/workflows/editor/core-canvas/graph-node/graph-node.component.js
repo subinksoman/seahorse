@@ -50,7 +50,13 @@ const GraphPanelNodeComponent = {
       this.GraphStyleService = GraphStyleService;
       this.datasourcesService = datasourcesService;
       this.DatasourcesPanelService = DatasourcesPanelService;
+    }
 
+    $onInit() {
+      // AngularJS 1.7+ no longer pre-assigns component bindings before the constructor runs
+      // (preAssignBindingsEnabled was removed in 1.7 — see T81), so `this.node` is undefined in
+      // the constructor. Reading it there threw and left every node unrendered; do the
+      // node-dependent init in $onInit, which runs after the bindings are assigned.
       this.actionIcon = actionIcons[this.node.operationId];
       this.nodeType = this.getNodeType();
       this.templateUrl = standardNodeTpl;

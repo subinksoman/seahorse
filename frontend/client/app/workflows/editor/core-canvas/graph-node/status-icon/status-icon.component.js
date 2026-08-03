@@ -61,11 +61,17 @@ const StatusIconComponent = {
     constructor($scope) {
       'ngInject';
 
+      this.$scope = $scope;
+    }
+
+    $onInit() {
+      // AngularJS 1.7+ no longer pre-assigns component bindings before the constructor runs
+      // (see T81), so read the `node` binding in $onInit rather than the constructor.
       if (this.nodeType === 'unknown') {
         this.tooltipMessage = this.node.description;
       }
 
-      $scope.$watch(() => this.node.knowledgeErrors, (newValue) => {
+      this.$scope.$watch(() => this.node.knowledgeErrors, (newValue) => {
         if (this.nodeType !== 'unknown') {
           const errors = this.node.getFancyKnowledgeErrors();
           this.tooltipMessage = errors || '';
