@@ -13,6 +13,9 @@ import { HelpersService } from './helpers.service';
 import { MouseEvent } from './mouse-event.service';
 import { EventsService } from './events.service';
 import { VersionService } from './version.service';
+import { ErrorService } from './error.service';
+import { NotificationService } from './notification.service';
+import { MultiSelectionService } from './multi-selection.service';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -27,7 +30,10 @@ angular.module('ds.lab')
   .factory('HelpersService', downgradeInjectable(HelpersService) as any) // Phase C-1: migrated to Angular 18
   .factory('MouseEvent', downgradeInjectable(MouseEvent) as any) // Phase C-1: migrated to Angular 18
   .factory('EventsService', downgradeInjectable(EventsService) as any) // Phase C-1: migrated to Angular 18
-  .factory('version', downgradeInjectable(VersionService) as any); // Phase C-1: migrated to Angular 18
+  .factory('version', downgradeInjectable(VersionService) as any) // Phase C-1: migrated to Angular 18
+  .factory('ErrorService', downgradeInjectable(ErrorService) as any) // Phase C-1: migrated to Angular 18
+  .factory('NotificationService', downgradeInjectable(NotificationService) as any) // Phase C-1: migrated to Angular 18
+  .factory('MultiSelectionService', downgradeInjectable(MultiSelectionService) as any); // Phase C-1: migrated to Angular 18
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],

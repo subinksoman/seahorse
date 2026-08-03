@@ -18,5 +18,6 @@
 
 exports.inject = function(module) {
   require('./multi-selection/multi-selection.js').inject(module);
-  require('./multi-selection/multi-selection.service.js').inject(module);
+  // multi-selection.service migrated to Angular 18 (ng2/multi-selection.service.ts) —
+  // downgraded as 'MultiSelectionService' in ng2/bootstrap.ts.
 };

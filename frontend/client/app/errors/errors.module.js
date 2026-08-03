@@ -20,5 +20,6 @@ var angular = require('angular');
 var errors = angular.module('ds.errors', []);
 require('./errors.controller.js').inject(errors);
 require('./errors.config.js').inject(errors);
-require('./errors.service.js').inject(errors);
+// errors.service migrated to Angular 18 (ng2/error.service.ts) — downgraded as 'ErrorService'
+// on ds.lab (one shared AngularJS injector), so the legacy registration here is gone.
 module.exports = errors;

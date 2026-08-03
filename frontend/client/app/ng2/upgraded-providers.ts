@@ -10,8 +10,12 @@
 // is first constructed (long after upgrade bootstrap), so the AngularJS injector is ready.
 export function $rootScopeFactory(i: any): any { return i.get('$rootScope'); }
 export function configFactory(i: any): any { return i.get('config'); }
+export function $logFactory(i: any): any { return i.get('$log'); }
+export function toastrFactory(i: any): any { return i.get('toastr'); } // angular-toastr service
 
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
-  { provide: 'config', useFactory: configFactory, deps: ['$injector'] }
+  { provide: 'config', useFactory: configFactory, deps: ['$injector'] },
+  { provide: '$log', useFactory: $logFactory, deps: ['$injector'] },
+  { provide: 'toastr', useFactory: toastrFactory, deps: ['$injector'] }
 ];

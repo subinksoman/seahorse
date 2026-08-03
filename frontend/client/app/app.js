@@ -54,7 +54,10 @@ if (browserValidator.isBrowserSupported()) {
     require('./workflows/library/library.module.js')
   ]);
   require('./app.config.js').inject(lab);
-  // version.factory migrated to Angular 18 (ng2/version.service.ts) — downgraded as 'version' in bootstrap.ts.
+  // version.factory migrated to Angular 18 (ng2/version.service.ts) — downgraded as 'version' in
+  // bootstrap.ts. config.js self-registers the 'config' constant on ds.lab as a side effect and was
+  // previously loaded transitively via version.factory.js; require it explicitly now that it is gone.
+  require('../config.js');
   require('./app.run.js').inject(lab);
 
   // Phase C: boot AngularJS ds.lab through the Angular (ngUpgrade) hybrid instead of ng-app.
