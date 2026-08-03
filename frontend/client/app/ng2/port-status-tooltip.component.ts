@@ -12,7 +12,10 @@ import '../workflows/editor/port-status-tooltip/port-status-tooltip.less';
 // {{ ::type }} -> {{ type }}, ng-if="::!$last" -> *ngIf="!last". The controller's getTypes() (called
 // each digest from the legacy ng-repeat) is recomputed in ngOnChanges instead — behaviour-identical and
 // avoids Angular dev-mode ExpressionChangedAfterChecked. Downgraded as directive 'portStatusTooltip';
-// its editor.html usage binds [portObject] (Angular syntax read by downgradeComponent from the AngularJS scope).
+// its editor.html usage binds [port-object] (kebab-case): the browser lowercases attribute names, so a
+// camelCase [portObject] becomes [portobject] which downgradeComponent cannot map to the portObject
+// @Input — the input stays undefined and the tooltip renders empty. ngUpgrade normalizes the dash-case
+// [port-object] form back to the camelCase input, so that is the required spelling for multi-word inputs.
 @Component({
   standalone: false,
   selector: 'port-status-tooltip',
@@ -29,20 +32,11 @@ import '../workflows/editor/port-status-tooltip/port-status-tooltip.less';
 export class PortStatusTooltipComponent implements DoCheck {
   @Input() portObject: any;
   outputTypes: string[] = [];
-  private _diag = 0;
 
   // Recompute each change-detection (like the legacy getTypes() called each digest from ng-repeat), so
   // a portObject bound slightly after creation (downgradeComponent + ng-if hover) still populates the
   // tooltip. Guard portObject/typeQualifier — both are transiently undefined before/without a hovered port.
   ngDoCheck(): void {
-    // TEMP DIAGNOSTIC (remove after): log the first few CD passes so we can see, from the browser
-    // console, whether the [portObject] binding actually reaches the downgraded component and what
-    // its typeQualifier looks like when a port is hovered.
-    if (this._diag < 4) {
-      this._diag++;
-      console.log('[port-tooltip-diag]', this._diag, 'portObject=', this.portObject,
-        'typeQualifier=', this.portObject && this.portObject.typeQualifier);
-    }
     const tq = this.portObject && this.portObject.typeQualifier;
     if (!tq || !tq.length) {
       if (this.outputTypes.length) { this.outputTypes = []; }

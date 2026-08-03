@@ -56,8 +56,6 @@ class ServerCommunication {
 
   messageHandler(uri, message) {
     let parsedBody = JSON.parse(message.body);
-    this.$log.info('ServerCommunication messageHandler(uri=' + uri + '): ',
-      parsedBody.messageType, parsedBody.messageBody);
 
     if (!ServerCommunication.isMessageKnown(parsedBody.messageType)) {
       this.$log.error('ServerCommunication messageHandler. Unknown message type "' + parsedBody.messageType + '"');
