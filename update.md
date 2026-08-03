@@ -745,6 +745,21 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "effort_days": 2,
     "status": "completed",
     "notes": "Migrated the webpack 1 config to webpack 2. global.js: output.path -> absolute path.join(_path,'dist'); resolve.extensions ['','.js'] -> ['.js']; resolve.modulesDirectories -> resolve.modules; module.preLoaders+loaders -> single module.rules (eslint via enforce:'pre' with emitWarning/failOnError:false so lint doesn't fail the legacy bundle); dropped invalid noParse:[]; loader chains use `use` with full '-loader' names (html-loader?-minimize, expose-loader?...); babel `query` -> `options`; top-level postcss/eslint moved into LoaderOptionsPlugin; NoErrorsPlugin -> NoEmitOnErrorsPlugin; removed DedupePlugin (gone in webpack 2); added resolveLoader.moduleExtensions:['-loader'] so the source's bare inline loader requires (require('imports?...!script!...')) still resolve. production.js/development.js: removed the webpack-1 `debug` key. build.sh: npm install -> npm install --legacy-peer-deps (npm 7+/Node 22 rejects the webpack-1-era peer pins: extract-text-webpack-plugin@0.9.1, karma-webpack@1, webpack-dev-server@1 - none used by `npm run dist`). Added frontend/.gitignore for dist/ + docker/dist/. Verified: `npm run dist` builds clean on Node 22 (exit 0, 0 errors) emitting libs/app/ga/common hashed bundles + index.html; no --openssl-legacy-provider needed (webpack 2.7 hashes with md5); the compiled app bundle contains the new WebSocket / heartbeat outgoing:20000 / .ipynb runtime fixes; full build-frontend.sh produced seahorse-frontend:<gitsha> (196MB) end-to-end with zero errors. Note: webpack config bundle-output still webpack 2.7 (uglify-js 2 via `webpack -p`); a further jump to webpack 4/5 + Angular replacement remains a separate larger effort."
+  },
+  {
+    "id": "T80",
+    "phase": "8 - Frontend Security",
+    "title": "Upgrade frontend dependencies to remove known vulnerabilities (AngularJS/webpack stack)",
+    "description": "npm audit on the committed frontend/package-lock.json (Node 22 / npm 10) reports 223 vulnerabilities (10 low, 58 moderate, 74 high, 81 critical) across 41 vulnerable direct deps. The app is a 2016-era AngularJS 1.5.7 SPA on webpack 2.7 / babel 6 / eslint 3 / PhantomJS - every layer EOL. Plan (see migration/T80-frontend-security-upgrade.md) is security-first and phased: Phase A hardens the browser-shipped runtime libs in place (angular 1.5.7->1.8.3 + angular-cookies/sanitize/mocks in lockstep, jquery 2.1.4->3.7.1, lodash 4.5->4.17.21, moment 2.11->2.30.1, bootstrap 3.3.4->3.4.1, angular-ui-router->0.2.20, sockjs-client->1.6.1, replace unmaintained jsen->ajv and ace-webapp->ace-builds) targeting 0 critical/high in `npm audit --omit=dev`; Phase B modernizes the build toolchain (webpack 2->5, babel 6->7, eslint 3->9, drop PhantomJS for headless Chrome, html-webpack-plugin/loaders to current) targeting 0 critical/high overall; Phase C (framework migration off permanently-EOL AngularJS) is flagged as a separate epic, out of scope here. Guardrail: one dep-cluster per commit, regenerate lockfile, `npm run dist` + `npm test` + mandatory LIVE editor smoke (drag/run workflow via STOMP, open .ipynb notebook + toPandas, report charts, file upload) after each cluster - AngularJS breakages are runtime, invisible to audit/webpack.",
+    "area": "frontend/package.json, frontend/package-lock.json, frontend/config/**, frontend/client/**",
+    "depends_on": [
+      "T77"
+    ],
+    "category": "security",
+    "risk": "High",
+    "effort_days": 22,
+    "status": "pending",
+    "notes": "Plan only. Deliverable doc: migration/T80-frontend-security-upgrade.md. Baseline audit captured 2026-08-03: 223 vulns (10 low / 58 moderate / 74 high / 81 critical), 41 direct. Runtime attack surface (ships to browser): angular, angular-sanitize, angular-ui-router, jquery, lodash, moment, bootstrap, sockjs-client, jsen(no fix->replace), ace-webapp(no fix->replace), d3/nvd3(defer). Build-toolchain criticals (webpack/babel/loaders/karma/phantomjs) do not reach the browser - second priority. Do NOT run `npm audit fix --force` (pulls webpack5/bootstrap5 majors that break the build+UI)."
   }
 ]
 ```
