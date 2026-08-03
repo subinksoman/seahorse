@@ -790,6 +790,21 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "effort_days": 2,
     "status": "completed",
     "notes": "Assessment only (no code). Chosen by user: 'Assessment & plan first'. Key finding: angular(1.x) has nothing above 1.8.3; next is @angular/core v22 = framework migration. Recommended: hybrid @angular/upgrade to a recent LTS, after/with T80 Phase B; treat as multi-month epic. This doc is the go/no-go input for Phase C execution (a future Txx)."
+  },
+  {
+    "id": "T83",
+    "phase": "8 - Frontend Security",
+    "title": "Frontend Phase A: bump/replace browser-shipped runtime libs to clear CVEs",
+    "description": "Execute the remaining T80 Phase A runtime hardening (T81 did only the angular bump). Bump the browser-shipped libraries to safe versions and replace the unfixable ones, one cluster per commit, each build + bootstrap-smoke verified: lodash 4.5->4.17.21, moment 2.11->2.30.1, sockjs-client 1.0->1.6.1 (safe same-major); bootstrap 3.3.4->3.4.1 (stay on v3, XSS CVEs); jquery 2.1.4->3.7.1 (XSS CVE-2020-11022/-11023; scan showed 0 removed-API usages, low risk); replace jsen->ajv in preset.service.js (jsen has no fix); replace ace-webapp->ace-builds in libs.js + attribute-code-snippet + cell-viewer-modal (ace-webapp has no fix). Target: 0 critical/high in `npm audit --omit=dev`. Guardrail: one cluster per commit + mandatory live smoke; NO `npm audit fix --force`.",
+    "area": "frontend/package.json, frontend/package-lock.json, frontend/client/app/common/services/preset.service.js, frontend/client/app/libs.js, frontend/client/app/common/deepsense-components/deepsense-attributes-panel/attribute-types/attribute-code-snippet/*, frontend/client/app/workflows/reports/report-table/cell-viewer/*",
+    "depends_on": [
+      "T81"
+    ],
+    "category": "security",
+    "risk": "Med",
+    "effort_days": 3,
+    "status": "in_progress",
+    "notes": "Cluster progress (build + bootstrap-smoke green each): [DONE 01471732a] lodash 4.17.21 + moment 2.30.1 + sockjs-client 1.6.1. [DONE 994f4c709] bootstrap 3.4.1. [PENDING] jquery 3.7.1 (0 removed-API usages found; 38 .bind()/.delegate() are deprecated-but-functional). [PENDING] jsen->ajv (1 file: preset.service.js). [PENDING] ace-webapp->ace-builds (3 files). Final: rebuild image + deploy + `npm audit --omit=dev` delta + live editor/report smoke."
   }
 ]
 ```
