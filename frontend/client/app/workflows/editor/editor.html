@@ -29,10 +29,10 @@
       }"
       class="flowchart-box__new-node new-node"
       id="node-new-node"
-      categories="$ctrl.categories"
-      containment="$ctrl.containment"
-      on-select="$ctrl.onSelect(operationId)"
-      on-display-rect-change="$ctrl.onDisplayRectChange(rect)"
+      [categories]="$ctrl.categories"
+      [containment]="$ctrl.containment"
+      (on-select)="$ctrl.onSelect($event)"
+      (on-display-rect-change)="$ctrl.onDisplayRectChange($event)"
       jsplumb-draggable
     ></new-node>
   </core-canvas>

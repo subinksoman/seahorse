@@ -52,6 +52,7 @@ import { GraphNodeComponent } from './graph-node.component';
 import { SearchOperationComponent } from './search-operation.component';
 import { OperationsListComponent } from './operations-list.component';
 import { OperationsCatalogueComponent } from './operations-catalogue.component';
+import { NewNodeComponent } from './new-node.component';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -106,12 +107,13 @@ angular.module('ds.lab')
   .directive('graphNode', downgradeComponent({ component: GraphNodeComponent }) as any)
   // operations-catalogue cluster: only the cap (operationCatalogue) is used from an AngularJS template
   // (new-node.html); its children operations-list / search-operation live only inside Angular templates.
-  .directive('operationCatalogue', downgradeComponent({ component: OperationsCatalogueComponent }) as any);
+  .directive('operationCatalogue', downgradeComponent({ component: OperationsCatalogueComponent }) as any)
+  .directive('newNode', downgradeComponent({ component: NewNodeComponent }) as any);
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],
   // Angular components used from AngularJS (via downgradeComponent) must be declared here.
-  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent],
+  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
   // migrated services can inject them by string token. See upgraded-providers.ts.
   providers: [...upgradedProviders]
