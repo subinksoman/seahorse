@@ -32,7 +32,7 @@
           </button>
           <file-upload-section style="flex: 1;"></file-upload-section>
           <recent-files-indicator
-            on-select="controller.onSelect"
+            [onSelect]="controller.onSelect"
           ></recent-files-indicator>
         </div>
 
@@ -40,9 +40,9 @@
 
         <div class="file-list-wrapper" custom-scroll-bar>
           <file-list
-            items="controller.items"
-            parents="controller.parents"
-            on-select="controller.onSelect"
+            [items]="controller.items"
+            [parents]="controller.parents"
+            [onSelect]="controller.onSelect"
           ></file-list>
         </div>
 
