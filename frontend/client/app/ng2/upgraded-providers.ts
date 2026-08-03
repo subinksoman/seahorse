@@ -13,6 +13,7 @@ export function configFactory(i: any): any { return i.get('config'); }
 export function $logFactory(i: any): any { return i.get('$log'); }
 export function toastrFactory(i: any): any { return i.get('toastr'); } // angular-toastr service
 export function $timeoutFactory(i: any): any { return i.get('$timeout'); }
+export function $intervalFactory(i: any): any { return i.get('$interval'); }
 export function $uibModalFactory(i: any): any { return i.get('$uibModal'); } // angular-ui-bootstrap
 export function $cookiesFactory(i: any): any { return i.get('$cookies'); } // ngCookies
 export function $qFactory(i: any): any { return i.get('$q'); }
@@ -26,6 +27,7 @@ export const upgradedProviders: any[] = [
   { provide: '$log', useFactory: $logFactory, deps: ['$injector'] },
   { provide: 'toastr', useFactory: toastrFactory, deps: ['$injector'] },
   { provide: '$timeout', useFactory: $timeoutFactory, deps: ['$injector'] },
+  { provide: '$interval', useFactory: $intervalFactory, deps: ['$injector'] },
   { provide: '$uibModal', useFactory: $uibModalFactory, deps: ['$injector'] },
   { provide: '$cookies', useFactory: $cookiesFactory, deps: ['$injector'] },
   { provide: '$q', useFactory: $qFactory, deps: ['$injector'] },

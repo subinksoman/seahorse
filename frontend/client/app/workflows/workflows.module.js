@@ -46,7 +46,7 @@ require('./workflows-status-bar/additional-html/executor-error.ctrl.js').inject(
 require('./workflows-editor/bottom-bar/bottom-bar.directive.js').inject(workflows);
 require('./workflows-editor/bottom-bar/bottom-bar.controller.js').inject(workflows);
 // bottom-bar.service migrated to Angular 18 (ng2/bottom-bar.service.ts) — downgraded as 'BottomBarService'.
-require('./session-manager.service.js').inject(workflows);
+// session-manager.service migrated to Angular 18 (ng2/session-manager.service.ts) — downgraded as 'SessionManager'.
 require('./navigation-bar/navigation-bar.module.js').inject(workflows);
 require('./cluster-settings-modals/choose-cluster-modal.ctrl.js').inject(workflows);
 // cluster-modal.srv migrated to Angular 18 (ng2/cluster-modal.service.ts) — downgraded as 'ClusterModalService'.

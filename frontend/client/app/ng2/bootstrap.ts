@@ -31,6 +31,7 @@ import { SessionManagerApi } from './session-manager-api.service';
 import { OperationsHierarchyService } from './operations-hierarchy.service';
 import { WorkflowCloneService } from './workflow-clone.service';
 import { OperationsService } from './operations.service';
+import { SessionManager } from './session-manager.service';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -63,7 +64,8 @@ angular.module('ds.lab')
   .factory('SessionManagerApi', downgradeInjectable(SessionManagerApi) as any) // Phase C-1: migrated to Angular 18
   .factory('OperationsHierarchyService', downgradeInjectable(OperationsHierarchyService) as any) // Phase C-1: migrated to Angular 18
   .factory('WorkflowCloneService', downgradeInjectable(WorkflowCloneService) as any) // Phase C-1: migrated to Angular 18
-  .factory('Operations', downgradeInjectable(OperationsService) as any); // Phase C-1: migrated to Angular 18
+  .factory('Operations', downgradeInjectable(OperationsService) as any) // Phase C-1: migrated to Angular 18
+  .factory('SessionManager', downgradeInjectable(SessionManager) as any); // Phase C-1: migrated to Angular 18
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],
