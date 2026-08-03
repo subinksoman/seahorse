@@ -21,6 +21,10 @@ import { DragAndDrop } from './drag-and-drop.service';
 import { ConfirmationModalService } from './confirmation-modal.service';
 import { ExportModalService } from './export-modal.service';
 import { DeleteModalService } from './delete-modal.service';
+import { DefaultInnerWorkflowGenerator } from './default-inner-workflow-generator.service';
+import { ReportService } from './report.service';
+import { ClusterModalService } from './cluster-modal.service';
+import { LibraryModalService } from './library-modal.service';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -43,7 +47,11 @@ angular.module('ds.lab')
   .factory('DragAndDrop', downgradeInjectable(DragAndDrop) as any) // Phase C-1: migrated to Angular 18
   .factory('ConfirmationModalService', downgradeInjectable(ConfirmationModalService) as any) // Phase C-1: migrated to Angular 18
   .factory('ExportModalService', downgradeInjectable(ExportModalService) as any) // Phase C-1: migrated to Angular 18
-  .factory('DeleteModalService', downgradeInjectable(DeleteModalService) as any); // Phase C-1: migrated to Angular 18
+  .factory('DeleteModalService', downgradeInjectable(DeleteModalService) as any) // Phase C-1: migrated to Angular 18
+  .factory('DefaultInnerWorkflowGenerator', downgradeInjectable(DefaultInnerWorkflowGenerator) as any) // Phase C-1: migrated to Angular 18
+  .factory('Report', downgradeInjectable(ReportService) as any) // Phase C-1: migrated to Angular 18
+  .factory('ClusterModalService', downgradeInjectable(ClusterModalService) as any) // Phase C-1: migrated to Angular 18
+  .factory('LibraryModalService', downgradeInjectable(LibraryModalService) as any); // Phase C-1: migrated to Angular 18
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],

@@ -21,7 +21,7 @@ var angular = require('angular');
 var reports = angular.module('ds.reports', []);
 
 require('./reports.controller.js').inject(reports);
-require('./reports.factory.js').inject(reports);
+// reports.factory migrated to Angular 18 (ng2/report.service.ts) — downgraded as 'Report'.
 require('./report.directive.js').inject(reports);
 
 require('./report-dataframe-full/report-dataframe-full.js').inject(reports);

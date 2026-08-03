@@ -15,6 +15,7 @@ export function toastrFactory(i: any): any { return i.get('toastr'); } // angula
 export function $timeoutFactory(i: any): any { return i.get('$timeout'); }
 export function $uibModalFactory(i: any): any { return i.get('$uibModal'); } // angular-ui-bootstrap
 export function $cookiesFactory(i: any): any { return i.get('$cookies'); } // ngCookies
+export function $qFactory(i: any): any { return i.get('$q'); }
 
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
@@ -23,5 +24,6 @@ export const upgradedProviders: any[] = [
   { provide: 'toastr', useFactory: toastrFactory, deps: ['$injector'] },
   { provide: '$timeout', useFactory: $timeoutFactory, deps: ['$injector'] },
   { provide: '$uibModal', useFactory: $uibModalFactory, deps: ['$injector'] },
-  { provide: '$cookies', useFactory: $cookiesFactory, deps: ['$injector'] }
+  { provide: '$cookies', useFactory: $cookiesFactory, deps: ['$injector'] },
+  { provide: '$q', useFactory: $qFactory, deps: ['$injector'] }
 ];
