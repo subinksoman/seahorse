@@ -1,3 +1,60 @@
+# Seahorse Release 4.2.0.5
+
+| | |
+|---|---|
+| **Tag** | `v4.2.0.5` |
+| **Release date** | 2026-08-03 |
+| **Previous tag** | `v4.2.0.4` |
+| **Type** | Frontend modernization — Phase B (build) + Phase C-1/C-2 (framework migration, in progress) (patch) |
+| **Stack** | Unchanged — Spark **4.2.0** / Scala 2.13.18 / JDK 17 / Python 3.12 |
+| **Images** | `seahorse-frontend` changes only; all others identical to 4.2.0.4 |
+
+## Summary
+A frontend-only patch over 4.2.0.4 that (1) completes **Phase B** — the build-toolchain
+modernization (**webpack 2 → 5**, **babel 6 → 7**, karma/headless-Chrome, eslint 3 → 9),
+taking the full `npm audit` from **223 → 7 at the time (0 critical)**; and (2) advances
+**Phase C** — the AngularJS → Angular 18 migration via an `@angular/upgrade` (ngUpgrade)
+hybrid: **all 35 application services** and **6 components** are now Angular 18, downgraded
+back into AngularJS so every consumer is unchanged. No backend, Spark, or API changes.
+
+## Phase B — build toolchain (T85/T86)
+- **webpack 2 → 5** (asset modules, Terser, splitChunks, `resolve.fallback`, ProvidePlugin,
+  `imports-loader`, `ng-annotate-loader` after babel for `ng-strict-di`), **babel 6 → 7**
+  (`@babel/preset-env`), **less 2 → 4** (`javascriptEnabled`), **html-webpack-plugin v5**,
+  **karma 6** + ChromeHeadless, **eslint 3 → 9** (flat config).
+- Full `npm audit` **223 → 7** at Phase B completion (**0 critical**); runtime `--omit=dev`
+  **57 → 5**.
+
+## Phase C — AngularJS → Angular 18 hybrid (T87, in progress)
+ngUpgrade strangler-fig: Angular 18 hosts the existing `ds.lab` AngularJS app (JIT).
+- **35 services → Angular 18** (`@Injectable`, `downgradeInjectable`): the whole
+  `common/services/` and `common/api-clients/` trees, the `WorkflowService` hub + its
+  dependents, session/library/report/modal/graph-node services. An `upgraded-provider` bridge
+  exposes AngularJS core (`$rootScope`, `$http`, `$q`, `config`, `toastr`, …) to the Angular
+  injector by string token.
+- **6 components → Angular 18** (`downgradeComponent`): `create-node-invitation`,
+  `port-status-tooltip`, `breadcrumbs`, and the **library-files cluster**
+  (`file-element`/`file-list`/`recent-files-indicator`) — templates rewritten to Angular
+  syntax, `[(ngModel)]` avoided (no `@angular/forms` dep), shared AngularJS directives
+  reimplemented inline.
+- Each unit was build- + deploy- + smoke-verified and pushed individually. Two latent bugs
+  fixed en route (a `config` side-effect require; detached-method `this` binding).
+
+## Security note (honest)
+Introducing the Angular 18 hybrid **temporarily raises** the `npm audit` high count: full
+audit is now **13 (0 critical, 7 high, 6 moderate)**. **6 of the 7 highs are the Angular-18
+framework itself** (i18n XSS / XSRF) — cleared by the planned **Angular 18 → 21** bump; the
+7th high (`angular`, AngularJS, EOL) and the AngularJS-ecosystem moderates clear when **Phase
+C completes** and AngularJS is removed. This is expected for a mid-migration hybrid that ships
+both frameworks.
+
+## Remaining (post-4.2.0.5)
+Phase C tail: the operations-catalogue + **graph-node / canvas / deepsense-\* + jsPlumb**
+cluster (interaction/geometry-critical — needs interactive QA), then remove
+`@angular/upgrade` + AngularJS + switch to AoT, then Angular 18 → 21.
+
+---
+
 # Seahorse Release 4.2.0.4
 
 | | |
