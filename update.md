@@ -902,6 +902,19 @@ Flat array — one object per task, ordered by phase. Import directly into a tra
     "effort_days": 1,
     "status": "completed",
     "notes": "Commit de651817f. Verified LIVE: `exim -bV` clean; deployed mail image de651817f; self-test to arjunjoicernd@gmail.com and a test to subin.soman@6dtech.co.in both delivered (=> R=smarthost A=smarthost_login, Gmail 250 OK, queue empty). The scheduler + workflow-execution halves were already verified working; this closes the delivery gap. Known separate item: EmailSenderApi.sendEmail uses `.map(throw _)` (a failed send would crash the job) - defensive best-effort fix recommended but not required now that delivery works. Also: scheduled runs execute on a CLONE not shown in the workflow list, so the email link is the only way to reach results (by design)."
+  },
+  {
+    "id": "T85",
+    "phase": "8 - Frontend Security",
+    "title": "Frontend Phase B: migrate build toolchain to webpack 5 + babel 7",
+    "description": "Modernize the EOL webpack-2 / babel-6 / UglifyJS-2 build (which blocked ES2018 deps in Phase A and holds ~most of the audit count). webpack 2.7->5.109 (+cli 5, dev-server 5); babel 6->@babel 7 (preset-env modules:commonjs so mixed ESM/CommonJS files keep `exports`; targets ie11 so output stays ES5 for ng-annotate; @babel/plugin-transform-runtime; add-module-exports); ng-annotate-loader restored AFTER babel (babel-plugin-angularjs-annotate could not annotate class controllers nested in `const X={controller:class}` object literals -> $injector:strictdi under ng-strict-di -> editor nodes didn't render). Config rewrite: resolveLoader.moduleExtensions + json-loader removed, CommonsChunkPlugin->splitChunks(single `common` chunk = one angular instance)+runtimeChunk, url/file-loader->asset modules, LoaderOptionsPlugin postcss->postcss.config.js, node:{}->resolve.fallback, CleanWebpackPlugin->output.clean, Terser replaces UglifyJS, less 2->4 (javascriptEnabled). font-awesome-webpack (this.exec gone in wp5)->direct font-awesome/css require. index.html: dropped html-webpack-plugin-v1 chunk loop (inject:body) + excluded template from ngtemplate rule (window is not defined). Legacy inline loaders script-loader/imports? -> imports-loader wrapper=window (+ vendor/ excluded from babel for jqCron this===window). html-loader sources:true restored so logo/icon <img src> resolve.",
+    "area": "frontend/config/webpack/*.js, frontend/.babelrc, frontend/postcss.config.js, frontend/package.json, frontend/client/index.html, frontend/client/app/libs.js, frontend/client/app/common/jqcron/jqcron.directive.js",
+    "depends_on": ["T83"],
+    "category": "security",
+    "risk": "High",
+    "effort_days": 5,
+    "status": "completed",
+    "notes": "Commit fff06fab6. Full npm audit 208 -> 97 (crit 76->23, high 64->47); runtime (--omit=dev) unchanged at 5 (build toolchain is build-time only). VERIFIED live (image fff06fab6): npm run dist green on Node 22; bundle bootstraps ds.lab under ng-strict-di (0 errors, 0 strictdi); editor renders the full 6-node workflow graph with jsPlumb edges; logo/cluster icons render; chunk order docker-config->runtime->common->libs->app. Remaining 97 bulk = the untouched karma/phantomjs/jasmine TEST toolchain (not used by dist) + eslint 3 + cross-env/assets-webpack-plugin + the angular EOL/Phase C runtime deps. Next cluster: drop PhantomJS + modernize karma/jasmine, bump eslint. Only 3 less backtick-JS deprecation warnings remain (cosmetic)."
   }
 ]
 ```
