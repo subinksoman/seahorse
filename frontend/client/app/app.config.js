@@ -17,7 +17,13 @@
 'use strict';
 
 /* @ngInject */
-function AppConfig($urlRouterProvider, toastrConfig, $cookiesProvider, $locationProvider) {
+function AppConfig($urlRouterProvider, toastrConfig, $cookiesProvider, $locationProvider, $qProvider) {
+  // ui-router defines its four transition-rejection types (superseded/prevented/aborted/failed) as
+  // $q rejections at init; it handles them internally, but AngularJS 1.6+ $q still logs them as
+  // "Possibly unhandled rejection: {}". They are benign navigation noise (present on every load), so
+  // disable the unhandled-rejection console logging to keep the console readable.
+  $qProvider.errorOnUnhandledRejections(false);
+
   // AngularJS 1.6 compatibility (upgraded 1.5.11 -> 1.8.3, T81): 1.6 changed the default hash
   // prefix from '' to '!'. Keep '#/...' URLs (not '#!/...') so existing links, bookmarks and
   // proxy routes are unaffected.
