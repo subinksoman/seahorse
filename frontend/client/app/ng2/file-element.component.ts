@@ -25,6 +25,7 @@ const ENTER_CODE = 13;
 //
 // NEEDS INTERACTIVE QA: navigate/download/delete/new-directory-create + upload-progress rendering.
 @Component({
+  standalone: false,
   selector: 'file-element',
   template: `
    <ng-container [ngSwitch]="item?.kind">

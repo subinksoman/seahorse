@@ -19,6 +19,7 @@ declare const jQuery: any; // global (expose-loader); malihu custom scrollbar pl
 //
 // NEEDS INTERACTIVE QA: open/close popover, live upload counter, scroll.
 @Component({
+  standalone: false,
   selector: 'recent-files-indicator',
   template: `
     <div class="recent-files-indicator">

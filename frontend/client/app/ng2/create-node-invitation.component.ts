@@ -12,6 +12,7 @@ import '../workflows/editor/create-node-invitation/create-node-invitation.less';
 // ng2/bootstrap.ts; the host `ng-if` in editor.html still works (it's an AngularJS attribute on the
 // downgraded element). Establishes the component-downgrade pattern for the rest of the UI layer.
 @Component({
+  standalone: false,
   selector: 'create-node-invitation',
   template: `
     <div class="create-node-invitation">

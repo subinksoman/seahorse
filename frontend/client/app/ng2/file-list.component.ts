@@ -12,6 +12,7 @@ import '../workflows/library/file-list/file-list.less';
 // AngularJS filter needed). The new-directory-visibility and parents $scope.$watch become bridged
 // $rootScope.$watch. Injects the Angular LibraryModalService. Downgraded as directive 'fileList'.
 @Component({
+  standalone: false,
   selector: 'file-list',
   template: `
     <div class="file-list">

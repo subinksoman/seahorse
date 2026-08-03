@@ -15,6 +15,7 @@ const MAX_PARENT_NUMBER_VISIBLE = 4;
 // ng-click -> (click), title={{}} -> [title]. Downgraded as directive 'breadcrumbs'; library-modal.html
 // usage rebound to [allParents]/[currentFolder].
 @Component({
+  standalone: false,
   selector: 'breadcrumbs',
   template: `
     <div class="breadcrumbs">

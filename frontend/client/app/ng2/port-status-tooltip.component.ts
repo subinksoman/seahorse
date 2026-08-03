@@ -14,6 +14,7 @@ import '../workflows/editor/port-status-tooltip/port-status-tooltip.less';
 // avoids Angular dev-mode ExpressionChangedAfterChecked. Downgraded as directive 'portStatusTooltip';
 // its editor.html usage binds [portObject] (Angular syntax read by downgradeComponent from the AngularJS scope).
 @Component({
+  standalone: false,
   selector: 'port-status-tooltip',
   template: `
     <div class="port-status-tooltip">
