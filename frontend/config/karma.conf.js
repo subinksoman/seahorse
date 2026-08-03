@@ -35,13 +35,16 @@ module.exports = function (config) {
 
     frameworks: ['jasmine'],
 
-    browsers: ['PhantomJS'],
+    browsers: ['ChromeHeadlessNoSandbox'],
+
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: { base: 'ChromeHeadless', flags: ['--no-sandbox', '--disable-gpu'] }
+    },
 
     plugins: [
       'karma-webpack',
       'karma-chrome-launcher',
       'karma-jasmine',
-      'karma-phantomjs-launcher'
     ],
 
     // preprocess matching files before serving them to the browser
