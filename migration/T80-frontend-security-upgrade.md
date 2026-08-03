@@ -130,16 +130,34 @@ one-cluster-per-commit cadence and the mandatory live-editor smoke.
 ### 7.1 AngularJS 1.7 binding-in-constructor regressions (fixed)
 1.7 removed `preAssignBindingsEnabled`, so component/directive bindings are no longer
 assigned before the controller constructor runs. Every controller that read a binding during
-instantiation broke (empty render or a throw). All sites found via a read-before-assign
-scanner over class / function / string-named controllers (inlining immediately-invoked
-helpers) and fixed by moving the read to `$onInit`:
-`editor.controller.js` (empty canvas), `graph-node.component.js`, `status-icon.component.js`,
-`distribution-continuous-chart.js`, `report-table.controller.js` (reports blank),
-`reports.controller.js`. Also removed the now-invalid
-`$compileProvider.preAssignBindingsEnabled(true)` (threw `$injector:modulerr`); kept
-`$locationProvider.hashPrefix('')`. Other categories swept clean: `$http .success()/.error()`
-(0), removed globals `angular.lowercase/uppercase` (0), `$cookies` direct property access (0),
-`ng-bind-html` (2 static app-defined strings, safe).
+instantiation broke (empty render or a throw). Fixed by moving the read to `$onInit`. All
+**seven** sites (surfaced incrementally through live testing, then closed out by a scanner):
+
+| Controller | Symptom | Binding |
+|---|---|---|
+| `editor.controller.js` | editor canvas empty (no nodes) | `workflow` (via `$scope.$watch(this.workflow.getNodes,…)`) |
+| `graph-node.component.js` | nodes don't render | `node` |
+| `status-icon.component.js` | node status icon | `node` |
+| `distribution-continuous-chart.js` | box-plot option dropped | `data` |
+| `report-table.controller.js` | reports blank | `table` (via `activate()`) |
+| `reports.controller.js` | report data init | `currentReport` |
+| `workflow-schedules.component.js` | "Add schedule" button dead | `workflow` (via `this.getSchedules()` → `fetchSchedules(this.workflow.id)`) |
+
+Also removed the now-invalid `$compileProvider.preAssignBindingsEnabled(true)` (threw
+`$injector:modulerr`); kept `$locationProvider.hashPrefix('')`.
+
+**Final comprehensive scan — 0 remaining.** A read-before-assign scanner resolves the
+controller through all three registration paths (inline class/function, `import`ed controller,
+and the 27 string-registered `.controller('Name')` controllers), inlines both immediately-
+invoked local helpers and `this.method()` class-method calls (the blind spot that hid the
+report + schedule bugs), and flags only true dereferencing reads (`this.x.` / `this.x[` /
+`this.x(` / comparisons). It reports **0** controllers reading a binding during construction,
+and is self-validated (re-introducing a read is detected). The only near-miss, `file-list`'s
+`this.mode = 'editable'`, is an assignment (the binding overwrites it), not a read.
+
+Other 1.6/1.7/1.8 categories swept clean: `$http .success()/.error()` (0), removed globals
+`angular.lowercase/uppercase` (0), `$cookies` direct property access (0), `ng-bind-html`
+(2 static app-defined strings, safe).
 
 ### 7.2 Report distribution charts "not showing" — NOT a bug, NOT frontend
 Confirmed the chart components render correctly (compiled `distribution-categorical-chart`
