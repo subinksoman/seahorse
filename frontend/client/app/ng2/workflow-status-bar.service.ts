@@ -4,9 +4,8 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
-import startEditingHTML from '../workflows/workflows-status-bar/additional-html/starting-popover.html';
-import startExecutorHTML from '../workflows/workflows-status-bar/additional-html/running-executor-popover.html';
-import executorErrorHTML from '../workflows/workflows-status-bar/additional-html/executor-error.html';
+// additionalHtmlForOwner is now a popover KEY (not an HTML URL): the migrated <menu-item> switches
+// on it to render the downgraded <starting-popover>/<running-executor-popover>/<executor-error>.
 import { sessionStatus } from '../enums/session-status.js';
 import { WorkflowService } from './workflow.service';
 import { UserService } from './user.service';
@@ -46,20 +45,20 @@ export class WorkflowStatusBarService {
         forOwnerOnly: true,
         icon: 'fa-play',
         callFunction: () => this.$rootScope.$emit('StatusBar.START_EDITING'),
-        additionalHtmlForOwner: startEditingHTML
+        additionalHtmlForOwner: 'starting'
       },
       startingEditing: {
         label: 'Starting...',
         icon: 'fa-cog',
         additionalClass: 'menu-item-disabled',
         additionalIconClass: 'fa-spin',
-        additionalHtmlForOwner: startExecutorHTML
+        additionalHtmlForOwner: 'running'
       },
       executorError: {
         label: 'Executor error',
         icon: 'fa-ban',
         additionalClass: 'disabled',
-        additionalHtmlForOwner: executorErrorHTML
+        additionalHtmlForOwner: 'error'
       },
       stopEditing: {
         label: 'Stop editing',

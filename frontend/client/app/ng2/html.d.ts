@@ -10,3 +10,10 @@ declare module '*.html' {
   const url: string;
   export default url;
 }
+
+// Image asset modules (webpack `type: 'asset'`) resolve to a URL string. Declared so migrated
+// Angular components (e.g. the status-bar cluster icons) can `import x from 'ASSETS/images/*.png'`.
+declare module '*.png' { const url: string; export default url; }
+declare module '*.jpg' { const url: string; export default url; }
+declare module '*.gif' { const url: string; export default url; }
+declare module '*.svg' { const url: string; export default url; }

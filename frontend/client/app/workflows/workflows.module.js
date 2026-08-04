@@ -30,19 +30,17 @@ require('./graph-panel/graph-panel.module.js').inject(workflows);
 require('./inner-workflows/public-param/public-params-list.js').inject(workflows);
 // default-inner-workflow-generator.service migrated to Angular 18 (ng2/) — downgraded as 'DefaultInnerWorkflowGenerator'.
 require('./workflows-editor/workflows-editor.module.js').inject(workflows);
-require('./workflows-status-bar/workflows-status-bar.drv.js').inject(workflows);
-require('./workflows-status-bar/workflows-status-bar.ctrl.js').inject(workflows);
-// workflows-editor-status-bar.service migrated to Angular 18 (ng2/) — downgraded as 'WorkflowStatusBarService'.
+// workflows-editor-status-bar (drv+ctrl) migrated to Angular (ng2/workflows-editor-status-bar.component.ts)
+// — downgraded 'workflowEditorStatusBar'. workflows-editor-status-bar.service already Angular
+// (ng2/workflow-status-bar.service.ts, downgraded 'WorkflowStatusBarService').
 require('./workflows-status-bar/documentation-link/documentation-link.directive.js').inject(workflows);
 // selection-items migrated to Angular (ng2/selection-items.component.ts) — downgraded 'selectionItems'.
 
 require('./general-data-panel/general-data-panel.module.js').inject(workflows);
 // copy-paste migrated to Angular 18 (ng2/copy-paste.service.ts) — downgraded as 'CopyPasteService'.
-require('./workflows-status-bar/menu-item/menu-item.directive.js').inject(workflows);
-require('./workflows-status-bar/menu-item/menu-item.controller.js').inject(workflows);
-require('./workflows-status-bar/additional-html/running-executor-popover.ctrl.js').inject(workflows);
-require('./workflows-status-bar/additional-html/starting-popover.ctrl.js').inject(workflows);
-require('./workflows-status-bar/additional-html/executor-error.ctrl.js').inject(workflows);
+// menu-item + the 3 additional-html popovers migrated to Angular (ng2/menu-item.component.ts +
+// ng2/status-bar-popovers.component.ts). menu-item's <ng-include> of a dynamic popover template URL
+// became an *ngSwitch on a popover key -> downgraded popover components.
 // bottom-bar migrated to Angular (ng2/bottom-bar.component.ts) — downgraded as directive 'bottomBar'.
 // bottom-bar.service migrated to Angular 18 (ng2/bottom-bar.service.ts) — downgraded as 'BottomBarService'.
 // session-manager.service migrated to Angular 18 (ng2/session-manager.service.ts) — downgraded as 'SessionManager'.
