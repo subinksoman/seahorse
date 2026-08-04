@@ -23,7 +23,6 @@ function HomeConfig($stateProvider) {
   $stateProvider.state('home', {
     url: '/',
     templateUrl: tpl,
-    controller: 'Home as home'
   });
 }
 

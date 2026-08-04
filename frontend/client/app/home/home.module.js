@@ -20,7 +20,8 @@ var angular = require('angular');
 
 var home = angular.module('ds.home', []);
 
-require('./home.ctrl.js').inject(home);
+// home.ctrl migrated to Angular (ng2/home.component.ts) — downgraded 'homeView'. The 'home' state
+// template now hosts <home-view> instead of the Home controller.
 require('./home.config.js').inject(home);
 
 module.exports = home;
