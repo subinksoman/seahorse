@@ -9,6 +9,14 @@
 .ds-modal-panel.ds-modal-lg {
   width: 900px;
 }
+/* near-fullscreen notebook modal (was uib windowClass o-modal--notebook) */
+.ds-modal-panel.ds-modal-notebook {
+  width: 92vw;
+  height: 92vh;
+}
+.ds-modal-panel.ds-modal-notebook .modal-content {
+  height: 100%;
+}
 .ds-modal-panel .modal-content {
   border-radius: 6px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);

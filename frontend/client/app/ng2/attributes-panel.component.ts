@@ -9,6 +9,8 @@ import {
 import { specialOperations } from '../enums/special-operations.js';
 import { VersionService } from './version.service';
 import { OperationsService } from './operations.service';
+import { ModalService } from './modal.service';
+import { NotebookModalComponent, ErrorMessageModalComponent } from './node-modals.component';
 // NOTE: attributes-panel.less is NOT imported here — like general-data-panel.less it is not self-contained
 // (@color-action etc. come from globally-imported variables); it is already loaded via the app less chain.
 
@@ -137,8 +139,7 @@ export class AttributesPanelComponent implements OnChanges, AfterViewInit, OnDes
     @Inject('$rootScope') private $rootScope: any,
     @Inject('AttributesPanelService') private AttributesPanelService: any,
     @Inject('config') private config: any,
-    @Inject('$sce') private $sce: any,
-    @Inject('$uibModal') private $uibModal: any,
+    private modal: ModalService,
     private version: VersionService,
     private Operations: OperationsService
   ) {
@@ -221,44 +222,18 @@ export class AttributesPanelComponent implements OnChanges, AfterViewInit, OnDes
     const rawName = this.node.uiName || this.node.name || languageLabel;
     const readableName = String(rawName)
       .replace(/[^a-zA-Z0-9_-]/g, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '') || languageLabel;
-    const url = `${this.config.notebookHost}/${onlineUrlPart}/${this.workflowId}/${this.node.id}/${encodedParams}/${readableName}${extension}`;
-    return this.$sce.trustAsResourceUrl(url);
+    // Return the RAW url; the CDK NotebookModalComponent trusts it via Angular's DomSanitizer.
+    return `${this.config.notebookHost}/${onlineUrlPart}/${this.workflowId}/${this.node.id}/${encodedParams}/${readableName}${extension}`;
   }
 
   showNotebook(): void {
-    const s = this.$rootScope.$new();
-    s.url = this.getNotebookUrl();
-    const modal = this.$uibModal.open({
-      scope: s,
-      template: `<iframe style="height: calc(100% - 60px); width:100%" frameborder="0" ng-src="{{::url}}"></iframe>
-                 <button type="button" class="btn btn-default pull-right" ng-click="$close()">Close</button>`,
-      windowClass: 'o-modal--notebook',
-      backdrop: 'static'
-    });
-    modal.result.finally(() => s.$destroy());
+    this.modal.open(NotebookModalComponent, { url: this.getNotebookUrl() },
+      { panelClass: ['ds-modal-panel', 'ds-modal-notebook'] });
   }
 
   showErrorMessage(): void {
-    const s = this.$rootScope.$new();
-    s.node = this.node;
-    const modal = this.$uibModal.open({
-      size: 'lg',
-      scope: s,
-      template: `
-        <button type="button" class="close" aria-label="Close" ng-click="$close()"><span aria-hidden="true">&times;</span></button>
-        <h2>Error title:</h2>
-        <pre class="o-error-trace">{{::node.state.error.title || 'No title'}}</pre>
-        <h2>Error message:</h2>
-        <pre class="o-error-trace">{{::node.state.error.message || 'No message'}}</pre>
-        <div ng-if="::node.state.error.details.stacktrace">
-          <h2>Stack trace:</h2>
-          <pre class="o-error-trace o-error-full-trace">{{::node.state.error.details.stacktrace}}</pre>
-        </div>
-        <button type="button" class="btn btn-default pull-right" ng-click="$close()">Close</button>
-        <br style="clear: right;" />`,
-      windowClass: 'o-modal--error'
-    });
-    modal.result.finally(() => s.$destroy());
+    this.modal.open(ErrorMessageModalComponent, { node: this.node },
+      { panelClass: ['ds-modal-panel', 'ds-modal-lg'] });
   }
 
   showInput(): void { this.nodeNameInputVisible = true; }
