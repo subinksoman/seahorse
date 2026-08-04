@@ -7,9 +7,9 @@ import { Injectable, Inject } from '@angular/core';
 import { ModalService } from './modal.service';
 import { DatabaseModalComponent } from './database-modal.component';
 import { GoogleSpreadsheetModalComponent } from './google-spreadsheet-modal.component';
-// The not-yet-converted datasource modals stay AngularJS (uib), opened via bridged $uibModal.
-import externalFileTpl from '../../components/datasources/datasources-toolbar/modals/external-file-modal/external-file-modal.html';
-import hdfsTpl from '../../components/datasources/datasources-toolbar/modals/hdfs-modal/hdfs-modal.html';
+import { ExternalFileModalComponent } from './external-file-modal.component';
+import { HdfsModalComponent } from './hdfs-modal.component';
+// The not-yet-converted datasource modal (library-datasource) stays AngularJS (uib) via $uibModal.
 import libraryTpl from '../../components/datasources/datasources-toolbar/modals/library-modal/library-modal.html';
 
 declare const angular: any; // global — angular.copy + angular.element(appendTo)
@@ -17,12 +17,12 @@ declare const angular: any; // global — angular.copy + angular.element(appendT
 // CDK datasource modals (Angular components).
 const CDK_CONFIGS: { [k: string]: any } = {
   jdbc: DatabaseModalComponent,
-  googleSpreadsheet: GoogleSpreadsheetModalComponent
+  googleSpreadsheet: GoogleSpreadsheetModalComponent,
+  externalFile: ExternalFileModalComponent,
+  hdfs: HdfsModalComponent
 };
 
 const UIB_CONFIGS: { [k: string]: { tpl: string; ctrl: string } } = {
-  externalFile: { tpl: externalFileTpl, ctrl: 'ExternalFileModalController' },
-  hdfs: { tpl: hdfsTpl, ctrl: 'HdfsModalController' },
   libraryFile: { tpl: libraryTpl, ctrl: 'LibraryModalController' }
 };
 

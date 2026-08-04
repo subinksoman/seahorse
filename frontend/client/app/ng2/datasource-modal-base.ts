@@ -34,6 +34,13 @@ export abstract class DatasourceModalBase {
     return this.datasourceParams.name !== '' && !this.doesNameExists();
   }
 
+  isCsvSeparatorValid(fileParams: any): boolean {
+    if (fileParams.fileFormat !== 'csv') { return true; }
+    const { separatorType, customSeparator } = fileParams.csvFileFormatParams;
+    if (!separatorType) { return false; }
+    return separatorType === 'custom' ? customSeparator !== '' : true;
+  }
+
   stopCopyingFromUserField(): void { /* overridden where a field auto-fills the name */ }
 
   cancel(): void { this.dialogRef.close(undefined); }
