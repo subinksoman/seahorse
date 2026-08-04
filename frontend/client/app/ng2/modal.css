@@ -30,3 +30,11 @@
 .cdk-overlay-container {
   z-index: 1100;
 }
+/* native column-search autocomplete (replaces angucomplete-alt) in the column-selector modal */
+.autocomplete-wrapper { position: relative; }
+.autocomplete-list {
+  position: absolute; z-index: 5; left: 0; right: 0; max-height: 180px; overflow-y: auto;
+  background: #fff; border: 1px solid #ccc; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.autocomplete-list__item { padding: 4px 10px; cursor: pointer; }
+.autocomplete-list__item:hover { background: #1ab394; color: #fff; }
