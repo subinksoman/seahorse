@@ -158,14 +158,19 @@ export class WorkflowsEditorComponent implements OnInit, OnDestroy, DoCheck, Aft
   }
 
   ngAfterViewInit(): void {
-    // The jsPlumb canvas paints nodes/edges on a layout tick. On first load nothing triggers that tick
-    // until a reflow (opening DevTools, resizing the window), so the canvas looks blank even though the
-    // graph-node elements are in the DOM. Force the initial paint once the view has settled. (The
-    // legacy AngularJS controller got this for free from the initial $digest + jsPlumb init.)
-    setTimeout(() => {
+    // Canvas sizing is driven by an AngularJS `$rootScope.$watch(getWindowSize)` in CanvasService that
+    // calls fit() when the sliding window gains its real dimensions. That watch only re-runs on a
+    // digest — but after the initial Angular render the app goes idle, so no ngUpgrade digest fires, the
+    // watch never sees the now-laid-out dimensions, and the nodes stay unfitted/blank until some event
+    // (e.g. opening DevTools) triggers a digest. The legacy AngularJS controller had a live digest loop
+    // and got this for free. Kick a digest after layout (twice, to catch layout timing) so the watch
+    // fires fit() and the canvas paints. $applyAsync is digest-safe (no "already in progress").
+    const kick = () => {
+      this.$rootScope.$applyAsync();
       this.adapterService.render();
-      window.dispatchEvent(new Event('resize'));
-    }, 0);
+    };
+    setTimeout(kick, 0);
+    setTimeout(kick, 250);
   }
 
   ngDoCheck(): void {
