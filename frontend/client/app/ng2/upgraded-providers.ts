@@ -40,6 +40,8 @@ export function datasourcesPanelServiceFactory(i: any): any { return i.get('Data
 export function adapterServiceFactory(i: any): any { return i.get('AdapterService'); }
 export function uibModalStackFactory(i: any): any { return i.get('$uibModalStack'); }
 export function graphNodeFactory(i: any): any { return i.get('GraphNode'); }
+// Datasources panel: bridged for the migrated datasources-element (opens the add/edit datasource modals).
+export function datasourcesModalsServiceFactory(i: any): any { return i.get('DatasourcesModalsService'); }
 
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
@@ -64,5 +66,6 @@ export const upgradedProviders: any[] = [
   { provide: 'DatasourcesPanelService', useFactory: datasourcesPanelServiceFactory, deps: ['$injector'] },
   { provide: 'AdapterService', useFactory: adapterServiceFactory, deps: ['$injector'] },
   { provide: '$uibModalStack', useFactory: uibModalStackFactory, deps: ['$injector'] },
-  { provide: 'GraphNode', useFactory: graphNodeFactory, deps: ['$injector'] }
+  { provide: 'GraphNode', useFactory: graphNodeFactory, deps: ['$injector'] },
+  { provide: 'DatasourcesModalsService', useFactory: datasourcesModalsServiceFactory, deps: ['$injector'] }
 ];
