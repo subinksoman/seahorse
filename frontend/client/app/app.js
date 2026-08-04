@@ -33,7 +33,7 @@ if (browserValidator.isBrowserSupported()) {
   let lab = angular.module('ds.lab', [
     // 'ui.router' removed — routing is now @angular/router (see ng2/app-routes.ts + <router-shell>).
     'ui.bootstrap',
-    'ngSanitize',
+    // 'ngSanitize' removed — the only ng-bind-html usages (preset-modal) now use $sce.trustAsHtml.
     'ngCookies',
     'rt.debounce',
     CommonModule,

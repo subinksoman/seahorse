@@ -17,7 +17,7 @@
 require('angular');
 require('angular-cookies');
 require('angular-debounce');
-require('angular-sanitize');
+// angular-sanitize removed — no ngSanitize dependency (see preset-modal $sce.trustAsHtml).
 require('angular-toastr');
 require('angular-ui-ace');
 // angular-ui-router removed — routing is now @angular/router (see ng2/app-routes.ts).

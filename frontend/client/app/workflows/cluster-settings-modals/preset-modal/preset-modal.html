@@ -68,7 +68,7 @@
             </div>
           </div>
           <div class="row form-row instructions animated fadeIn" ng-show="controller.focused === field">
-            <div class="col-md-12" ng-bind-html="controller.labels[field].instruction"></div>
+            <div class="col-md-12" ng-bind-html="controller.trust(controller.labels[field].instruction)"></div>
           </div>
         </div>
 
@@ -81,7 +81,7 @@
           </div>
         </div>
         <div class="row form-row instructions" ng-show="controller.focused === 'params'">
-          <div class="col-md-12" ng-bind-html="controller.labels.params.instruction"></div>
+          <div class="col-md-12" ng-bind-html="controller.trust(controller.labels.params.instruction)"></div>
         </div>
         <div class="row form-row">
           <div class="col-md-12 cluster-textarea">

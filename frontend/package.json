@@ -40,7 +40,6 @@
     "angular-cookies": "1.8.3",
     "angular-debounce": "^1.1.0",
     "angular-mocks": "1.8.3",
-    "angular-sanitize": "1.8.3",
     "angular-toastr": "~1.7.0",
     "angular-ui-ace": "~0.2.3",
     "angular-ui-bootstrap": "~1.1.2",

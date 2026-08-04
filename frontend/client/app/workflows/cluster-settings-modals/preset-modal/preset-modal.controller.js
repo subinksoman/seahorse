@@ -17,10 +17,13 @@
 'use strict';
 
 /* @ngInject */
-function PresetModalCtrl($uibModalInstance, $log, PresetService, PresetModalLabels, preset, type, isSnapshot) {
+function PresetModalCtrl($uibModalInstance, $log, $sce, PresetService, PresetModalLabels, preset, type, isSnapshot) {
   const vm = this;
 
   vm.labels = getLabelsForType(type);
+  // The instruction strings are hardcoded, trusted HTML. Marking them $sce-trusted lets ng-bind-html
+  // render them WITHOUT ngSanitize (so angular-sanitize can be dropped — clears that audit moderate).
+  vm.trust = (html) => $sce.trustAsHtml(html);
   vm.preset = angular.copy(preset) || {isEditable: true, isDefault: false};
   vm.isSnapshot = isSnapshot;
   vm.focused = undefined;
