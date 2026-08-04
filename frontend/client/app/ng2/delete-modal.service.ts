@@ -4,46 +4,27 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
-import tpl from '../common/modals/delete-modal/delete-modal.html';
+import { ModalService } from './modal.service';
+import { DeleteModalComponent } from './delete-modal.component';
 
-// Phase C-1: migrated from common/modals/delete-modal/delete-modal.service.js. Guards a delete with
-// a "don't ask again" cookie ($cookies, bridged) and, when needed, a confirmation modal ($uibModal,
-// bridged); template + DeleteConfirmationModalController stay AngularJS. Public surface (handleDelete)
-// unchanged; downgraded as 'DeleteModalService'.
+// Phase C / AngularJS removal: guards a delete with a "don't ask again" cookie ($cookies, still bridged)
+// and, when needed, the CDK DeleteModalComponent (was uib-modal). Public surface (handleDelete) unchanged.
 @Injectable({ providedIn: 'root' })
 export class DeleteModalService {
   constructor(
-    @Inject('$uibModal') private $uibModal: any,
-    @Inject('$cookies') private $cookies: any,
-    @Inject('$rootScope') private $rootScope: any
+    private modal: ModalService,
+    @Inject('$cookies') private $cookies: any
   ) {}
 
   handleDelete(deleteHandler: (...args: any[]) => any, cookieName: string): void {
-    if (this.$cookies.get(cookieName) !== 'true') {
-      this.openDeleteModal()
-        .then((cookieValue: any) => {
-          return cookieValue ? this.$cookies.put(cookieName, 'true') : false;
-        })
-        .then(deleteHandler);
-    } else {
+    if (this.$cookies.get(cookieName) === 'true') {
       deleteHandler();
+      return;
     }
-  }
-
-  private openDeleteModal(): any {
-    // DeleteConfirmationModalController folded in via the child-scope trick (see confirmation-modal).
-    const scope = this.$rootScope.$new();
-    scope.controller = { doNotShowAgain: false };
-    const modal = this.$uibModal.open({
-      animation: false,
-      templateUrl: tpl,
-      scope,
-      backdrop: 'static',
-      keyboard: true
+    this.modal.open<any>(DeleteModalComponent, {}, { disableClose: false }).result.then((res: any) => {
+      if (!res) { return; } // dismissed
+      if (res.doNotShowAgain) { this.$cookies.put(cookieName, 'true'); }
+      deleteHandler();
     });
-    scope.controller.ok = () => modal.close(scope.controller.doNotShowAgain);
-    scope.controller.close = () => modal.dismiss();
-    modal.result.finally(() => scope.$destroy());
-    return modal.result;
   }
 }
