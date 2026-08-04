@@ -29,6 +29,6 @@ require('./attribute-numeric/attribute-numeric-type.js');
 require('./attribute-prefix-based-creator-type/attribute-prefix-based-creator-type.js');
 require('./attribute-save-to-library/attribute-save-to-library-type.js');
 require('./attribute-single-choice/attribute-single-choice-type.js');
-require('./attribute-string/attribute-string-type.js');
+// attribute-string-type migrated to Angular (app/ng2/attribute-string-type.component.ts) — downgraded 'attributeStringType'.
 require('./attribute-workflow/attribute-workflow-type.js');
 require('./attribute-datasource/attribute-datasource.js');
