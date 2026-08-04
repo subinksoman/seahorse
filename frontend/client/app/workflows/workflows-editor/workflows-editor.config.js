@@ -41,6 +41,11 @@ function WorkflowsConfig($stateProvider) {
               /* eslint-enable no-console */
               ServerCommunication.init(workflow.id);
             }
+            // initRootWorkflow MUST run here (before dataIsLoaded), so getCurrentWorkflow() is ready
+            // before ANY component reads it. The parent-state status bar (ng-if="dataIsLoaded") now
+            // constructs as a downgraded Angular component a tick before <workflows-editor>'s ngOnInit,
+            // so deferring init to the component leaves the status bar with an empty workflow stack.
+            WorkflowService.initRootWorkflow(workflow);
             $rootScope.stateData.dataIsLoaded = true;
             $rootScope._workflowWithResults = workflow;
             return workflow;

@@ -147,8 +147,9 @@ export class WorkflowsEditorComponent implements OnInit, OnDestroy, DoCheck {
   ) {}
 
   ngOnInit(): void {
+    // initRootWorkflow already ran in the ui-router resolve (so getCurrentWorkflow() is ready before
+    // the parent-state status bar constructs); here we just finish the controller's setup.
     this.workflowWithResults = this.$rootScope._workflowWithResults;
-    (this.workflowService as any).initRootWorkflow(this.workflowWithResults);
 
     this.adapterService.setMouseClickOnPortFunction((data: any) => this.openReport(data));
     this.BottomBarData = (this.bottomBarService as any).tabsState;
