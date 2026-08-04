@@ -173,10 +173,14 @@ export class AttributesPanelComponent implements OnChanges, AfterViewInit, OnDes
 
   private setCorrectHeight(): void {
     const container = this.host.nativeElement;
-    const others = jQuery('> .ibox-title--main, > .c-attributes-tabs', container)
-      .map((_i: number, el: any) => jQuery(el).outerHeight(true));
+    // Descendant selector (not '>'): in the downgraded Angular DOM the header/tabs live inside the <aside>,
+    // one level deeper than the legacy directive assumed. Sum only the panel's own header + tabs (the first
+    // of each), then size the panel's main .ibox-content to fill the rest.
+    const header = container.querySelector('.ibox-title--main');
+    const tabs = container.querySelector('.c-attributes-tabs');
     let heightOfOthers = 0;
-    for (let i = 0; i < others.length; i++) { heightOfOthers += others[i]; }
+    if (header) { heightOfOthers += jQuery(header).outerHeight(true); }
+    if (tabs) { heightOfOthers += jQuery(tabs).outerHeight(true); }
     const body = container.querySelector('.ibox-content');
     if (body) { jQuery(body).css('height', 'calc(100% - ' + heightOfOthers + 'px)'); }
   }

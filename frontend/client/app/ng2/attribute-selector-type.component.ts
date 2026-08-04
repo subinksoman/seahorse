@@ -75,6 +75,8 @@ export class AttributeSelectorTypeComponent implements OnInit {
       scope,
       windowClass: 'selection-modal'
     });
+    // The modal template's "Done" button calls modal.close() off the (shared) scope — expose it.
+    scope.modal = modal;
     modal.result.finally(() => {
       this.clearEmptyParameters();
       scope.$destroy();
