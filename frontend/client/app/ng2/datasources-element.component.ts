@@ -4,6 +4,7 @@
  */
 
 import { Component, Input, Output, EventEmitter, Inject, OnInit } from '@angular/core';
+import { DatasourcesModalsService } from './datasources-modals.service';
 import { DeleteModalService } from './delete-modal.service';
 import { datasourceModalMode } from '../../common/datasources/datasource-modal-mode.js';
 import { datasourceContext } from '../enums/datasources-context.js';
@@ -78,7 +79,7 @@ export class DatasourcesElementComponent implements OnInit {
 
   constructor(
     private DeleteModalService: DeleteModalService,
-    @Inject('DatasourcesModalsService') private DatasourcesModalsService: any,
+    private DatasourcesModalsService: DatasourcesModalsService,
     @Inject('datasourcesService') private datasourcesService: any
   ) {}
 

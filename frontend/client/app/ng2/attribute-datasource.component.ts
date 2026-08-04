@@ -4,6 +4,7 @@
  */
 
 import { Component, Input, Inject, DoCheck } from '@angular/core';
+import { DatasourcesModalsService } from './datasources-modals.service';
 import * as _ from 'lodash';
 import { datasourceModalMode } from '../../common/datasources/datasource-modal-mode.js';
 
@@ -57,7 +58,7 @@ export class AttributeDatasourceComponent implements DoCheck {
   constructor(
     @Inject('DatasourcesPanelService') private DatasourcesPanelService: any,
     @Inject('datasourcesService') private datasourcesService: any,
-    @Inject('DatasourcesModalsService') private DatasourcesModalsService: any,
+    private DatasourcesModalsService: DatasourcesModalsService,
     @Inject('AttributesPanelService') private AttributesPanelService: any
   ) {}
 

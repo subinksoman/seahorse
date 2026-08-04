@@ -4,6 +4,7 @@
  */
 
 import { Component, Input, Inject, DoCheck } from '@angular/core';
+import { DatasourcesModalsService } from './datasources-modals.service';
 import { LibraryService } from './library.service';
 import { datasourceModalMode } from '../../common/datasources/datasource-modal-mode.js';
 import { datasourceContext } from '../enums/datasources-context.js';
@@ -62,7 +63,7 @@ export class DatasourcesToolbarComponent implements DoCheck {
   uploadingInProgress = false;
 
   constructor(
-    @Inject('DatasourcesModalsService') private DatasourcesModalsService: any,
+    private DatasourcesModalsService: DatasourcesModalsService,
     private LibraryService: LibraryService
   ) {}
 
