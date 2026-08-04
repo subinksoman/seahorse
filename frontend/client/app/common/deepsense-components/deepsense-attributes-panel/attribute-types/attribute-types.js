@@ -15,7 +15,7 @@
  */
 
 // attribute-boolean-type migrated to Angular.
-require('./attribute-code-snippet/attribute-code-snippet-type.js');
+require('./attribute-code-snippet/attribute-code-snippet-type-modal/attribute-code-snippet-type-modal.ctrl.js'); // code-snippet migrated to Angular; modal ctrl kept for the edit-in-window modal
 require('./attribute-column-selector/attribute-selector-type.js');
 // migrated to Angular (ng2/) — downgraded.
 require('./attribute-dynamic-param/attribute-dynamic-param-type.js');

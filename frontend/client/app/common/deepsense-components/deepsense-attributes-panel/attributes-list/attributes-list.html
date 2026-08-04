@@ -47,8 +47,9 @@
         <attribute-single-choice-type ng-switch-when="choice"></attribute-single-choice-type>
         <attribute-multiple-choice-type ng-switch-when="multipleChoice"></attribute-multiple-choice-type>
         <attribute-numeric-type ng-switch-when="numeric" [parameter]="parameter"></attribute-numeric-type>
-        <attribute-code-snippet-type ng-switch-when="codeSnippet" value="parameter.value"
-                                     language="parameter.schema.language.name"></attribute-code-snippet-type>
+        <attribute-code-snippet-type ng-switch-when="codeSnippet" [value]="parameter.value"
+                                     (value-change)="parameter.value = $event"
+                                     [language]="parameter.schema.language.name"></attribute-code-snippet-type>
         <attribute-workflow-type ng-switch-when="workflow" [parameter-name]="parameter.name"></attribute-workflow-type>
         <attribute-string-type ng-switch-when="string" [parameter]="parameter"></attribute-string-type>
         <attribute-creator-type ng-switch-when="creator" [parameter]="parameter"></attribute-creator-type>
