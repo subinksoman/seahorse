@@ -79,6 +79,7 @@ import { AttributeSaveToLibraryTypeComponent } from './attribute-save-to-library
 import { AttributeLoadFromLibraryTypeComponent } from './attribute-load-from-library-type.component';
 import { LibraryConnectorComponent } from './library-connector.component';
 import { AttributeDatasourceComponent } from './attribute-datasource.component';
+import { AttributeBooleanTypeComponent } from './attribute-boolean-type.component';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -165,12 +166,13 @@ angular.module('ds.lab')
   .directive('attributeWorkflowType', downgradeComponent({ component: AttributeWorkflowTypeComponent }) as any)
   .directive('attributeSaveToLibrary', downgradeComponent({ component: AttributeSaveToLibraryTypeComponent }) as any)
   .directive('attributeLoadFromLibrary', downgradeComponent({ component: AttributeLoadFromLibraryTypeComponent }) as any)
-  .directive('attributeDatasource', downgradeComponent({ component: AttributeDatasourceComponent }) as any);
+  .directive('attributeDatasource', downgradeComponent({ component: AttributeDatasourceComponent }) as any)
+  .directive('attributeBooleanType', downgradeComponent({ component: AttributeBooleanTypeComponent }) as any);
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],
   // Angular components used from AngularJS (via downgradeComponent) must be declared here.
-  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent, ReportComponent, AttributeStringTypeComponent, AttributeNumericTypeComponent, AttributeMultipleNumericTypeComponent, AttributeWorkflowTypeComponent, AttributeSaveToLibraryTypeComponent, AttributeLoadFromLibraryTypeComponent, LibraryConnectorComponent, AttributeDatasourceComponent],
+  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent, ReportComponent, AttributeStringTypeComponent, AttributeNumericTypeComponent, AttributeMultipleNumericTypeComponent, AttributeWorkflowTypeComponent, AttributeSaveToLibraryTypeComponent, AttributeLoadFromLibraryTypeComponent, LibraryConnectorComponent, AttributeDatasourceComponent, AttributeBooleanTypeComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
   // migrated services can inject them by string token. See upgraded-providers.ts.
   providers: [...upgradedProviders]

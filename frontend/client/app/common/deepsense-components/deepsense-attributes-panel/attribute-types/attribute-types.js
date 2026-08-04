@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-require('./attribute-boolean/attribute-boolean-type.js');
+// attribute-boolean-type migrated to Angular.
 require('./attribute-code-snippet/attribute-code-snippet-type.js');
 require('./attribute-column-selector/attribute-selector-type.js');
 // migrated to Angular (ng2/) — downgraded.

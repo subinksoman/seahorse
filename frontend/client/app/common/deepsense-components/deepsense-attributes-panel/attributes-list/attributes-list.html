@@ -43,7 +43,7 @@
     </div>
     <div class="ibox-content">
       <div class="attributes-value-view" ng-switch="::parameter.schema.type">
-        <attribute-boolean-type ng-switch-when="boolean"></attribute-boolean-type>
+        <attribute-boolean-type ng-switch-when="boolean" [parameter]="parameter"></attribute-boolean-type>
         <attribute-single-choice-type ng-switch-when="choice"></attribute-single-choice-type>
         <attribute-multiple-choice-type ng-switch-when="multipleChoice"></attribute-multiple-choice-type>
         <attribute-numeric-type ng-switch-when="numeric" [parameter]="parameter"></attribute-numeric-type>
