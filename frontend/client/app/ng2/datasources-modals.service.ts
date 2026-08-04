@@ -6,17 +6,22 @@
 import { Injectable, Inject } from '@angular/core';
 import { ModalService } from './modal.service';
 import { DatabaseModalComponent } from './database-modal.component';
-// The 4 not-yet-converted datasource modals stay AngularJS (uib), opened via bridged $uibModal.
+import { GoogleSpreadsheetModalComponent } from './google-spreadsheet-modal.component';
+// The not-yet-converted datasource modals stay AngularJS (uib), opened via bridged $uibModal.
 import externalFileTpl from '../../components/datasources/datasources-toolbar/modals/external-file-modal/external-file-modal.html';
-import googleSpreadsheetTpl from '../../components/datasources/datasources-toolbar/modals/google-spreadsheet-modal/google-spreadsheet-modal.html';
 import hdfsTpl from '../../components/datasources/datasources-toolbar/modals/hdfs-modal/hdfs-modal.html';
 import libraryTpl from '../../components/datasources/datasources-toolbar/modals/library-modal/library-modal.html';
 
 declare const angular: any; // global — angular.copy + angular.element(appendTo)
 
+// CDK datasource modals (Angular components).
+const CDK_CONFIGS: { [k: string]: any } = {
+  jdbc: DatabaseModalComponent,
+  googleSpreadsheet: GoogleSpreadsheetModalComponent
+};
+
 const UIB_CONFIGS: { [k: string]: { tpl: string; ctrl: string } } = {
   externalFile: { tpl: externalFileTpl, ctrl: 'ExternalFileModalController' },
-  googleSpreadsheet: { tpl: googleSpreadsheetTpl, ctrl: 'GoogleSpreadsheetModalController' },
   hdfs: { tpl: hdfsTpl, ctrl: 'HdfsModalController' },
   libraryFile: { tpl: libraryTpl, ctrl: 'LibraryModalController' }
 };
@@ -36,8 +41,8 @@ export class DatasourcesModalsService {
   openModal(datasourceType: string, mode: any, datasource?: any): any {
     this.$log.info('DatasourcesModalsService.openModal()', mode, datasourceType);
 
-    if (datasourceType === 'jdbc') {
-      return this.modal.open(DatabaseModalComponent, { editedDatasource: datasource, mode },
+    if (CDK_CONFIGS[datasourceType]) {
+      return this.modal.open(CDK_CONFIGS[datasourceType], { editedDatasource: datasource, mode },
         { panelClass: ['ds-modal-panel', 'ds-modal-lg'] });
     }
 
