@@ -17,13 +17,9 @@
 'use strict';
 
 exports.inject = function(module) {
-  // The three modal *services* (confirmation/delete/export) migrated to Angular 18 (ng2/) and are
-  // downgraded in ng2/bootstrap.ts; their AngularJS *controllers* (.ctrl.js) stay and are kept here.
-  require('./confirmation-modal/confirmation-modal.ctrl.js').inject(module);
-  require('./delete-modal/delete-modal.ctrl.js').inject(module);
-  require('./export-modal/export-modal.ctrl.js').inject(module);
+  // confirmation/delete/export/workflow-clone modal controllers folded into their Angular services
+  // (ng2/*.service.ts) via the child-scope trick — no AngularJS controller registration needed. The
+  // modal templates + uib-modal itself stay AngularJS until the ui.bootstrap -> Bootstrap 5 step.
   require('./new-workflow-modal/new-workflow-modal.ctrl.js').inject(module);
   require('./upload-workflow-modal/upload-workflow-modal.ctrl.js').inject(module);
-  // workflow-clone-modal.srv migrated to Angular 18 (ng2/workflow-clone.service.ts) — downgraded as 'WorkflowCloneService'.
-  require('./workflow-clone-modal/workflow-clone-modal.ctrl.js').inject(module);
 };

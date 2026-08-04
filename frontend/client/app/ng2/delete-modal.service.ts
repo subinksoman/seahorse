@@ -14,7 +14,8 @@ import tpl from '../common/modals/delete-modal/delete-modal.html';
 export class DeleteModalService {
   constructor(
     @Inject('$uibModal') private $uibModal: any,
-    @Inject('$cookies') private $cookies: any
+    @Inject('$cookies') private $cookies: any,
+    @Inject('$rootScope') private $rootScope: any
   ) {}
 
   handleDelete(deleteHandler: (...args: any[]) => any, cookieName: string): void {
@@ -30,13 +31,19 @@ export class DeleteModalService {
   }
 
   private openDeleteModal(): any {
-    return this.$uibModal.open({
+    // DeleteConfirmationModalController folded in via the child-scope trick (see confirmation-modal).
+    const scope = this.$rootScope.$new();
+    scope.controller = { doNotShowAgain: false };
+    const modal = this.$uibModal.open({
       animation: false,
       templateUrl: tpl,
-      controller: 'DeleteConfirmationModalController',
-      controllerAs: 'controller',
+      scope,
       backdrop: 'static',
       keyboard: true
-    }).result;
+    });
+    scope.controller.ok = () => modal.close(scope.controller.doNotShowAgain);
+    scope.controller.close = () => modal.dismiss();
+    modal.result.finally(() => scope.$destroy());
+    return modal.result;
   }
 }
