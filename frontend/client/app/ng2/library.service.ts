@@ -186,14 +186,24 @@ export class LibraryService {
   uploadFiles(files: any): any {
     this.$log.info(`LibraryService.uploadFiles(${files})`);
 
-    let promisesArray: any[] = [];
-    if (angular.isArray(files)) {
-      promisesArray = files.map((file: any) => {
-        return this.uploadFile(file);
-      });
-    } else {
-      this.$log.error('FilesList is not an array');
-    }
+    // Normalize to a flat array of File. The upload directives pass `[...input.files]` (an array of File),
+    // but a FileList can also arrive directly or wrapped in an array — recursively expand any FileList/array
+    // so uploadFile() always receives a single File. (Previously an un-expanded FileList reached uploadFile
+    // and every upload silently failed on file.name / the API call.)
+    const flat: any[] = [];
+    const collect = (item: any): void => {
+      if (!item) {
+        return;
+      }
+      if (typeof File !== 'undefined' && item instanceof File) {
+        flat.push(item);
+      } else if (typeof item.length === 'number' && typeof item !== 'string') {
+        Array.from(item).forEach(collect);
+      }
+    };
+    collect(files);
+
+    const promisesArray = flat.map((file: any) => this.uploadFile(file));
     return this.$q.all(promisesArray);
   }
 
