@@ -50,7 +50,7 @@ require('./cluster-settings-modals/choose-cluster-modal.ctrl.js').inject(workflo
 // cluster-modal.srv migrated to Angular 18 (ng2/cluster-modal.service.ts) — downgraded as 'ClusterModalService'.
 require('./cluster-settings-modals/preset-modal/preset-modal.controller.js').inject(workflows);
 require('./cluster-settings-modals/preset-modal/preset-modal-labels.js').inject(workflows);
-require('./library/library-modal.controller.js').inject(workflows);
+// library-modal.controller migrated to Angular (ng2/library-modal.component.ts, CDK).
 // library-modal.service migrated to Angular 18 (ng2/library-modal.service.ts) — downgraded as 'LibraryModalService'.
 require('./library/file-upload-section/file-upload-change.directive.js').inject(workflows);
 require('./library/file-upload-section/dropzone-file-upload.directive.js').inject(workflows);
