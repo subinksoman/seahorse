@@ -18,8 +18,8 @@
   </div>
 
   <breadcrumbs
-    [allParents]="controller.parents"
-    [currentFolder]="controller.currentDirName"
+    [all-parents]="controller.parents"
+    [current-folder]="controller.currentDirName"
   ></breadcrumbs>
 
   <div class="dataframe-library-modal__body">
@@ -32,7 +32,7 @@
           </button>
           <file-upload-section style="flex: 1;"></file-upload-section>
           <recent-files-indicator
-            [onSelect]="controller.onSelect"
+            [on-select]="controller.onSelect"
           ></recent-files-indicator>
         </div>
 
@@ -42,7 +42,7 @@
           <file-list
             [items]="controller.items"
             [parents]="controller.parents"
-            [onSelect]="controller.onSelect"
+            [on-select]="controller.onSelect"
           ></file-list>
         </div>
 
