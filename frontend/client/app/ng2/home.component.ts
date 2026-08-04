@@ -78,7 +78,7 @@ import { WorkflowCloneService } from './workflow-clone.service';
                 </td>
                 <td class="color-gray table__action-icons table__centered table__cell"><b>Actions</b></td>
               </tr>
-              <tr *ngFor="let workflow of getVisibleWorkflows(); let i = index; trackBy: trackById">
+              <tr *ngFor="let workflow of visibleWorkflows; let i = index; trackBy: trackById">
                 <td class="table__cell table__centered">
                   <a (click)="goToWorkflowEditor(workflow.id)">{{ i + 1 }}</a>
                 </td>
@@ -148,6 +148,11 @@ export class HomeComponent implements OnInit, DoCheck {
   readonly seahorseMain = seahorseMain;
 
   workflows: any[] = undefined;
+  // Bound by *ngFor. Recomputed in ngDoCheck (NOT via a method in the template): Angular runs in dev
+  // mode here, and binding *ngFor to a method that returns a fresh _.orderBy array each call throws
+  // ExpressionChangedAfterItHasBeenCheckedError on the verification pass. A stored field is stable
+  // within a CD cycle.
+  visibleWorkflows: any[] = [];
   filterString: string;
   sessionManagerState = 'UNDEFINED';
   loadingWorkflowsState = 'UNDEFINED';
@@ -182,6 +187,7 @@ export class HomeComponent implements OnInit, DoCheck {
     _.forEach(this.workflows, (w: any) => {
       w.sessionStatus = (this.sessionManager as any).statusForWorkflowId(w.id);
     });
+    this.visibleWorkflows = this.getVisibleWorkflows();
   }
 
   downloadWorkflows = (): void => {
