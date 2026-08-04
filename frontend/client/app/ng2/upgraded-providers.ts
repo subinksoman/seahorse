@@ -46,6 +46,8 @@ export function datasourcesModalsServiceFactory(i: any): any { return i.get('Dat
 export function filterFactory(i: any): any { return i.get('$filter'); }
 // deepsense-attributes: bridged for migrated attribute-types (disabled-mode + panel interactions).
 export function attributesPanelServiceFactory(i: any): any { return i.get('AttributesPanelService'); }
+// attributes-panel: bridged for the Jupyter notebook URL (trustAsResourceUrl).
+export function sceFactory(i: any): any { return i.get('$sce'); }
 
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
@@ -73,5 +75,6 @@ export const upgradedProviders: any[] = [
   { provide: 'GraphNode', useFactory: graphNodeFactory, deps: ['$injector'] },
   { provide: 'DatasourcesModalsService', useFactory: datasourcesModalsServiceFactory, deps: ['$injector'] },
   { provide: '$filter', useFactory: filterFactory, deps: ['$injector'] },
-  { provide: 'AttributesPanelService', useFactory: attributesPanelServiceFactory, deps: ['$injector'] }
+  { provide: 'AttributesPanelService', useFactory: attributesPanelServiceFactory, deps: ['$injector'] },
+  { provide: '$sce', useFactory: sceFactory, deps: ['$injector'] }
 ];
