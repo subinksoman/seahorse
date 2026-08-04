@@ -7,6 +7,12 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { UpgradeModule, downgradeInjectable, downgradeComponent } from '@angular/upgrade/static';
 import { RouterModule, Router } from '@angular/router';
 import { setUpLocationSync } from '@angular/router/upgrade';
+import { DialogModule } from '@angular/cdk/dialog';
+// Import the prebuilt CSS by file path (NODE_MODULES webpack alias) — @angular/cdk's package `exports`
+// field doesn't expose the .css subpath, but a direct file path bypasses exports resolution.
+import 'NODE_MODULES/@angular/cdk/overlay-prebuilt.css';
+import './modal.css';
+import { ConfirmationModalComponent } from './confirmation-modal.component';
 import { appRoutes } from './app-routes';
 import { RouterShellComponent, WorkflowsShellComponent } from './router-shell.component';
 import { HelloAngularService } from './hello.service';
@@ -206,13 +212,13 @@ angular.module('ds.lab')
   .directive('routerShell', downgradeComponent({ component: RouterShellComponent }) as any);
 
 @NgModule({
-  imports: [BrowserModule, UpgradeModule,
+  imports: [BrowserModule, UpgradeModule, DialogModule,
     // initialNavigation 'disabled': we never bootstrap an Angular ROOT component (Angular does
     // upgrade.bootstrap of ds.lab instead), so the router's automatic initial navigation never fires.
     // We kick it manually in ngDoBootstrap after the AngularJS app + location sync are up.
     RouterModule.forRoot(appRoutes, { useHash: true, initialNavigation: 'disabled' })],
   // Angular components used from AngularJS (via downgradeComponent) must be declared here.
-  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent, ReportComponent, AttributeStringTypeComponent, AttributeNumericTypeComponent, AttributeMultipleNumericTypeComponent, AttributeWorkflowTypeComponent, AttributeSaveToLibraryTypeComponent, AttributeLoadFromLibraryTypeComponent, LibraryConnectorComponent, AttributeDatasourceComponent, AttributeBooleanTypeComponent, AttributeCodeSnippetTypeComponent, AttributeSelectorTypeComponent, AttributesSerializedViewComponent, AttributesListComponent, AttributeSingleChoiceTypeComponent, AttributeMultipleChoiceTypeComponent, AttributeMultiplierTypeComponent, AttributeDynamicParamTypeComponent, AttributesPanelComponent, TimeDiffComponent, DeepsenseLoadingSpinnerSmComponent, SelectionItemsComponent, WorkflowsEditorStatusBarComponent, MenuItemComponent, StartingPopoverComponent, RunningExecutorPopoverComponent, ExecutorErrorComponent, NavigationBarComponent, ErrorViewComponent, HomeComponent, ResizableDirective, ResizableListenerDirective, WorkflowsEditorComponent, PublicParamsListComponent, WorkflowSchedulesUpgradeDirective, RouterShellComponent, WorkflowsShellComponent],
+  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent, ReportComponent, AttributeStringTypeComponent, AttributeNumericTypeComponent, AttributeMultipleNumericTypeComponent, AttributeWorkflowTypeComponent, AttributeSaveToLibraryTypeComponent, AttributeLoadFromLibraryTypeComponent, LibraryConnectorComponent, AttributeDatasourceComponent, AttributeBooleanTypeComponent, AttributeCodeSnippetTypeComponent, AttributeSelectorTypeComponent, AttributesSerializedViewComponent, AttributesListComponent, AttributeSingleChoiceTypeComponent, AttributeMultipleChoiceTypeComponent, AttributeMultiplierTypeComponent, AttributeDynamicParamTypeComponent, AttributesPanelComponent, TimeDiffComponent, DeepsenseLoadingSpinnerSmComponent, SelectionItemsComponent, WorkflowsEditorStatusBarComponent, MenuItemComponent, StartingPopoverComponent, RunningExecutorPopoverComponent, ExecutorErrorComponent, NavigationBarComponent, ErrorViewComponent, HomeComponent, ResizableDirective, ResizableListenerDirective, WorkflowsEditorComponent, PublicParamsListComponent, WorkflowSchedulesUpgradeDirective, RouterShellComponent, WorkflowsShellComponent, ConfirmationModalComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
   // migrated services can inject them by string token. See upgraded-providers.ts.
   providers: [...upgradedProviders]

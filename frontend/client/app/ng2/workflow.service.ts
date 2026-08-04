@@ -93,7 +93,7 @@ export class WorkflowService {
       } else {
         this.confirmationModalService.showModal({
           message: 'Are you sure you want to stop executor? Cached results will disappear.'
-        }).then(() => this.stopEditing());
+        }).then((confirmed: boolean) => { if (confirmed) { this.stopEditing(); } });
       }
     });
 

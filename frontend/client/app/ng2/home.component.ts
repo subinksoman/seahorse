@@ -270,7 +270,8 @@ export class HomeComponent implements OnInit, DoCheck {
     (this.confirmationModalService as any).showModal({
       message: 'The operation will delete workflow "' + workflow.name +
         '". Deletion cannot be undone afterwards.'
-    }).then(() => {
+    }).then((confirmed: boolean) => {
+      if (!confirmed) { return; }
       (this.workflowService as any).deleteWorkflow(workflow.id);
       (this.sessionManagerApi as any).deleteSessionById(workflow.id);
     });

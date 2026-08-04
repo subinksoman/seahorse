@@ -1,0 +1,15 @@
+/* Phase C / AngularJS removal: styling for the CDK-dialog-based modals (ModalService). The overlay +
+   backdrop come from @angular/cdk/overlay-prebuilt.css (imported alongside this). The content
+   components reuse Bootstrap's .modal-content box; here we just size/centre the panel. */
+.ds-modal-panel {
+  width: 600px;
+  max-width: 92vw;
+}
+.ds-modal-panel .modal-content {
+  border-radius: 6px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+.cdk-dialog-container {
+  outline: none;
+  display: block;
+}

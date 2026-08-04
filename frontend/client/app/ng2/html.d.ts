@@ -17,3 +17,6 @@ declare module '*.png' { const url: string; export default url; }
 declare module '*.jpg' { const url: string; export default url; }
 declare module '*.gif' { const url: string; export default url; }
 declare module '*.svg' { const url: string; export default url; }
+
+// Side-effect CSS imports (CDK overlay + modal styles) — webpack's css-loader handles them at build.
+declare module '*.css';

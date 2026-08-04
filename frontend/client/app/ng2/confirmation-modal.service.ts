@@ -3,34 +3,21 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { Injectable, Inject } from '@angular/core';
-import tpl from '../common/modals/confirmation-modal/confirmation-modal.html';
+import { Injectable } from '@angular/core';
+import { ModalService } from './modal.service';
+import { ConfirmationModalComponent } from './confirmation-modal.component';
 
-// Phase C-1: migrated from common/modals/confirmation-modal/confirmation-modal.service.js. Opens the
-// confirmation modal via angular-ui-bootstrap ($uibModal, bridged). The modal TEMPLATE stays AngularJS
-// (uib-modal), but the former ConfirmationModalController is now folded in via the child-scope trick:
-// a fresh $rootScope child scope carries `controller` (message + ok/close) so the template is unchanged
-// and no AngularJS controller registration is needed. Downgraded as 'ConfirmationModalService'.
+// Phase C / AngularJS removal: now opens the CDK-based ConfirmationModalComponent via ModalService
+// (was uib-modal via bridged $uibModal). Public surface changed slightly: showModal now RESOLVES a
+// boolean (true = confirmed, false = dismissed) instead of resolve-on-OK / reject-on-dismiss — callers
+// updated accordingly. Downgraded as 'ConfirmationModalService' for any remaining AngularJS callers.
 @Injectable({ providedIn: 'root' })
 export class ConfirmationModalService {
-  constructor(
-    @Inject('$uibModal') private $uibModal: any,
-    @Inject('$rootScope') private $rootScope: any
-  ) {}
+  constructor(private modal: ModalService) {}
 
-  showModal(options: { message: string } = { message: '' }): any {
-    const scope = this.$rootScope.$new();
-    scope.controller = { message: options.message };
-    const modal = this.$uibModal.open({
-      animation: true,
-      templateUrl: tpl,
-      scope,
-      backdrop: 'static',
-      keyboard: true
-    });
-    scope.controller.close = () => modal.dismiss();
-    scope.controller.ok = () => modal.close();
-    modal.result.finally(() => scope.$destroy());
-    return modal.result;
+  showModal(options: { message: string } = { message: '' }): Promise<boolean> {
+    return this.modal
+      .open<boolean>(ConfirmationModalComponent, { message: options.message }, { disableClose: false })
+      .result.then((v) => !!v);
   }
 }
