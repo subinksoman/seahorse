@@ -109,11 +109,11 @@ declare const jQuery: any;
         </section>
         <ng-container *ngSwitchCase="'parameters'">
           <attributes-list *ngIf="node.parameters"
-            [is-root-level-parameter]="true"
-            [parameters-list]="node.parameters"
-            [is-inner-workflow]="isInnerWorkflow"
+            [isRootLevelParameter]="true"
+            [parametersList]="node.parameters"
+            [isInnerWorkflow]="isInnerWorkflow"
             [node]="node"
-            [public-params]="publicParams"></attributes-list>
+            [publicParams]="publicParams"></attributes-list>
           <deepsense-loading-spinner-sm class="text-center" *ngIf="!node.parameters"></deepsense-loading-spinner-sm>
         </ng-container>
       </section>
