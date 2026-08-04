@@ -15,6 +15,8 @@ export class ExportModalService {
   constructor(private modal: ModalService) {}
 
   showModal(): void {
-    this.modal.open(ExportModalComponent, {}, { panelClass: 'ds-modal-panel seahorse-modal-wrapper' });
+    // panelClass MUST be an array for multiple classes — CDK calls classList.add(panelClass), which
+    // throws on a space-containing string.
+    this.modal.open(ExportModalComponent, {}, { panelClass: ['ds-modal-panel', 'seahorse-modal-wrapper'] });
   }
 }
