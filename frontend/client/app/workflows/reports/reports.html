@@ -26,12 +26,12 @@
     <div ng-switch="controller.getReport().reportType">
       <report-dataframe-full
         ng-switch-when="DataFrameFull"
-        report="controller.getReport()"
+        [report]="controller.getReport()"
       >
       </report-dataframe-full>
       <report-default
         ng-switch-default
-        report="controller.getReport()">
+        [report]="controller.getReport()">
       </report-default>
     </div>
   </div>

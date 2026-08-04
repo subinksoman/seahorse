@@ -68,6 +68,8 @@ import { DatasourcesListComponent } from './datasources-list.component';
 import { DatasourcesToolbarComponent } from './datasources-toolbar.component';
 import { DatasourcesPanelComponent } from './datasources-panel.component';
 import { ReportTableComponent } from './report-table.component';
+import { ReportDefaultComponent } from './report-default.component';
+import { ReportDataframeFullComponent } from './report-dataframe-full.component';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -141,12 +143,14 @@ angular.module('ds.lab')
   // (and element) live inside Angular templates now.
   .directive('datasourcesPanel', downgradeComponent({ component: DatasourcesPanelComponent }) as any)
   // report subsystem (bottom-up): the data-sample grid (cell-viewer modal + charts stay AngularJS).
-  .directive('reportTable', downgradeComponent({ component: ReportTableComponent }) as any);
+  .directive('reportTable', downgradeComponent({ component: ReportTableComponent }) as any)
+  .directive('reportDefault', downgradeComponent({ component: ReportDefaultComponent }) as any)
+  .directive('reportDataframeFull', downgradeComponent({ component: ReportDataframeFullComponent }) as any);
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],
   // Angular components used from AngularJS (via downgradeComponent) must be declared here.
-  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent],
+  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
   // migrated services can inject them by string token. See upgraded-providers.ts.
   providers: [...upgradedProviders]

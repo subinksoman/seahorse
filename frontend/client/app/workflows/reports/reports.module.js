@@ -24,8 +24,8 @@ require('./reports.controller.js').inject(reports);
 // reports.factory migrated to Angular 18 (ng2/report.service.ts) — downgraded as 'Report'.
 require('./report.directive.js').inject(reports);
 
-require('./report-dataframe-full/report-dataframe-full.js').inject(reports);
-require('./report-default/report-default.js').inject(reports);
+// report-dataframe-full migrated to Angular (app/ng2/report-dataframe-full.component.ts).
+// report-default migrated to Angular (app/ng2/report-default.component.ts).
 // report-table migrated to Angular (app/ng2/report-table.component.ts) — downgraded as directive 'reportTable'.
 require('./report-table/cell-viewer/cell-viewer-modal.ctrl.js').inject(reports);
 
