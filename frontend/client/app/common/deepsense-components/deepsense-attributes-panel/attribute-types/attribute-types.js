@@ -25,7 +25,7 @@ require('./attribute-load-from-library/library-connector/library-connector.js');
 require('./attribute-multiple-choice/attribute-multiple-choice-type.js');
 require('./attribute-multiple-numeric/attribute-multiple-numeric-type.js');
 require('./attribute-multiplier/attribute-multiplier-type.js');
-require('./attribute-numeric/attribute-numeric-type.js');
+// attribute-numeric-type migrated to Angular (app/ng2/attribute-numeric-type.component.ts) — downgraded 'attributeNumericType'.
 require('./attribute-prefix-based-creator-type/attribute-prefix-based-creator-type.js');
 require('./attribute-save-to-library/attribute-save-to-library-type.js');
 require('./attribute-single-choice/attribute-single-choice-type.js');
