@@ -16,23 +16,25 @@ declare const $: any; // jQuery global
 @Component({
   standalone: false,
   template: `
-    <div class="export-modal">
-      <div class="export-modal__header"><div class="modal-title">Export workflow</div></div>
-      <div class="export-modal__body">
-        <div class="checkbox-wrapper export-label">
-          <label class="format-form-label" [ngClass]="{'active': includeDatasources}">
-            <input type="checkbox" [checked]="includeDatasources"
-                   (change)="includeDatasources = $any($event.target).checked"/>
-            <span>Export with definitions of the datasources.</span>
-          </label>
+    <div class="modal-content">
+      <div class="export-modal">
+        <div class="export-modal__header"><div class="modal-title">Export workflow</div></div>
+        <div class="export-modal__body">
+          <div class="checkbox-wrapper export-label">
+            <label class="format-form-label" [ngClass]="{'active': includeDatasources}">
+              <input type="checkbox" [checked]="includeDatasources"
+                     (change)="includeDatasources = $any($event.target).checked"/>
+              <span>Export with definitions of the datasources.</span>
+            </label>
+          </div>
+          <div class="export-additional-info">
+            (Note that those definitions may contain sensitive information, e.g. database credentials).
+          </div>
         </div>
-        <div class="export-additional-info">
-          (Note that those definitions may contain sensitive information, e.g. database credentials).
+        <div class="export-modal__footer">
+          <button (click)="download()" class="btn btn-blue no-selection" type="button">Export Workflow</button>
+          <button (click)="close()" class="btn btn-white" type="button">Cancel</button>
         </div>
-      </div>
-      <div class="export-modal__footer">
-        <button (click)="download()" class="btn btn-blue no-selection" type="button">Export Workflow</button>
-        <button (click)="close()" class="btn btn-white" type="button">Cancel</button>
       </div>
     </div>
   `
