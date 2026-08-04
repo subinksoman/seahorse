@@ -75,8 +75,9 @@
 
     <section ng-if="$ctrl.publicParams.length > 0">
       <public-params-list
-        workflow="$ctrl.workflow"
-        public-params="$ctrl.publicParams"
+        [workflow]="$ctrl.workflow"
+        [public-params]="$ctrl.publicParams"
+        (public-params-change)="$ctrl.publicParams = $event"
       ></public-params-list>
     </section>
   </div>

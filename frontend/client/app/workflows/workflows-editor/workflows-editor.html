@@ -39,12 +39,15 @@
 
     <general-data-panel
       ng-if="!workflow.getSelectedNode()"
-      workflow="workflow.getWorkflow()"
-      name="workflow.getWorkflow().name"
+      [workflow]="workflow.getWorkflow()"
+      [name]="workflow.getWorkflow().name"
+      (name-change)="workflow.getWorkflow().name = $event"
       class="right-panel-resizable"
-      description="workflow.getWorkflow().description"
-      public-params="workflow.WorkflowService.getCurrentWorkflow().publicParams"
-      disabled-mode="!workflow.isEditable()"
+      [description]="workflow.getWorkflow().description"
+      (description-change)="workflow.getWorkflow().description = $event"
+      [public-params]="workflow.WorkflowService.getCurrentWorkflow().publicParams"
+      (public-params-change)="workflow.WorkflowService.getCurrentWorkflow().publicParams = $event"
+      [disabled-mode]="!workflow.isEditable()"
       resizable
       resizable-panel-name="rightPanel"
       resizable-position="left"
