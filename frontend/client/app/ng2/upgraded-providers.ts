@@ -48,6 +48,10 @@ export function filterFactory(i: any): any { return i.get('$filter'); }
 export function attributesPanelServiceFactory(i: any): any { return i.get('AttributesPanelService'); }
 // attributes-panel: bridged for the Jupyter notebook URL (trustAsResourceUrl).
 export function sceFactory(i: any): any { return i.get('$sce'); }
+// Router track: ui-router's $state / $stateParams, bridged for the migrated routed views (home,
+// error-view). These go away when ui-router is swapped for @angular/router (Router/ActivatedRoute).
+export function stateFactory(i: any): any { return i.get('$state'); }
+export function stateParamsFactory(i: any): any { return i.get('$stateParams'); }
 
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
@@ -76,5 +80,7 @@ export const upgradedProviders: any[] = [
   { provide: 'DatasourcesModalsService', useFactory: datasourcesModalsServiceFactory, deps: ['$injector'] },
   { provide: '$filter', useFactory: filterFactory, deps: ['$injector'] },
   { provide: 'AttributesPanelService', useFactory: attributesPanelServiceFactory, deps: ['$injector'] },
-  { provide: '$sce', useFactory: sceFactory, deps: ['$injector'] }
+  { provide: '$sce', useFactory: sceFactory, deps: ['$injector'] },
+  { provide: '$state', useFactory: stateFactory, deps: ['$injector'] },
+  { provide: '$stateParams', useFactory: stateParamsFactory, deps: ['$injector'] }
 ];
