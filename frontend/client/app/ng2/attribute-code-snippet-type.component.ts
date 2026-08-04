@@ -11,7 +11,8 @@ import {
 import 'ace-builds/src-min-noconflict/mode-sql.js';
 import 'ace-builds/src-min-noconflict/mode-python.js';
 import 'ace-builds/src-min-noconflict/mode-r.js';
-import cellModalTpl from '../common/deepsense-components/deepsense-attributes-panel/attribute-types/attribute-code-snippet/attribute-code-snippet-type-modal/attribute-code-snippet-type-modal.html';
+import { ModalService } from './modal.service';
+import { CodeSnippetModalComponent } from './code-snippet-modal.component';
 
 declare const ace: any; // ace-builds (loaded globally via libs.js)
 
@@ -38,7 +39,7 @@ export class AttributeCodeSnippetTypeComponent implements AfterViewInit, OnChang
   @ViewChild('editor') editorEl: ElementRef;
   private editor: any;
 
-  constructor(@Inject('$uibModal') private $uibModal: any) {}
+  constructor(private modal: ModalService) {}
 
   ngAfterViewInit(): void {
     this.editor = ace.edit(this.editorEl.nativeElement);
@@ -77,26 +78,18 @@ export class AttributeCodeSnippetTypeComponent implements AfterViewInit, OnChang
   }
 
   editInWindow(): void {
-    const that = this;
-    const modalInstance = this.$uibModal.open({
-      animation: true,
-      backdrop: 'static',
-      templateUrl: cellModalTpl,
-      controller: 'AttributeCodeSnippetTypeModalCtrl',
-      controllerAs: 'acstmCtrl',
-      size: 'lg',
-      resolve: {
-        codeSnippet: () => ({ code: that.value, language: (that.language || 'text').toLowerCase() })
-      }
-    });
-    modalInstance.result.then((modifiedCode: any) => {
-      if (that.value !== modifiedCode) {
-        that.value = modifiedCode;
-        that.valueChange.emit(modifiedCode);
-        if (that.editor && that.editor.getValue() !== modifiedCode) {
-          that.editor.setValue(modifiedCode || '', -1);
+    this.modal.open<string>(
+      CodeSnippetModalComponent,
+      { code: this.value, language: (this.language || 'text').toLowerCase() },
+      { panelClass: ['ds-modal-panel', 'ds-modal-lg'] }
+    ).result.then((modifiedCode) => {
+      if (modifiedCode !== undefined && this.value !== modifiedCode) {
+        this.value = modifiedCode;
+        this.valueChange.emit(modifiedCode);
+        if (this.editor && this.editor.getValue() !== modifiedCode) {
+          this.editor.setValue(modifiedCode || '', -1);
         }
       }
-    }, () => {});
+    });
   }
 }

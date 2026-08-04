@@ -4,7 +4,8 @@
  */
 
 import { Component, Input, Inject, OnInit, DoCheck } from '@angular/core';
-import cellViewerTpl from '../workflows/reports/report-table/cell-viewer/cell-viewer-modal.html';
+import { ModalService } from './modal.service';
+import { CellViewerModalComponent } from './cell-viewer-modal.component';
 
 // The reports.controller EVENTS.SELECT_COLUMN string (inlined to avoid importing the AngularJS controller,
 // which has registration side effects). Kept in sync with reports.controller.js.
@@ -75,7 +76,7 @@ export class ReportTableComponent implements OnInit, DoCheck {
   constructor(
     @Inject('$rootScope') private $rootScope: any,
     @Inject('$filter') private $filter: any,
-    @Inject('$uibModal') private $uibModal: any
+    private modal: ModalService
   ) {}
 
   ngOnInit(): void {
@@ -138,22 +139,7 @@ export class ReportTableComponent implements OnInit, DoCheck {
   }
 
   editInWindow(value: any): void {
-    const that = this;
-    const modalInstance = this.$uibModal.open({
-      animation: true,
-      backdrop: 'static',
-      templateUrl: cellViewerTpl,
-      controller: 'cellViewerModalCtrl',
-      controllerAs: 'acstmCtrl',
-      size: 'lg',
-      resolve: {
-        codeSnippet: () => ({ code: value })
-      }
-    });
-    modalInstance.result.then((modifiedCode: any) => {
-      if (that.value !== modifiedCode) {
-        that.value = modifiedCode;
-      }
-    }, () => {});
+    // Read-only cell viewer — the result is ignored (nothing is editable).
+    this.modal.open(CellViewerModalComponent, { code: value }, { panelClass: ['ds-modal-panel', 'ds-modal-lg'] });
   }
 }
