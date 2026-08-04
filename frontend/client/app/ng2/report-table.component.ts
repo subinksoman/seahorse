@@ -31,11 +31,11 @@ const SELECT_COLUMN = 'select-column';
               <div>
                 <p class="break-mid-words">
                   <ng-container *ngIf="getDistributionType(columnName) as dist">
-                    <span class="has-distribution rt-dist" (click)="showDistribution(columnName)"
+                    <span class="has-distribution" (click)="showDistribution(columnName)"
+                          [title]="'Open ' + dist.subtype + ' distibution'"
                           [ngSwitch]="dist.subtype">
                       <i *ngSwitchCase="'discrete'" class="fa fa-pie-chart"></i>
                       <i *ngSwitchCase="'continuous'" class="fa fa-bar-chart-o"></i>
-                      <span class="rt-dist__tooltip">Open {{ dist.subtype }} distibution</span>
                     </span>
                   </ng-container>
                   <span>{{ columnName }}</span>
@@ -59,16 +59,7 @@ const SELECT_COLUMN = 'select-column';
         </tbody>
       </table>
     </div>
-  `,
-  styles: [`
-    .rt-dist { position: relative; }
-    .rt-dist__tooltip {
-      display: none; position: absolute; bottom: 100%; left: 0; margin-bottom: 6px; white-space: nowrap;
-      z-index: 1000; padding: 5px 9px; background: #fff; color: #333; font-size: 12px;
-      border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-    }
-    .rt-dist:hover .rt-dist__tooltip { display: block; }
-  `]
+  `
 })
 export class ReportTableComponent implements OnInit, DoCheck {
   @Input() table: any;
