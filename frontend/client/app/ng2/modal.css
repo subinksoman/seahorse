@@ -17,3 +17,8 @@
   outline: none;
   display: block;
 }
+/* Keep CDK modals ABOVE any not-yet-converted angular-ui-bootstrap modal (uib is z-index ~1050), so a
+   CDK modal opened over/under a uib one stacks correctly during the transition. */
+.cdk-overlay-container {
+  z-index: 1100;
+}

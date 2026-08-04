@@ -3,9 +3,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { Injectable, Inject } from '@angular/core';
-import clusterModalTpl from '../workflows/cluster-settings-modals/choose-cluster-modal.html';
-import presetModalTpl from '../workflows/cluster-settings-modals/preset-modal/preset-modal.html';
+import { Injectable } from '@angular/core';
+import { ModalService } from './modal.service';
+import { ChooseClusterModalComponent } from './choose-cluster-modal.component';
+import { PresetModalComponent } from './preset-modal.component';
 
 const presetTypesMap: { [k: string]: string } = {
   standalone: 'Stand-alone',
@@ -14,44 +15,23 @@ const presetTypesMap: { [k: string]: string } = {
   local: 'Local'
 };
 
-// Phase C-1: migrated from workflows/cluster-settings-modals/cluster-modal.srv.js. Opens the
-// cluster-selection / preset modals via angular-ui-bootstrap ($uibModal, bridged); templates +
-// ChooseClusterModalCtrl/PresetModalCtrl stay AngularJS. Public surface unchanged; downgraded as
-// 'ClusterModalService'.
+// Phase C / AngularJS removal: opens the cluster-selection / preset modals on CDK/ModalService (was
+// uib-modal). The choose-cluster modal opens the preset modal, so both are CDK — CDK stacks its
+// overlays cleanly. Public surface unchanged; downgraded as 'ClusterModalService'.
 @Injectable({ providedIn: 'root' })
 export class ClusterModalService {
-  constructor(@Inject('$uibModal') private $uibModal: any) {}
+  constructor(private modal: ModalService) {}
 
   formatPresetType(type: string): string {
     return presetTypesMap[type];
   }
 
   openClusterSelectionModal(): any {
-    return this.$uibModal.open({
-      animation: false,
-      templateUrl: clusterModalTpl,
-      controller: 'ChooseClusterModalCtrl',
-      controllerAs: 'controller',
-      backdrop: 'static',
-      size: 'lg',
-      keyboard: true
-    });
+    return this.modal.open(ChooseClusterModalComponent, {}, { panelClass: ['ds-modal-panel', 'ds-modal-lg'] });
   }
 
   openCurrentClusterModal(type: string, preset: any, isSnapshot: boolean): any {
-    return this.$uibModal.open({
-      animation: false,
-      templateUrl: presetModalTpl,
-      controller: 'PresetModalCtrl',
-      controllerAs: 'controller',
-      backdrop: 'static',
-      size: 'lg',
-      keyboard: true,
-      resolve: {
-        preset: () => preset,
-        type: () => type,
-        isSnapshot: () => isSnapshot
-      }
-    });
+    return this.modal.open(PresetModalComponent, { preset, type, isSnapshot },
+      { panelClass: ['ds-modal-panel', 'ds-modal-lg'] });
   }
 }
