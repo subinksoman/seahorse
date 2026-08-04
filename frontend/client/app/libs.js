@@ -20,7 +20,7 @@ require('angular-debounce');
 require('angular-sanitize');
 require('angular-toastr');
 require('angular-ui-ace');
-require('angular-ui-router');
+// angular-ui-router removed — routing is now @angular/router (see ng2/app-routes.ts).
 require('angular-ui-bootstrap');
 require('angular-xeditable');
 require('angucomplete-alt');
