@@ -15,7 +15,10 @@ import { Component, Input, OnInit } from '@angular/core';
 // null-safe). This establishes the approach for the full ~38-component deepsense-attributes campaign.
 @Component({
   standalone: false,
-  selector: 'attribute-string-type',
+  // creator + prefixBasedCreator are byte-identical to string; one component serves all three selectors so
+  // the (Angular) attributes-list dispatcher's <attribute-creator-type>/<attribute-prefix-based-creator-type>
+  // resolve (downgrade names alone only work in AngularJS templates, not the Angular dispatcher).
+  selector: 'attribute-string-type, attribute-creator-type, attribute-prefix-based-creator-type',
   template: `
     <input type="text" class="form-control"
            [ngClass]="{ 'invalid-param-value': parameter && !parameter.validate() }"
