@@ -14,16 +14,14 @@ import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
   template: `
     <div class="modal-content">
       <div class="inmodal">
-        <form (ngSubmit)="close(true)">
-          <div class="modal-header">
-            <h4 class="modal-title">Are you sure to proceed?</h4>
-          </div>
-          <div class="modal-body">{{ data?.message }}</div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-white" (click)="close(false)">Cancel</button>
-            <button type="submit" class="btn btn-info" cdkFocusInitial>OK</button>
-          </div>
-        </form>
+        <div class="modal-header">
+          <h4 class="modal-title">Are you sure to proceed?</h4>
+        </div>
+        <div class="modal-body">{{ data?.message }}</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-white" (click)="close(false)">Cancel</button>
+          <button type="button" class="btn btn-info" (click)="close(true)" cdkFocusInitial>OK</button>
+        </div>
       </div>
     </div>
   `
