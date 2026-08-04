@@ -16,15 +16,17 @@
 
 'use strict';
 
-import tpl from './workflows-editor.html';
+// workflows-editor.html + WorkflowsEditorController migrated to Angular (ng2/workflows-editor
+// .component.ts) — downgraded 'workflowsEditor'. The state now renders <workflows-editor>; the resolve
+// (below) stashes the downloaded workflow on $rootScope._workflowWithResults for the component's
+// ngOnInit (preserving the async gate — the component renders only after the resolve completes).
 
 /* @ngInject */
 function WorkflowsConfig($stateProvider) {
 
   $stateProvider.state('workflows.editor', {
     url: '/:id/editor',
-    templateUrl: tpl,
-    controller: 'WorkflowsEditorController as workflow',
+    template: '<workflows-editor></workflows-editor>',
     resolve: {
       workflowWithResults: /* @ngInject */ ($q, $rootScope, $stateParams, $state, NotificationService,
         WorkflowService, Operations, OperationsHierarchyService, ServerCommunication, UserService) => {
@@ -40,6 +42,7 @@ function WorkflowsConfig($stateProvider) {
               ServerCommunication.init(workflow.id);
             }
             $rootScope.stateData.dataIsLoaded = true;
+            $rootScope._workflowWithResults = workflow;
             return workflow;
           })
           .catch((error) => {

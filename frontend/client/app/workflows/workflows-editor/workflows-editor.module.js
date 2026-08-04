@@ -17,7 +17,8 @@
 'use strict';
 
 exports.inject = function(module) {
-  require('./workflows-editor.controller.js').inject(module);
+  // workflows-editor.controller migrated to Angular (ng2/workflows-editor.component.ts) — downgraded
+  // 'workflowsEditor'. The config (below) still runs the ui-router state + resolve.
   require('./workflows-editor.config.js').inject(module);
   // graph-nodes.service + node-copy-paste-visitor + workflows-editor.service migrated to Angular 18 (ng2/) — downgraded in bootstrap.ts.
 };
