@@ -33,7 +33,7 @@ require('./workflows-editor/workflows-editor.module.js').inject(workflows);
 // workflows-editor-status-bar (drv+ctrl) migrated to Angular (ng2/workflows-editor-status-bar.component.ts)
 // — downgraded 'workflowEditorStatusBar'. workflows-editor-status-bar.service already Angular
 // (ng2/workflow-status-bar.service.ts, downgraded 'WorkflowStatusBarService').
-require('./workflows-status-bar/documentation-link/documentation-link.directive.js').inject(workflows);
+// documentation-link directive removed — zero usages anywhere in the app (dead code).
 // selection-items migrated to Angular (ng2/selection-items.component.ts) — downgraded 'selectionItems'.
 
 require('./general-data-panel/general-data-panel.module.js').inject(workflows);

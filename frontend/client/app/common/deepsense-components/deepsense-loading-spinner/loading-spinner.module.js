@@ -19,7 +19,7 @@
 
 const spinner = angular.module('deepsense.spinner', []);
 
-require('./lg/loading-spinner-lg.drv.js');
+// lg spinner removed — it had zero usages anywhere in the app (dead code).
 require('./processing/loading-spinner-processing.drv.js');
 require('./sm/loading-spinner-sm.drv.js');
 
