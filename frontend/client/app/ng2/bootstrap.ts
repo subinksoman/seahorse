@@ -5,6 +5,10 @@ import { NgModule, DoBootstrap } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { UpgradeModule, downgradeInjectable, downgradeComponent } from '@angular/upgrade/static';
+import { RouterModule } from '@angular/router';
+import { setUpLocationSync } from '@angular/router/upgrade';
+import { appRoutes } from './app-routes';
+import { RouterShellComponent, WorkflowsShellComponent } from './router-shell.component';
 import { HelloAngularService } from './hello.service';
 import { UserService } from './user.service';
 import { UUIDGenerator } from './uuid-generator.service';
@@ -198,12 +202,13 @@ angular.module('ds.lab')
   .directive('navigationBar', downgradeComponent({ component: NavigationBarComponent }) as any)
   .directive('errorView', downgradeComponent({ component: ErrorViewComponent }) as any)
   .directive('homeView', downgradeComponent({ component: HomeComponent }) as any)
-  .directive('workflowsEditor', downgradeComponent({ component: WorkflowsEditorComponent }) as any);
+  .directive('workflowsEditor', downgradeComponent({ component: WorkflowsEditorComponent }) as any)
+  .directive('routerShell', downgradeComponent({ component: RouterShellComponent }) as any);
 
 @NgModule({
-  imports: [BrowserModule, UpgradeModule],
+  imports: [BrowserModule, UpgradeModule, RouterModule.forRoot(appRoutes, { useHash: true })],
   // Angular components used from AngularJS (via downgradeComponent) must be declared here.
-  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent, ReportComponent, AttributeStringTypeComponent, AttributeNumericTypeComponent, AttributeMultipleNumericTypeComponent, AttributeWorkflowTypeComponent, AttributeSaveToLibraryTypeComponent, AttributeLoadFromLibraryTypeComponent, LibraryConnectorComponent, AttributeDatasourceComponent, AttributeBooleanTypeComponent, AttributeCodeSnippetTypeComponent, AttributeSelectorTypeComponent, AttributesSerializedViewComponent, AttributesListComponent, AttributeSingleChoiceTypeComponent, AttributeMultipleChoiceTypeComponent, AttributeMultiplierTypeComponent, AttributeDynamicParamTypeComponent, AttributesPanelComponent, TimeDiffComponent, DeepsenseLoadingSpinnerSmComponent, SelectionItemsComponent, WorkflowsEditorStatusBarComponent, MenuItemComponent, StartingPopoverComponent, RunningExecutorPopoverComponent, ExecutorErrorComponent, NavigationBarComponent, ErrorViewComponent, HomeComponent, ResizableDirective, ResizableListenerDirective, WorkflowsEditorComponent, PublicParamsListComponent, WorkflowSchedulesUpgradeDirective],
+  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent, ReportComponent, AttributeStringTypeComponent, AttributeNumericTypeComponent, AttributeMultipleNumericTypeComponent, AttributeWorkflowTypeComponent, AttributeSaveToLibraryTypeComponent, AttributeLoadFromLibraryTypeComponent, LibraryConnectorComponent, AttributeDatasourceComponent, AttributeBooleanTypeComponent, AttributeCodeSnippetTypeComponent, AttributeSelectorTypeComponent, AttributesSerializedViewComponent, AttributesListComponent, AttributeSingleChoiceTypeComponent, AttributeMultipleChoiceTypeComponent, AttributeMultiplierTypeComponent, AttributeDynamicParamTypeComponent, AttributesPanelComponent, TimeDiffComponent, DeepsenseLoadingSpinnerSmComponent, SelectionItemsComponent, WorkflowsEditorStatusBarComponent, MenuItemComponent, StartingPopoverComponent, RunningExecutorPopoverComponent, ExecutorErrorComponent, NavigationBarComponent, ErrorViewComponent, HomeComponent, ResizableDirective, ResizableListenerDirective, WorkflowsEditorComponent, PublicParamsListComponent, WorkflowSchedulesUpgradeDirective, RouterShellComponent, WorkflowsShellComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
   // migrated services can inject them by string token. See upgraded-providers.ts.
   providers: [...upgradedProviders]
@@ -213,6 +218,10 @@ export class AppModule implements DoBootstrap {
   ngDoBootstrap(): void {
     // Bootstrap the existing AngularJS app under Angular's control (strict DI preserved).
     this.upgrade.bootstrap(document.documentElement, ['ds.lab'], { strictDi: true });
+    // ui-router removed: @angular/router now owns routing (rendered into the downgraded <router-shell>
+    // in index.html). setUpLocationSync keeps the Angular Router and AngularJS $location on ONE URL
+    // (hash mode) so they don't fight.
+    setUpLocationSync(this.upgrade, 'hash');
     // eslint-disable-next-line no-console
     console.log('[hybrid] Angular', '18', 'bootstrapped ds.lab; helloAngular =', (angular.element(document.documentElement).injector() ? 'wired' : '?'));
   }

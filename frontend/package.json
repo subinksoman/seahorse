@@ -30,6 +30,7 @@
     "@angular/core": "^21.2.19",
     "@angular/platform-browser": "^21.2.19",
     "@angular/platform-browser-dynamic": "^21.2.19",
+    "@angular/router": "^21.2.19",
     "@angular/upgrade": "^21.2.19",
     "@babel/runtime": "^7.25.9",
     "ace-builds": "^1.4.14",

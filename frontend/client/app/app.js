@@ -31,7 +31,7 @@ import { ComponentModule } from 'COMPONENTS/components.module';
 
 if (browserValidator.isBrowserSupported()) {
   let lab = angular.module('ds.lab', [
-    'ui.router',
+    // 'ui.router' removed — routing is now @angular/router (see ng2/app-routes.ts + <router-shell>).
     'ui.bootstrap',
     'ngSanitize',
     'ngCookies',

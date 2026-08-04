@@ -48,10 +48,6 @@ export function filterFactory(i: any): any { return i.get('$filter'); }
 export function attributesPanelServiceFactory(i: any): any { return i.get('AttributesPanelService'); }
 // attributes-panel: bridged for the Jupyter notebook URL (trustAsResourceUrl).
 export function sceFactory(i: any): any { return i.get('$sce'); }
-// Router track: ui-router's $state / $stateParams, bridged for the migrated routed views (home,
-// error-view). These go away when ui-router is swapped for @angular/router (Router/ActivatedRoute).
-export function stateFactory(i: any): any { return i.get('$state'); }
-export function stateParamsFactory(i: any): any { return i.get('$stateParams'); }
 // ngFileUpload's Upload service, bridged for the (migrated) upload-workflow modal folded into HomeComponent.
 export function uploadFactory(i: any): any { return i.get('Upload'); }
 
@@ -83,7 +79,5 @@ export const upgradedProviders: any[] = [
   { provide: '$filter', useFactory: filterFactory, deps: ['$injector'] },
   { provide: 'AttributesPanelService', useFactory: attributesPanelServiceFactory, deps: ['$injector'] },
   { provide: '$sce', useFactory: sceFactory, deps: ['$injector'] },
-  { provide: '$state', useFactory: stateFactory, deps: ['$injector'] },
-  { provide: '$stateParams', useFactory: stateParamsFactory, deps: ['$injector'] },
   { provide: 'Upload', useFactory: uploadFactory, deps: ['$injector'] }
 ];

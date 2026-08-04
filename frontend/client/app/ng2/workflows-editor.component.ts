@@ -4,6 +4,7 @@
  */
 
 import { Component, OnInit, OnDestroy, DoCheck, AfterViewInit, Inject } from '@angular/core';
+import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { WorkflowCloneService } from './workflow-clone.service';
 import { ReportService } from './report.service';
@@ -126,7 +127,7 @@ export class WorkflowsEditorComponent implements OnInit, OnDestroy, DoCheck, Aft
 
   constructor(
     @Inject('$rootScope') private $rootScope: any,
-    @Inject('$state') private $state: any,
+    private router: Router,
     @Inject('ServerCommunication') private serverCommunication: any,
     @Inject('AdapterService') private adapterService: any,
     @Inject('CanvasService') private canvasService: any,
@@ -323,7 +324,7 @@ export class WorkflowsEditorComponent implements OnInit, OnDestroy, DoCheck, Aft
   private _goToWorkflow(workflow: any): void {
     const id = workflow.workflowId;
     this.serverCommunication.unsubscribeFromAllExchanges();
-    this.$state.go(this.$state.current, { id }, { reload: true });
+    this.router.navigate(['/workflows', id, 'editor']);
   }
 
   loadParametersForNode(): void {

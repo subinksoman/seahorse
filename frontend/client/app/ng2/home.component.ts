@@ -17,6 +17,7 @@ import { SessionManagerApi } from './session-manager-api.service';
 import { ConfirmationModalService } from './confirmation-modal.service';
 import { WorkflowCloneService } from './workflow-clone.service';
 import { WorkflowsApiClient } from './workflows-api-client.service';
+import { Router } from '@angular/router';
 
 // Phase C / router track (step 2): migrated from home/home.ctrl.js + home.html. The workflow-list
 // landing view. Downgraded 'homeView'; the ui-router 'home' state template now hosts <home-view>.
@@ -162,7 +163,7 @@ export class HomeComponent implements OnInit, DoCheck {
   constructor(
     @Inject('$rootScope') private $rootScope: any,
     @Inject('$uibModal') private $uibModal: any,
-    @Inject('$state') private $state: any,
+    private router: Router,
     @Inject('ServerCommunication') private serverCommunication: any,
     @Inject('Upload') private upload: any,
     private workflowService: WorkflowService,
@@ -258,7 +259,7 @@ export class HomeComponent implements OnInit, DoCheck {
   }
 
   goToWorkflowEditor(workflowId: string): void {
-    this.$state.go('workflows.editor', { id: workflowId });
+    this.router.navigate(['/workflows', workflowId, 'editor']);
   }
 
   cloneWorkflow(workflow: any): void {
@@ -308,7 +309,7 @@ export class HomeComponent implements OnInit, DoCheck {
         scope.controller.errorMessage = message || 'Server error';
       });
     };
-    modal.result.then((workflowId: string) => this.$state.go('workflows.editor', { id: workflowId }), () => {})
+    modal.result.then((workflowId: string) => this.router.navigate(['/workflows', workflowId, 'editor']), () => {})
       .finally(() => scope.$destroy());
   }
 
@@ -345,7 +346,7 @@ export class HomeComponent implements OnInit, DoCheck {
         scope.controller.errorMessage = message || 'Server error';
       });
     };
-    modal.result.then((workflowId: string) => this.$state.go('workflows.editor', { id: workflowId }), () => {})
+    modal.result.then((workflowId: string) => this.router.navigate(['/workflows', workflowId, 'editor']), () => {})
       .finally(() => scope.$destroy());
   }
 }

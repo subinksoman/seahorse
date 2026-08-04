@@ -17,38 +17,14 @@
 'use strict';
 
 /* @ngInject */
-function AppRun($rootScope, $uibModalStack) {
-
+function AppRun($rootScope) {
+  // Seed the shared loading flags. ui-router is gone, so the former $stateChangeStart/Success handlers
+  // (reset flags, drop deepsense listeners, clear modals) now live on @angular/router NavigationStart
+  // in ng2/router-shell.component.ts. showView gating is dropped (the router-outlet governs rendering).
   $rootScope.stateData = {
     showView: undefined,
     dataIsLoaded: undefined
   };
-
-  $rootScope.$on('$stateChangeStart', () => {
-    $rootScope.stateData.dataIsLoaded = undefined;
-    $rootScope.showView = undefined;
-
-    _unbindDeepsenseCustomListeners();
-    _clearModalsFromStack();
-  });
-
-  $rootScope.$on('$stateChangeSuccess', () => {
-    $rootScope.stateData.showView = true;
-  });
-
-  function _unbindDeepsenseCustomListeners() {
-    for(let key in $rootScope.$$listeners) {
-      if (key[0] !== '$') {
-        delete $rootScope.$$listeners[key];
-      }
-    }
-  }
-
-  function _clearModalsFromStack() {
-    while ($uibModalStack.getTop()) {
-      $uibModalStack.dismiss($uibModalStack.getTop().key);
-    }
-  }
 }
 
 exports.function = AppRun;

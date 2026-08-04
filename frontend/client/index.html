@@ -14,15 +14,14 @@
   type="warning"
   string="Reconnecting">
 </loading-mask>
-<ui-view id="wrapper"
+<!-- ui-router removed: <router-shell> is a downgraded Angular component hosting the @angular/router
+     <router-outlet>. This element stays in the (still AngularJS-bootstrapped) index.html so the
+     AngularJS droppable directive still applies to it. -->
+<router-shell id="wrapper"
          class="animated fadeIn"
-         ng-class="{
-             'c-home': home.$state.includes('home')
-           }"
-         ng-show="stateData.showView"
          droppable
          droppable-type="frame">
-</ui-view>
+</router-shell>
 <feedback></feedback>
 <deepsense-loading-spinner-processing ng-if="!stateData.dataIsLoaded">
   Loading

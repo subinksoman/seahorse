@@ -22,6 +22,6 @@ var home = angular.module('ds.home', []);
 
 // home.ctrl migrated to Angular (ng2/home.component.ts) — downgraded 'homeView'. The 'home' state
 // template now hosts <home-view> instead of the Home controller.
-require('./home.config.js').inject(home);
+// home.config ($stateProvider) removed — routing is /router (ng2/app-routes.ts).
 
 module.exports = home;

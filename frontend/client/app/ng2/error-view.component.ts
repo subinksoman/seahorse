@@ -3,7 +3,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { Component, Input, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 // Phase C / router track (step 1): migrated from errors/errors.controller.js + the 3 error state
 // templates (error-missing / error-version / error-request-timeout). One component switches on a
@@ -42,30 +43,35 @@ import { Component, Input, OnInit, Inject } from '@angular/core';
   `
 })
 export class ErrorViewComponent implements OnInit {
-  @Input() mode: string;
+  mode: string;
   errorMessage: string;
+  type: string;
+  id: string;
 
   constructor(
     @Inject('config') private config: any,
     @Inject('$rootScope') private $rootScope: any,
-    @Inject('$stateParams') private $stateParams: any,
-    @Inject('$state') private $state: any
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    const snap = this.route.snapshot;
+    this.mode = snap.data['mode'];
+    this.type = snap.paramMap.get('type');
+    this.id = snap.paramMap.get('id');
+    this.errorMessage = snap.queryParamMap.get('errorMessage') ||
+      (this.$rootScope.stateData && this.$rootScope.stateData.errorMessage);
     this.$rootScope.stateData.dataIsLoaded = true;
     this.$rootScope.showView = true;
-    this.errorMessage = this.$stateParams.errorMessage ||
-      (this.$rootScope.stateData && this.$rootScope.stateData.errorMessage);
   }
 
-  getType(): string { return this.$stateParams.type; }
-  getErrorDescription(): string { return this.$stateParams.errorMessage; }
+  getType(): string { return this.type; }
+  getErrorDescription(): string { return this.errorMessage; }
   getAPIVersion(): string { return this.config.apiVersion; }
   getLink(): string {
-    return this.config.apiHost + '/' + this.config.urlApiVersion + '/' +
-      this.$stateParams.type + 's/' + this.$stateParams.id + '/download';
+    return this.config.apiHost + '/' + this.config.urlApiVersion + '/' + this.type + 's/' + this.id + '/download';
   }
 
-  goHome(): void { this.$state.go('home'); }
+  goHome(): void { this.router.navigate(['/']); }
 }

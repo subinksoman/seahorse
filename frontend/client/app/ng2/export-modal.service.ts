@@ -6,6 +6,7 @@
 import { Injectable, Inject } from '@angular/core';
 import tpl from '../common/modals/export-modal/export-modal.html';
 import { WorkflowsApiClient } from './workflows-api-client.service';
+import { WorkflowService } from './workflow.service';
 
 declare const $: any; // jQuery global
 
@@ -19,7 +20,7 @@ export class ExportModalService {
   constructor(
     @Inject('$uibModal') private $uibModal: any,
     @Inject('$rootScope') private $rootScope: any,
-    @Inject('$stateParams') private $stateParams: any,
+    private workflowService: WorkflowService,
     private workflowsApiClient: WorkflowsApiClient
   ) {}
 
@@ -28,8 +29,9 @@ export class ExportModalService {
     scope.$ctrl = {
       includeDatasources: undefined,
       download: () => {
+        const workflowId = (this.workflowService as any).getCurrentWorkflow().id;
         const url = (this.workflowsApiClient as any)
-          .getDownloadWorkflowMethodUrl(this.$stateParams.id, scope.$ctrl.includeDatasources);
+          .getDownloadWorkflowMethodUrl(workflowId, scope.$ctrl.includeDatasources);
         $('body').append(`<iframe style="display: none" src="${url}"></iframe>`);
         scope.$ctrl.close();
       }
