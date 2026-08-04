@@ -29,7 +29,7 @@ declare const jQuery: any;
     <aside class="ibox operation-attributes-panel animated fadeIn"
            [ngClass]="{ 'operation-attributes-panel__disabled': disabledMode }">
       <header class="ibox-title ibox-title--main">
-        <section [hidden]="disabledMode && !node.uiName" class="ibox-title node-edition-section flex-content--no-flex m-b-n-xs">
+        <section *ngIf="!(disabledMode && !node.uiName)" class="ibox-title node-edition-section flex-content--no-flex m-b-n-xs">
           <p *ngIf="!nodeNameInputVisible" class="node-edition-section__editable-text"
              (click)="enableEdition()" [title]="!disabledMode ? 'Click to change name' : ''">
             {{ node.uiName || 'Enter custom name' }}
@@ -57,21 +57,21 @@ declare const jQuery: any;
                  'label-queued': node.state.status === 'status_queued',
                  'label-running': node.state.status === 'status_running'
                }">{{ node.state.status.replace('status_', '') }}</p>
-            <button [hidden]="node.state.status !== 'status_failed'" (click)="showErrorMessage()"
+            <button *ngIf="node.state.status === 'status_failed'" (click)="showErrorMessage()"
                     class="btn btn-xs btn-info o-action-text o-error-btn">
               <span class="fa fa-exclamation-triangle"></span>
               <span class="o-action-text__text-element">Click here to show errors</span>
             </button>
           </header>
-          <p class="o-state__time text-right navy-bg" [hidden]="!node.state.started">
+          <p class="o-state__time text-right navy-bg" *ngIf="node.state.started">
             <span class="block">Execution start</span><i class="fa fa-clock-o"></i>
             <time class="text-right" [attr.datetime]="node.state.started">{{ node.state.started | date:'medium' }}</time>
           </p>
-          <p class="o-state__time text-right lazur-bg" [hidden]="!node.state.ended">
+          <p class="o-state__time text-right lazur-bg" *ngIf="node.state.ended">
             <span class="block">Execution end</span><i class="fa fa-clock-o"></i>
             <time class="text-right" [attr.datetime]="node.state.ended">{{ node.state.ended | date:'medium' }}</time>
           </p>
-          <p class="o-state__time text-right gray-bg" [hidden]="!node.state.ended">
+          <p class="o-state__time text-right gray-bg" *ngIf="node.state.ended">
             <span class="block">Execution time</span><i class="fa fa-clock-o"></i>
             <time-diff [start]="node.state.started" [end]="node.state.ended"></time-diff>
           </p>
