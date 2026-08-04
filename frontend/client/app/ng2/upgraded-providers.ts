@@ -52,6 +52,8 @@ export function sceFactory(i: any): any { return i.get('$sce'); }
 // error-view). These go away when ui-router is swapped for @angular/router (Router/ActivatedRoute).
 export function stateFactory(i: any): any { return i.get('$state'); }
 export function stateParamsFactory(i: any): any { return i.get('$stateParams'); }
+// ngFileUpload's Upload service, bridged for the (migrated) upload-workflow modal folded into HomeComponent.
+export function uploadFactory(i: any): any { return i.get('Upload'); }
 
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
@@ -82,5 +84,6 @@ export const upgradedProviders: any[] = [
   { provide: 'AttributesPanelService', useFactory: attributesPanelServiceFactory, deps: ['$injector'] },
   { provide: '$sce', useFactory: sceFactory, deps: ['$injector'] },
   { provide: '$state', useFactory: stateFactory, deps: ['$injector'] },
-  { provide: '$stateParams', useFactory: stateParamsFactory, deps: ['$injector'] }
+  { provide: '$stateParams', useFactory: stateParamsFactory, deps: ['$injector'] },
+  { provide: 'Upload', useFactory: uploadFactory, deps: ['$injector'] }
 ];

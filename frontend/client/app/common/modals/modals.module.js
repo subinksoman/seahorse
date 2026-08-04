@@ -17,9 +17,9 @@
 'use strict';
 
 exports.inject = function(module) {
-  // confirmation/delete/export/workflow-clone modal controllers folded into their Angular services
-  // (ng2/*.service.ts) via the child-scope trick — no AngularJS controller registration needed. The
-  // modal templates + uib-modal itself stay AngularJS until the ui.bootstrap -> Bootstrap 5 step.
-  require('./new-workflow-modal/new-workflow-modal.ctrl.js').inject(module);
-  require('./upload-workflow-modal/upload-workflow-modal.ctrl.js').inject(module);
+  // ALL modal controllers (confirmation/delete/export/workflow-clone/new-workflow/upload-workflow) are
+  // folded into their Angular callers/services via the child-scope trick — no AngularJS controller
+  // registration remains. The modal templates + uib-modal itself stay AngularJS until the
+  // ui.bootstrap -> Bootstrap 5 step. (new-workflow + upload-workflow are opened from HomeComponent;
+  // upload uses the bridged ngFileUpload 'Upload'.)
 };
