@@ -16,7 +16,10 @@
 
 // attribute-boolean-type migrated to Angular.
 require('./attribute-code-snippet/attribute-code-snippet-type-modal/attribute-code-snippet-type-modal.ctrl.js'); // code-snippet migrated to Angular; modal ctrl kept for the edit-in-window modal
-require('./attribute-column-selector/attribute-selector-type.js');
+// attribute-selector-type + attributes-serialized-view migrated to Angular (ng2/). The modal's
+// selector-items + calculated-selected-columns stay AngularJS (opened on the Angular component's child scope):
+require('./attribute-column-selector/calculated-selected-columns/calculated-selected-columns.js');
+require('./attribute-column-selector/selector-items/selector-items.js');
 // migrated to Angular (ng2/) — downgraded.
 require('./attribute-dynamic-param/attribute-dynamic-param-type.js');
 require('./attribute-gridsearch-param/attribute-gridsearch-param-type.js');

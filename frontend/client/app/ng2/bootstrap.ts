@@ -81,6 +81,8 @@ import { LibraryConnectorComponent } from './library-connector.component';
 import { AttributeDatasourceComponent } from './attribute-datasource.component';
 import { AttributeBooleanTypeComponent } from './attribute-boolean-type.component';
 import { AttributeCodeSnippetTypeComponent } from './attribute-code-snippet-type.component';
+import { AttributeSelectorTypeComponent } from './attribute-selector-type.component';
+import { AttributesSerializedViewComponent } from './attributes-serialized-view.component';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -169,12 +171,13 @@ angular.module('ds.lab')
   .directive('attributeLoadFromLibrary', downgradeComponent({ component: AttributeLoadFromLibraryTypeComponent }) as any)
   .directive('attributeDatasource', downgradeComponent({ component: AttributeDatasourceComponent }) as any)
   .directive('attributeBooleanType', downgradeComponent({ component: AttributeBooleanTypeComponent }) as any)
-  .directive('attributeCodeSnippetType', downgradeComponent({ component: AttributeCodeSnippetTypeComponent }) as any);
+  .directive('attributeCodeSnippetType', downgradeComponent({ component: AttributeCodeSnippetTypeComponent }) as any)
+  .directive('attributeSelectorType', downgradeComponent({ component: AttributeSelectorTypeComponent }) as any);
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],
   // Angular components used from AngularJS (via downgradeComponent) must be declared here.
-  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent, ReportComponent, AttributeStringTypeComponent, AttributeNumericTypeComponent, AttributeMultipleNumericTypeComponent, AttributeWorkflowTypeComponent, AttributeSaveToLibraryTypeComponent, AttributeLoadFromLibraryTypeComponent, LibraryConnectorComponent, AttributeDatasourceComponent, AttributeBooleanTypeComponent, AttributeCodeSnippetTypeComponent],
+  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent, ReportComponent, AttributeStringTypeComponent, AttributeNumericTypeComponent, AttributeMultipleNumericTypeComponent, AttributeWorkflowTypeComponent, AttributeSaveToLibraryTypeComponent, AttributeLoadFromLibraryTypeComponent, LibraryConnectorComponent, AttributeDatasourceComponent, AttributeBooleanTypeComponent, AttributeCodeSnippetTypeComponent, AttributeSelectorTypeComponent, AttributesSerializedViewComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
   // migrated services can inject them by string token. See upgraded-providers.ts.
   providers: [...upgradedProviders]
