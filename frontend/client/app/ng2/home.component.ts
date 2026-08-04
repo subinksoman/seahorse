@@ -6,8 +6,6 @@
 import { Component, OnInit, DoCheck, Inject } from '@angular/core';
 import * as _ from 'lodash';
 import moment from 'moment';
-import uploadWorkflowTpl from '../common/modals/upload-workflow-modal/upload-workflow-modal.html';
-import newWorkflowTpl from '../common/modals/new-workflow-modal/new-workflow-modal.html';
 import logo from 'ASSETS/images/deepsense-logo.svg';
 import seahorseMain from 'ASSETS/images/seahorse-main.png';
 import { WorkflowService } from './workflow.service';
@@ -16,8 +14,10 @@ import { SessionManager } from './session-manager.service';
 import { SessionManagerApi } from './session-manager-api.service';
 import { ConfirmationModalService } from './confirmation-modal.service';
 import { WorkflowCloneService } from './workflow-clone.service';
-import { WorkflowsApiClient } from './workflows-api-client.service';
 import { Router } from '@angular/router';
+import { ModalService } from './modal.service';
+import { NewWorkflowModalComponent } from './new-workflow-modal.component';
+import { UploadWorkflowModalComponent } from './upload-workflow-modal.component';
 
 // Phase C / router track (step 2): migrated from home/home.ctrl.js + home.html. The workflow-list
 // landing view. Downgraded 'homeView'; the ui-router 'home' state template now hosts <home-view>.
@@ -162,17 +162,15 @@ export class HomeComponent implements OnInit, DoCheck {
 
   constructor(
     @Inject('$rootScope') private $rootScope: any,
-    @Inject('$uibModal') private $uibModal: any,
     private router: Router,
+    private modal: ModalService,
     @Inject('ServerCommunication') private serverCommunication: any,
-    @Inject('Upload') private upload: any,
     private workflowService: WorkflowService,
     private userService: UserService,
     private sessionManager: SessionManager,
     private sessionManagerApi: SessionManagerApi,
     private confirmationModalService: ConfirmationModalService,
-    private workflowCloneService: WorkflowCloneService,
-    private workflowsApiClient: WorkflowsApiClient
+    private workflowCloneService: WorkflowCloneService
   ) {}
 
   ngOnInit(): void {
@@ -283,71 +281,17 @@ export class HomeComponent implements OnInit, DoCheck {
     });
   }
 
-  // NewWorkflowModalController folded in via the child-scope trick (see the modal services).
   displayCreateWorkflowPopup(event: Event): void {
     event.preventDefault();
-    const scope = this.$rootScope.$new();
-    scope.controller = { name: '', description: '', loading: false, errorMessage: undefined };
-    const modal = this.$uibModal.open({
-      animation: true,
-      templateUrl: newWorkflowTpl,
-      scope,
-      backdrop: 'static',
-      keyboard: true
+    this.modal.open<string>(NewWorkflowModalComponent).result.then((workflowId) => {
+      if (workflowId) { this.router.navigate(['/workflows', workflowId, 'editor']); }
     });
-    scope.controller.close = () => modal.dismiss();
-    scope.controller.ok = () => {
-      const DEFAULT_NAME = 'Draft workflow';
-      scope.controller.loading = true;
-      (this.workflowsApiClient as any).createWorkflow({
-        name: scope.controller.name || DEFAULT_NAME,
-        description: scope.controller.description || ''
-      }).then((response: any) => {
-        modal.close(response.workflowId);
-      }).catch(({ data } = {} as any) => {
-        const { message } = (data || {});
-        scope.controller.loading = false;
-        scope.controller.errorMessage = message || 'Server error';
-      });
-    };
-    modal.result.then((workflowId: string) => this.router.navigate(['/workflows', workflowId, 'editor']), () => {})
-      .finally(() => scope.$destroy());
   }
 
-  // UploadWorkflowModalController folded in via the child-scope trick; Upload = ngFileUpload (bridged).
   displayUploadWorkflowPopup(event: Event): void {
     event.preventDefault();
-    const scope = this.$rootScope.$new();
-    scope.controller = { status: 'preparing', errorMessage: '', progress: '' };
-    const modal = this.$uibModal.open({
-      animation: true,
-      templateUrl: uploadWorkflowTpl,
-      scope,
-      backdrop: 'static',
-      keyboard: true
+    this.modal.open<string>(UploadWorkflowModalComponent).result.then((workflowId) => {
+      if (workflowId) { this.router.navigate(['/workflows', workflowId, 'editor']); }
     });
-    scope.controller.close = () => modal.dismiss();
-    scope.controller.ok = () => modal.close();
-    scope.controller.upload = (file: any) => {
-      scope.controller.status = 'failure';
-      this.upload.upload({
-        url: (this.workflowsApiClient as any).getUploadWorkflowMethodUrl(),
-        method: 'POST',
-        file,
-        fileFormDataName: 'workflowFile'
-      }).progress((evt: any) => {
-        scope.controller.status = 'loading';
-        scope.controller.progress = parseInt('' + (100.0 * evt.loaded / evt.total), 10);
-      }).then((response: any) => {
-        scope.controller.status = 'success';
-        modal.close(response.data.workflowId);
-      }).catch(({ data } = {} as any) => {
-        const { message } = (data || {});
-        scope.controller.status = 'failure';
-        scope.controller.errorMessage = message || 'Server error';
-      });
-    };
-    modal.result.then((workflowId: string) => this.router.navigate(['/workflows', workflowId, 'editor']), () => {})
-      .finally(() => scope.$destroy());
   }
 }
