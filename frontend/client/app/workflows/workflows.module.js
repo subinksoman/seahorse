@@ -34,8 +34,8 @@ require('./workflows-status-bar/workflows-status-bar.drv.js').inject(workflows);
 require('./workflows-status-bar/workflows-status-bar.ctrl.js').inject(workflows);
 // workflows-editor-status-bar.service migrated to Angular 18 (ng2/) — downgraded as 'WorkflowStatusBarService'.
 require('./workflows-status-bar/documentation-link/documentation-link.directive.js').inject(workflows);
-require('./workflows-status-bar/selection-items/selection-items.controller.js').inject(workflows);
-require('./workflows-status-bar/selection-items/selection-items.directive.js').inject(workflows);
+// selection-items migrated to Angular (ng2/selection-items.component.ts) — downgraded 'selectionItems'.
+
 require('./general-data-panel/general-data-panel.module.js').inject(workflows);
 // copy-paste migrated to Angular 18 (ng2/copy-paste.service.ts) — downgraded as 'CopyPasteService'.
 require('./workflows-status-bar/menu-item/menu-item.directive.js').inject(workflows);

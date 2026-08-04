@@ -90,6 +90,7 @@ import { AttributeMultiplierTypeComponent } from './attribute-multiplier-type.co
 import { AttributeDynamicParamTypeComponent } from './attribute-dynamic-param-type.component';
 import { AttributesPanelComponent } from './attributes-panel.component';
 import { TimeDiffComponent, DeepsenseLoadingSpinnerSmComponent } from './deepsense-attributes-misc.components';
+import { SelectionItemsComponent } from './selection-items.component';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -181,12 +182,13 @@ angular.module('ds.lab')
   .directive('attributeCodeSnippetType', downgradeComponent({ component: AttributeCodeSnippetTypeComponent }) as any)
   .directive('attributeSelectorType', downgradeComponent({ component: AttributeSelectorTypeComponent }) as any)
   .directive('attributesList', downgradeComponent({ component: AttributesListComponent }) as any)
-  .directive('deepsenseOperationAttributes', downgradeComponent({ component: AttributesPanelComponent }) as any);
+  .directive('deepsenseOperationAttributes', downgradeComponent({ component: AttributesPanelComponent }) as any)
+  .directive('selectionItems', downgradeComponent({ component: SelectionItemsComponent }) as any);
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],
   // Angular components used from AngularJS (via downgradeComponent) must be declared here.
-  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent, ReportComponent, AttributeStringTypeComponent, AttributeNumericTypeComponent, AttributeMultipleNumericTypeComponent, AttributeWorkflowTypeComponent, AttributeSaveToLibraryTypeComponent, AttributeLoadFromLibraryTypeComponent, LibraryConnectorComponent, AttributeDatasourceComponent, AttributeBooleanTypeComponent, AttributeCodeSnippetTypeComponent, AttributeSelectorTypeComponent, AttributesSerializedViewComponent, AttributesListComponent, AttributeSingleChoiceTypeComponent, AttributeMultipleChoiceTypeComponent, AttributeMultiplierTypeComponent, AttributeDynamicParamTypeComponent, AttributesPanelComponent, TimeDiffComponent, DeepsenseLoadingSpinnerSmComponent],
+  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent, ReportComponent, AttributeStringTypeComponent, AttributeNumericTypeComponent, AttributeMultipleNumericTypeComponent, AttributeWorkflowTypeComponent, AttributeSaveToLibraryTypeComponent, AttributeLoadFromLibraryTypeComponent, LibraryConnectorComponent, AttributeDatasourceComponent, AttributeBooleanTypeComponent, AttributeCodeSnippetTypeComponent, AttributeSelectorTypeComponent, AttributesSerializedViewComponent, AttributesListComponent, AttributeSingleChoiceTypeComponent, AttributeMultipleChoiceTypeComponent, AttributeMultiplierTypeComponent, AttributeDynamicParamTypeComponent, AttributesPanelComponent, TimeDiffComponent, DeepsenseLoadingSpinnerSmComponent, SelectionItemsComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
   // migrated services can inject them by string token. See upgraded-providers.ts.
   providers: [...upgradedProviders]
