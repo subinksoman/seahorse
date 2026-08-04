@@ -25,7 +25,6 @@ function ErrorsConfig($stateProvider) {
   $stateProvider.state('MissingState', {
     url: '/error/missing',
     templateUrl: errorMissingTpl,
-    controller: 'ErrorController as controller'
   });
 
   $stateProvider.state('ConflictState', {
@@ -36,13 +35,11 @@ function ErrorsConfig($stateProvider) {
       errorMessage: undefined
     },
     templateUrl: errorVersionTpl,
-    controller: 'ErrorController as controller'
   });
 
   $stateProvider.state('RequestTimeout', {
     url: '/error/request-timeout',
     templateUrl: errorTimeoutTpl,
-    controller: 'ErrorController as controller'
   });
 }
 

@@ -18,7 +18,8 @@
 
 var angular = require('angular');
 var errors = angular.module('ds.errors', []);
-require('./errors.controller.js').inject(errors);
+// errors.controller migrated to Angular (ng2/error-view.component.ts) — downgraded 'errorView'.
+// The 3 state templates now host <error-view mode="..."> instead of ErrorController.
 require('./errors.config.js').inject(errors);
 // errors.service migrated to Angular 18 (ng2/error.service.ts) — downgraded as 'ErrorService'
 // on ds.lab (one shared AngularJS injector), so the legacy registration here is gone.
