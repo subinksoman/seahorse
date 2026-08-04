@@ -31,6 +31,9 @@ const attributesPanel = angular.module('deepsense.attributes-panel', [
 require('./attribute-types/attribute-types.js');
 // attributes-list migrated to Angular (ng2/attributes-list.component.ts) — downgraded 'attributesList'.
 // attributes-panel (deepsenseOperationAttributes) migrated to Angular (ng2/attributes-panel.component.ts).
+// Its service stays AngularJS (bridged to Angular, used by attributes-list + attribute-datasource + the
+// panel) — re-registered directly now that the migrated directive no longer requires it transitively.
+require('./attributes-panel/attributes-panel.service.js');
 require('./common/common.js');
 
 module.exports = attributesPanel;
