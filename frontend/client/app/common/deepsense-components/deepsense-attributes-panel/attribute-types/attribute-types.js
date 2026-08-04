@@ -20,14 +20,14 @@ require('./attribute-column-selector/attribute-selector-type.js');
 // migrated to Angular (ng2/) — downgraded.
 require('./attribute-dynamic-param/attribute-dynamic-param-type.js');
 require('./attribute-gridsearch-param/attribute-gridsearch-param-type.js');
-require('./attribute-load-from-library/attribute-load-from-library-type.js');
-require('./attribute-load-from-library/library-connector/library-connector.js');
+// attribute-load-from-library (+library-connector) migrated to Angular.
+// (library-connector migrated with load-from-library)
 require('./attribute-multiple-choice/attribute-multiple-choice-type.js');
 // migrated to Angular (ng2/) — downgraded.
 require('./attribute-multiplier/attribute-multiplier-type.js');
 // attribute-numeric-type migrated to Angular (app/ng2/attribute-numeric-type.component.ts) — downgraded 'attributeNumericType'.
 // migrated to Angular (ng2/) — downgraded.
-require('./attribute-save-to-library/attribute-save-to-library-type.js');
+// attribute-save-to-library migrated to Angular.
 require('./attribute-single-choice/attribute-single-choice-type.js');
 // attribute-string-type migrated to Angular (app/ng2/attribute-string-type.component.ts) — downgraded 'attributeStringType'.
 // migrated to Angular (ng2/) — downgraded.
