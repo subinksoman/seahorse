@@ -3,7 +3,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { Component, OnInit, OnDestroy, DoCheck, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, DoCheck, AfterViewInit, Inject } from '@angular/core';
 import * as _ from 'lodash';
 import { WorkflowCloneService } from './workflow-clone.service';
 import { ReportService } from './report.service';
@@ -110,7 +110,7 @@ import { MouseEvent as MouseEventService } from './mouse-event.service';
     </div>
   `
 })
-export class WorkflowsEditorComponent implements OnInit, OnDestroy, DoCheck {
+export class WorkflowsEditorComponent implements OnInit, OnDestroy, DoCheck, AfterViewInit {
   selectedNode: any = null;
   selectedPortObject: any = null;
   report: any = null;
@@ -155,6 +155,17 @@ export class WorkflowsEditorComponent implements OnInit, OnDestroy, DoCheck {
     this.BottomBarData = (this.bottomBarService as any).tabsState;
 
     this.init(this.workflowWithResults);
+  }
+
+  ngAfterViewInit(): void {
+    // The jsPlumb canvas paints nodes/edges on a layout tick. On first load nothing triggers that tick
+    // until a reflow (opening DevTools, resizing the window), so the canvas looks blank even though the
+    // graph-node elements are in the DOM. Force the initial paint once the view has settled. (The
+    // legacy AngularJS controller got this for free from the initial $digest + jsPlumb init.)
+    setTimeout(() => {
+      this.adapterService.render();
+      window.dispatchEvent(new Event('resize'));
+    }, 0);
   }
 
   ngDoCheck(): void {
