@@ -5,7 +5,7 @@ import { NgModule, DoBootstrap } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { UpgradeModule, downgradeInjectable, downgradeComponent } from '@angular/upgrade/static';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { setUpLocationSync } from '@angular/router/upgrade';
 import { appRoutes } from './app-routes';
 import { RouterShellComponent, WorkflowsShellComponent } from './router-shell.component';
@@ -206,7 +206,11 @@ angular.module('ds.lab')
   .directive('routerShell', downgradeComponent({ component: RouterShellComponent }) as any);
 
 @NgModule({
-  imports: [BrowserModule, UpgradeModule, RouterModule.forRoot(appRoutes, { useHash: true })],
+  imports: [BrowserModule, UpgradeModule,
+    // initialNavigation 'disabled': we never bootstrap an Angular ROOT component (Angular does
+    // upgrade.bootstrap of ds.lab instead), so the router's automatic initial navigation never fires.
+    // We kick it manually in ngDoBootstrap after the AngularJS app + location sync are up.
+    RouterModule.forRoot(appRoutes, { useHash: true, initialNavigation: 'disabled' })],
   // Angular components used from AngularJS (via downgradeComponent) must be declared here.
   declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent, ReportComponent, AttributeStringTypeComponent, AttributeNumericTypeComponent, AttributeMultipleNumericTypeComponent, AttributeWorkflowTypeComponent, AttributeSaveToLibraryTypeComponent, AttributeLoadFromLibraryTypeComponent, LibraryConnectorComponent, AttributeDatasourceComponent, AttributeBooleanTypeComponent, AttributeCodeSnippetTypeComponent, AttributeSelectorTypeComponent, AttributesSerializedViewComponent, AttributesListComponent, AttributeSingleChoiceTypeComponent, AttributeMultipleChoiceTypeComponent, AttributeMultiplierTypeComponent, AttributeDynamicParamTypeComponent, AttributesPanelComponent, TimeDiffComponent, DeepsenseLoadingSpinnerSmComponent, SelectionItemsComponent, WorkflowsEditorStatusBarComponent, MenuItemComponent, StartingPopoverComponent, RunningExecutorPopoverComponent, ExecutorErrorComponent, NavigationBarComponent, ErrorViewComponent, HomeComponent, ResizableDirective, ResizableListenerDirective, WorkflowsEditorComponent, PublicParamsListComponent, WorkflowSchedulesUpgradeDirective, RouterShellComponent, WorkflowsShellComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
@@ -214,7 +218,7 @@ angular.module('ds.lab')
   providers: [...upgradedProviders]
 })
 export class AppModule implements DoBootstrap {
-  constructor(private upgrade: UpgradeModule) {}
+  constructor(private upgrade: UpgradeModule, private router: Router) {}
   ngDoBootstrap(): void {
     // Bootstrap the existing AngularJS app under Angular's control (strict DI preserved).
     this.upgrade.bootstrap(document.documentElement, ['ds.lab'], { strictDi: true });
@@ -222,6 +226,9 @@ export class AppModule implements DoBootstrap {
     // in index.html). setUpLocationSync keeps the Angular Router and AngularJS $location on ONE URL
     // (hash mode) so they don't fight.
     setUpLocationSync(this.upgrade, 'hash');
+    // Kick the router's initial navigation manually (disabled in forRoot) — there is no Angular root
+    // component to trigger it automatically in this hybrid.
+    this.router.initialNavigation();
     // eslint-disable-next-line no-console
     console.log('[hybrid] Angular', '18', 'bootstrapped ds.lab; helloAngular =', (angular.element(document.documentElement).injector() ? 'wired' : '?'));
   }
