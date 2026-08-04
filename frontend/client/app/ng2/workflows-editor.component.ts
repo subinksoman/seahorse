@@ -129,6 +129,7 @@ export class WorkflowsEditorComponent implements OnInit, OnDestroy, DoCheck, Aft
     @Inject('$state') private $state: any,
     @Inject('ServerCommunication') private serverCommunication: any,
     @Inject('AdapterService') private adapterService: any,
+    @Inject('CanvasService') private canvasService: any,
     @Inject('DatasourcesPanelService') private datasourcesPanelService: any,
     private workflowCloneService: WorkflowCloneService,
     private reportService: ReportService,
@@ -165,9 +166,13 @@ export class WorkflowsEditorComponent implements OnInit, OnDestroy, DoCheck, Aft
     // (e.g. opening DevTools) triggers a digest. The legacy AngularJS controller had a live digest loop
     // and got this for free. Kick a digest after layout (twice, to catch layout timing) so the watch
     // fires fit() and the canvas paints. $applyAsync is digest-safe (no "already in progress").
+    // Call CanvasService.fit() directly (same thing the "fit to editor" toolbar button does, which the
+    // user confirmed makes the nodes appear). This is deterministic — unlike relying on the getWindowSize
+    // $watch, which only fires fit() if it detects a size CHANGE on a digest. Kick twice for layout timing.
     const kick = () => {
-      this.$rootScope.$applyAsync();
+      this.canvasService.fit();
       this.adapterService.render();
+      this.$rootScope.$applyAsync();
     };
     setTimeout(kick, 0);
     setTimeout(kick, 250);
