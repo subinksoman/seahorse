@@ -20,10 +20,8 @@
 import angular from 'angular';
 
 // App
-import DatasourcesPanelComponent from './datasources-panel/datasources-panel.component.js';
-// datasources-element migrated to Angular (app/ng2/datasources-element.component.ts) — downgraded as 'datasourcesElement'.
-import DatasourcesListComponent from './datasources-list/datasources-list.component.js';
-import DatasourcesToolbarComponent from './datasources-toolbar/datasources-toolbar.component.js';
+// datasources panel/list/toolbar/element migrated to Angular (app/ng2/datasources-*.component.ts) —
+// datasourcesPanel + datasourcesElement downgraded in bootstrap.ts; list + toolbar are Angular-template-only.
 import FileSettingsComponent from './datasources-toolbar/file-settings/file-settings.component.js';
 import DatasourcesPanelService from './datasources-panel/datasources-panel.service.js';
 import DatasourcesModalsService from './datasources-toolbar/modals/datasources-modals.service.js';
@@ -37,9 +35,6 @@ import LibraryModalController from './datasources-toolbar/modals/library-modal/l
 
 export const datasourcesModule = angular
   .module('datasources', [])
-  .component('datasourcesPanel', DatasourcesPanelComponent)
-  .component('datasourcesList', DatasourcesListComponent)
-  .component('datasourcesToolbar', DatasourcesToolbarComponent)
   .component('fileSettings', FileSettingsComponent)
   .service('DatasourcesPanelService', DatasourcesPanelService)
   .service('DatasourcesModalsService', DatasourcesModalsService)
