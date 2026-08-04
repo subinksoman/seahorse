@@ -44,7 +44,7 @@ require('./general-data-panel/general-data-panel.module.js').inject(workflows);
 // bottom-bar migrated to Angular (ng2/bottom-bar.component.ts) — downgraded as directive 'bottomBar'.
 // bottom-bar.service migrated to Angular 18 (ng2/bottom-bar.service.ts) — downgraded as 'BottomBarService'.
 // session-manager.service migrated to Angular 18 (ng2/session-manager.service.ts) — downgraded as 'SessionManager'.
-require('./navigation-bar/navigation-bar.module.js').inject(workflows);
+// navigation-bar migrated to Angular (ng2/navigation-bar.component.ts) — downgraded 'navigationBar'.
 require('./cluster-settings-modals/choose-cluster-modal.ctrl.js').inject(workflows);
 // cluster-modal.srv migrated to Angular 18 (ng2/cluster-modal.service.ts) — downgraded as 'ClusterModalService'.
 require('./cluster-settings-modals/preset-modal/preset-modal.controller.js').inject(workflows);
