@@ -3,19 +3,19 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { Injectable } from '@angular/core';
-import { ModalService } from './modal.service';
-import { LibraryModalComponent } from './library-modal.component';
+import { Injectable, Inject } from '@angular/core';
+import tpl from '../workflows/library/library-modal.html';
 
-// Phase C / AngularJS removal: opens the library picker on CDK/ModalService (was uib-modal). Also holds
-// the uploading-files popover + new-directory-input UI flags (root singleton). openLibraryModal resolves
-// the selected item (undefined if dismissed). Downgraded as 'LibraryModalService'.
+// Phase C-1: migrated from workflows/library/library-modal.service.js. Opens the library modal via
+// angular-ui-bootstrap ($uibModal, bridged); template + LibraryModalCtrl stay AngularJS. Also holds
+// the uploading-files popover + new-directory-input UI flags (legacy closure vars -> instance fields;
+// root singleton, identical semantics). Public surface unchanged; downgraded as 'LibraryModalService'.
 @Injectable({ providedIn: 'root' })
 export class LibraryModalService {
   private isUploadingFilesPopoverOpen = false;
   private isNewDirectoryInputVisible = false;
 
-  constructor(private modal: ModalService) {
+  constructor(@Inject('$uibModal') private $uibModal: any) {
     // getUploadingFilesPopoverStatus is passed detached to $scope.$watch (recent-files-indicator);
     // the legacy service used closures (no `this`), so bind the state getters to keep instance context.
     this.getUploadingFilesPopoverStatus = this.getUploadingFilesPopoverStatus.bind(this);
@@ -23,12 +23,25 @@ export class LibraryModalService {
   }
 
   openLibraryModal(mode: any, params: any): any {
-    return this.modal.open(LibraryModalComponent, { mode, params },
-      { panelClass: ['ds-modal-panel', 'ds-modal-lg'] })
-      .result.then((result: any) => {
+    return this.$uibModal.open({
+      animation: false,
+      templateUrl: tpl,
+      size: 'lg',
+      controller: 'LibraryModalCtrl',
+      controllerAs: 'controller',
+      backdrop: 'static',
+      keyboard: true,
+      resolve: {
+        mode: () => mode,
+        params: () => params
+      }
+    }).result.then((result: any) => {
+      this.closeUploadingFilesPopover();
+      return result;
+    })
+      .catch(() => {
         this.closeUploadingFilesPopover();
         this.hideNewDirectoryInput();
-        return result;
       });
   }
 
