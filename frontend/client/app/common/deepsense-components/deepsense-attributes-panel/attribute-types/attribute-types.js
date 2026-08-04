@@ -17,18 +17,18 @@
 require('./attribute-boolean/attribute-boolean-type.js');
 require('./attribute-code-snippet/attribute-code-snippet-type.js');
 require('./attribute-column-selector/attribute-selector-type.js');
-require('./attribute-creator-type/attribute-creator-type.js');
+// migrated to Angular (ng2/) — downgraded.
 require('./attribute-dynamic-param/attribute-dynamic-param-type.js');
 require('./attribute-gridsearch-param/attribute-gridsearch-param-type.js');
 require('./attribute-load-from-library/attribute-load-from-library-type.js');
 require('./attribute-load-from-library/library-connector/library-connector.js');
 require('./attribute-multiple-choice/attribute-multiple-choice-type.js');
-require('./attribute-multiple-numeric/attribute-multiple-numeric-type.js');
+// migrated to Angular (ng2/) — downgraded.
 require('./attribute-multiplier/attribute-multiplier-type.js');
 // attribute-numeric-type migrated to Angular (app/ng2/attribute-numeric-type.component.ts) — downgraded 'attributeNumericType'.
-require('./attribute-prefix-based-creator-type/attribute-prefix-based-creator-type.js');
+// migrated to Angular (ng2/) — downgraded.
 require('./attribute-save-to-library/attribute-save-to-library-type.js');
 require('./attribute-single-choice/attribute-single-choice-type.js');
 // attribute-string-type migrated to Angular (app/ng2/attribute-string-type.component.ts) — downgraded 'attributeStringType'.
-require('./attribute-workflow/attribute-workflow-type.js');
+// migrated to Angular (ng2/) — downgraded.
 require('./attribute-datasource/attribute-datasource.js');
