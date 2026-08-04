@@ -27,7 +27,7 @@ require('./workflows.config.js').inject(workflows);
 // workflows.service (WorkflowService hub) migrated to Angular 18 (ng2/workflow.service.ts) — downgraded as 'WorkflowService'.
 require('./common-behaviours/common-behaviours.module.js').inject(workflows);
 require('./graph-panel/graph-panel.module.js').inject(workflows);
-// public-params-list migrated to Angular (ng2/public-params-list.component.ts) — downgraded as directive 'publicParamsList'.
+require('./inner-workflows/public-param/public-params-list.js').inject(workflows);
 // default-inner-workflow-generator.service migrated to Angular 18 (ng2/) — downgraded as 'DefaultInnerWorkflowGenerator'.
 require('./workflows-editor/workflows-editor.module.js').inject(workflows);
 require('./workflows-status-bar/workflows-status-bar.drv.js').inject(workflows);

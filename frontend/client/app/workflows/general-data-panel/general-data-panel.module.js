@@ -16,6 +16,7 @@
 
 'use strict';
 
-// general-data-panel migrated to Angular (ng2/general-data-panel.component.ts) — downgraded as directive
-// 'generalDataPanel' in ng2/bootstrap.ts. This module's inject is now a no-op (kept so its callers don't break).
-exports.inject = function (module) {}; // eslint-disable-line no-unused-vars
+exports.inject = function (module) {
+  require('./general-data.panel.directive.js').inject(module);
+  require('./general-data-panel.controller.js').inject(module);
+};
