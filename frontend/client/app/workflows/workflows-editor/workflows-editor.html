@@ -39,16 +39,30 @@
 
     <general-data-panel
       ng-if="!workflow.getSelectedNode()"
-      workflow="workflow.getWorkflow()"
-      name="workflow.getWorkflow().name"
+      [workflow]="workflow.getWorkflow()"
+      [name]="workflow.getWorkflow().name"
+      (name-change)="workflow.getWorkflow().name = $event"
       class="right-panel-resizable"
-      description="workflow.getWorkflow().description"
-      public-params="workflow.WorkflowService.getCurrentWorkflow().publicParams"
-      disabled-mode="!workflow.isEditable()"
+      [description]="workflow.getWorkflow().description"
+      (description-change)="workflow.getWorkflow().description = $event"
+      [disabled-mode]="!workflow.isEditable()"
       resizable
       resizable-panel-name="rightPanel"
       resizable-position="left"
       resizable-add-shift="-10">
+      <!-- projected AngularJS islands (compiled in this WorkflowsEditorController scope) -->
+      <section class="ibox-content o-general-data-panel__content">
+        <header>
+          <p class="o-general-data-panel__header">Schedules:</p>
+          <workflow-schedules workflow="workflow.getWorkflow()"></workflow-schedules>
+        </header>
+      </section>
+      <section ng-if="workflow.WorkflowService.getCurrentWorkflow().publicParams.length > 0">
+        <public-params-list
+          workflow="workflow.getWorkflow()"
+          public-params="workflow.WorkflowService.getCurrentWorkflow().publicParams"
+        ></public-params-list>
+      </section>
     </general-data-panel>
   </section>
 

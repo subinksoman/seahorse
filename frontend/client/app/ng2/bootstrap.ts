@@ -62,6 +62,7 @@ import { EditorComponent } from './editor.component';
 import { BottomBarComponent } from './bottom-bar.component';
 import { FocusElementDirective } from './focus-element.directive';
 import { CustomScrollBarDirective } from './custom-scroll-bar.directive';
+import { GeneralDataPanelComponent } from './general-data-panel.component';
 import { upgradedProviders } from './upgraded-providers';
 
 declare const angular: any;
@@ -125,12 +126,15 @@ angular.module('ds.lab')
   // editor-view orchestrator: used from workflows-editor.html (still AngularJS); ui-router untouched.
   .directive('editor', downgradeComponent({ component: EditorComponent }) as any)
   // editor side panels (incremental): bottom-bar Reports tab.
-  .directive('bottomBar', downgradeComponent({ component: BottomBarComponent }) as any);
+  .directive('bottomBar', downgradeComponent({ component: BottomBarComponent }) as any)
+  // general-data-panel: name/description migrated to Angular; schedules + public-params stay AngularJS,
+  // projected in via <ng-content> from workflows-editor.html (keeps the working workflow-schedules widget).
+  .directive('generalDataPanel', downgradeComponent({ component: GeneralDataPanelComponent }) as any);
 
 @NgModule({
   imports: [BrowserModule, UpgradeModule],
   // Angular components used from AngularJS (via downgradeComponent) must be declared here.
-  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective],
+  declarations: [CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent],
   // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
   // migrated services can inject them by string token. See upgraded-providers.ts.
   providers: [...upgradedProviders]
