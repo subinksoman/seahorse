@@ -85,7 +85,7 @@ import { MouseEvent as MouseEventService } from './mouse-event.service';
               <workflow-schedules [workflow]="getWorkflow()"></workflow-schedules>
             </header>
           </section>
-          <section *ngIf="getWorkflow().publicParams.length > 0">
+          <section *ngIf="getWorkflow().publicParams?.length > 0">
             <public-params-list
               [workflow]="getWorkflow()"
               [publicParams]="getWorkflow().publicParams">
