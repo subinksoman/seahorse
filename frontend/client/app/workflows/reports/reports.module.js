@@ -20,9 +20,9 @@ var angular = require('angular');
 
 var reports = angular.module('ds.reports', []);
 
-require('./reports.controller.js').inject(reports);
+// reports.controller (ReportCtrl) migrated to Angular (app/ng2/report.component.ts) — downgraded as 'report'.
 // reports.factory migrated to Angular 18 (ng2/report.service.ts) — downgraded as 'Report'.
-require('./report.directive.js').inject(reports);
+// report.directive migrated to Angular (app/ng2/report.component.ts).
 
 // report-dataframe-full migrated to Angular (app/ng2/report-dataframe-full.component.ts).
 // report-default migrated to Angular (app/ng2/report-default.component.ts).
