@@ -31,4 +31,4 @@ require('./attribute-multiplier/attribute-multiplier-type.js');
 require('./attribute-single-choice/attribute-single-choice-type.js');
 // attribute-string-type migrated to Angular (app/ng2/attribute-string-type.component.ts) — downgraded 'attributeStringType'.
 // migrated to Angular (ng2/) — downgraded.
-require('./attribute-datasource/attribute-datasource.js');
+// attribute-datasource migrated to Angular.
