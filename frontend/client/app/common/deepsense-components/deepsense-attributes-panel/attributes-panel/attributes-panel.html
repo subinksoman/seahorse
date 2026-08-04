@@ -179,8 +179,11 @@
     </section>
     <attributes-list
       ng-if="node.parameters"
-      is-root-level-parameter="'true'"
-      parameters-list="node.parameters"
+      [is-root-level-parameter]="true"
+      [parameters-list]="node.parameters"
+      [is-inner-workflow]="isInnerWorkflow"
+      [node]="node"
+      [public-params]="publicParams"
       ng-switch-when="parameters">
     </attributes-list>
     <deepsense-loading-spinner-sm class="text-center" ng-if="!node.parameters"></deepsense-loading-spinner-sm>

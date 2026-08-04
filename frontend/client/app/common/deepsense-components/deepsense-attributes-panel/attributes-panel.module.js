@@ -29,7 +29,7 @@ const attributesPanel = angular.module('deepsense.attributes-panel', [
 });
 
 require('./attribute-types/attribute-types.js');
-require('./attributes-list/attributes-list.js');
+// attributes-list migrated to Angular (ng2/attributes-list.component.ts) — downgraded 'attributesList'.
 require('./attributes-panel/attributes-panel.js');
 require('./common/common.js');
 

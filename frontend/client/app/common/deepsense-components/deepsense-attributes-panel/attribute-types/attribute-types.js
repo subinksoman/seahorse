@@ -21,17 +21,17 @@ require('./attribute-code-snippet/attribute-code-snippet-type-modal/attribute-co
 require('./attribute-column-selector/calculated-selected-columns/calculated-selected-columns.js');
 require('./attribute-column-selector/selector-items/selector-items.js');
 // migrated to Angular (ng2/) — downgraded.
-require('./attribute-dynamic-param/attribute-dynamic-param-type.js');
-require('./attribute-gridsearch-param/attribute-gridsearch-param-type.js');
+// migrated to Angular (recursive core).
+// migrated to Angular (recursive core).
 // attribute-load-from-library (+library-connector) migrated to Angular.
 // (library-connector migrated with load-from-library)
-require('./attribute-multiple-choice/attribute-multiple-choice-type.js');
+// migrated to Angular (recursive core).
 // migrated to Angular (ng2/) — downgraded.
-require('./attribute-multiplier/attribute-multiplier-type.js');
+// migrated to Angular (recursive core).
 // attribute-numeric-type migrated to Angular (app/ng2/attribute-numeric-type.component.ts) — downgraded 'attributeNumericType'.
 // migrated to Angular (ng2/) — downgraded.
 // attribute-save-to-library migrated to Angular.
-require('./attribute-single-choice/attribute-single-choice-type.js');
+// migrated to Angular (recursive core).
 // attribute-string-type migrated to Angular (app/ng2/attribute-string-type.component.ts) — downgraded 'attributeStringType'.
 // migrated to Angular (ng2/) — downgraded.
 // attribute-datasource migrated to Angular.
