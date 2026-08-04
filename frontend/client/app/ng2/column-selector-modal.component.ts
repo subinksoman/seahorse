@@ -32,16 +32,16 @@ import * as _ from 'lodash';
 
       <article class="modal-body u-flex o-modal-selector__main-panel">
         <section class="o-modal-selector__item u-flex__1" *ngFor="let itemType of itemTypes"
-                 [hidden]="itemType.id === 'indexRange' && isItemIdInList('indexRange')">
+                 [style.display]="(itemType.id === 'indexRange' && isItemIdInList('indexRange')) ? 'none' : null">
           <h4 class="text-center">{{ itemType.verbose }}</h4>
 
           <div class="o-modal-selector__list--empty text-navy fa fa-plus-circle fa-5x
                       u-flex u-flex--center-center u-fill-parent u-cursor-pointer"
                [ngClass]="{'o-modal-selector__list--single fa-arrows-h': selectorIsSingle()}"
-               [hidden]="isItemIdInList(itemType.id)"
+               *ngIf="!isItemIdInList(itemType.id)"
                (click)="selectorIsSingle() ? switchItem(itemType) : addItem(itemType.id)"></div>
 
-          <div *ngFor="let item of getItemsThisType(itemType.id)" [hidden]="!isItemIdInList(itemType.id)"
+          <div *ngFor="let item of getItemsThisType(itemType.id)"
                class="o-modal-selector__list o-modal-selector__list--{{ itemType.id.toLowerCase() }}">
 
             <!-- typeList -->
@@ -97,7 +97,8 @@ import * as _ from 'lodash';
         </section>
 
         <!-- index range -->
-        <section class="o-modal-selector__item u-flex__1" [hidden]="!isItemIdInList('indexRange')">
+        <section class="o-modal-selector__item u-flex__1"
+                 [style.display]="!isItemIdInList('indexRange') ? 'none' : null">
           <h4 class="text-center">Index range</h4>
           <section class="o-modal-selector__list o-modal-selector__list--index">
             <form style="flex: 1" (submit)="addIndex(); $event.preventDefault()" *ngIf="!selectorIsSingle()">
