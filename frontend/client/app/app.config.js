@@ -17,11 +17,9 @@
 'use strict';
 
 /* @ngInject */
-function AppConfig($urlRouterProvider, toastrConfig, $cookiesProvider, $locationProvider, $qProvider) {
-  // ui-router defines its four transition-rejection types (superseded/prevented/aborted/failed) as
-  // $q rejections at init; it handles them internally, but AngularJS 1.6+ $q still logs them as
-  // "Possibly unhandled rejection: {}". They are benign navigation noise (present on every load), so
-  // disable the unhandled-rejection console logging to keep the console readable.
+function AppConfig(toastrConfig, $cookiesProvider, $locationProvider, $qProvider) {
+  // Keep unhandled-rejection console logging off — modal dismissals (uib-modal) reject their result
+  // promises, which AngularJS 1.6+ would otherwise log as "Possibly unhandled rejection". Benign.
   $qProvider.errorOnUnhandledRejections(false);
 
   // AngularJS 1.6 compatibility (upgraded 1.5.11 -> 1.8.3, T81): 1.6 changed the default hash
@@ -48,7 +46,8 @@ function AppConfig($urlRouterProvider, toastrConfig, $cookiesProvider, $location
       'warning': 'toast-warning'
     }
   });
-  $urlRouterProvider.otherwise('/');
+  // ($urlRouterProvider.otherwise('/') removed — @angular/router's { path: '**', redirectTo: '' } route
+  //  now handles the fallback.)
 
   const expiresDate = new Date();
   expiresDate.setFullYear(expiresDate.getFullYear() + 2);
