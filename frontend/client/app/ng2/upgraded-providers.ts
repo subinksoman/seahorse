@@ -42,6 +42,8 @@ export function uibModalStackFactory(i: any): any { return i.get('$uibModalStack
 export function graphNodeFactory(i: any): any { return i.get('GraphNode'); }
 // Datasources panel: bridged for the migrated datasources-element (opens the add/edit datasource modals).
 export function datasourcesModalsServiceFactory(i: any): any { return i.get('DatasourcesModalsService'); }
+// Report table: bridged for the migrated report-table (uses the AngularJS `precision` / `cut` filters).
+export function filterFactory(i: any): any { return i.get('$filter'); }
 
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
@@ -67,5 +69,6 @@ export const upgradedProviders: any[] = [
   { provide: 'AdapterService', useFactory: adapterServiceFactory, deps: ['$injector'] },
   { provide: '$uibModalStack', useFactory: uibModalStackFactory, deps: ['$injector'] },
   { provide: 'GraphNode', useFactory: graphNodeFactory, deps: ['$injector'] },
-  { provide: 'DatasourcesModalsService', useFactory: datasourcesModalsServiceFactory, deps: ['$injector'] }
+  { provide: 'DatasourcesModalsService', useFactory: datasourcesModalsServiceFactory, deps: ['$injector'] },
+  { provide: '$filter', useFactory: filterFactory, deps: ['$injector'] }
 ];
