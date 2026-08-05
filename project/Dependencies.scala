@@ -63,7 +63,7 @@ object Version {
   val pekkoHttp = "1.1.0"
   val wiremock = "1.57"
   val flyway = "4.0"
-  val jetty = "9.3.8.v20160314"
+  val jetty = "9.4.58.v20250814"
   val log4j2 = "2.19.0" // matches Spark 3.4.4; provides log4j-slf4j2-impl for slf4j 2.x (Pekko)
   val amazonS3 = "1.10.16"
   val googleApi = "1.22.0"
@@ -114,7 +114,7 @@ object Library {
   val guiceMultibindings = "com.google.inject.extensions" % "guice-multibindings" % Version.guice
   val guiceAssistedInject = "com.google.inject.extensions" % "guice-assistedinject" % Version.guice
   val jcloudsKeystone = jclouds("keystone")
-  val jettyWebapp = "org.eclipse.jetty" % "jetty-webapp" % "9.3.8.v20160314"
+  val jettyWebapp = "org.eclipse.jetty" % "jetty-webapp" % Version.jetty
   val metricsScala = "nl.grons" %% "metrics4-scala" % Version.metricsScala excludeAkkaActor
   val mockitoCore = "org.mockito" % "mockito-core" % Version.mockito
   val nscalaTime = "com.github.nscala-time" %% "nscala-time" % Version.nsscalaTime

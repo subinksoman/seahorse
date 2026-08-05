@@ -129,3 +129,14 @@ ThisBuild / libraryDependencies ++= Seq(
 // Keep Mockito at 1.10.19 (a transitive dep otherwise evicts it up to 3.x/5.x on 2.13, which
 // removed org.mockito.Matchers -> the specs' `any(...)` matchers stop resolving).
 ThisBuild / dependencyOverrides += "org.mockito" % "mockito-core" % "1.10.19"
+
+// T92 security: patched versions of vulnerable transitive deps (Trivy CRITICAL/HIGH).
+ThisBuild / dependencyOverrides ++= Seq(
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.18.8",
+  "com.fasterxml.jackson.core" % "jackson-core" % "2.18.8",
+  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.18.8",
+  "org.json" % "json" % "20240303",
+  "com.google.code.gson" % "gson" % "2.10.1",
+  "commons-io" % "commons-io" % "2.16.1",
+  "org.slf4j" % "slf4j-ext" % "2.0.7"
+)
