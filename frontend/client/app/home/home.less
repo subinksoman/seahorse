@@ -10,11 +10,21 @@
     // Match the editor logo's viewport position (vertically centered in its 90px header): top 33/left 55.
     top: 33px;
     left: 55px;
+    // No focus/click outline or image border on the logo link.
+    outline: none;
+    border: none;
+
+    &:focus,
+    &:active {
+      outline: none;
+    }
 
     img {
       // Match the editor nav logo (.c-navbar__logo) exactly: 140px wide, aspect-ratio-preserving height.
       width: 140px;
       height: auto;
+      border: 0;
+      outline: none;
     }
   }
 
