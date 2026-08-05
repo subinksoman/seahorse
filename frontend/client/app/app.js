@@ -30,7 +30,7 @@ import '../less/app.less';
 // bootstraps the Angular AppModule (ng2/bootstrap.ts bootstraps AppRootComponent into <app-root>).
 if (browserValidator.isBrowserSupported()) {
   require('../config.js');
-  require('./ng2/bootstrap.ts');
+  require('./bootstrap.ts');
 } else {
   document.addEventListener('DOMContentLoaded', function() {
     document.body.innerHTML = browserValidator.getErrorMessageHTML();

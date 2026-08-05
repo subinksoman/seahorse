@@ -15,7 +15,7 @@
     "types": ["angular"]
   },
   "include": [
-    "client/app/ng2/**/*.ts"
+    "client/app/**/*.ts"
   ],
   "exclude": [
     "node_modules",
