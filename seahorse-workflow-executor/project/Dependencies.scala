@@ -18,7 +18,7 @@ import sbt._
 
 object Version {
 
-  val spark = sys.props.getOrElse("SPARK_VERSION", "3.0.0")
+  val spark = sys.props.getOrElse("SPARK_VERSION", "4.2.0")
   println(s"SPARK_VERSION: $spark")
   val (scala, java, hadoop, akka, apacheCommons) = spark match {
     // T40: the whole Spark 4.x series (4.0.x / 4.1.x / 4.2.x). Pinned to Scala 2.13.18 (4.2.0's

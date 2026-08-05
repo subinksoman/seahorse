@@ -26,7 +26,7 @@ object Version {
    // Mixing lines causes classpath skew (JValue missing / MappingException + losslessDate changes).
    // NB: read the sys-prop directly — `spark` is declared later in this object, so referencing it
    // here would hit a null during initialization.
-   val json4s = if (sys.props.getOrElse("SPARK_VERSION", "3.0.0").startsWith("4.")) "4.0.7" else "3.7.0-M11"
+   val json4s = if (sys.props.getOrElse("SPARK_VERSION", "4.2.0").startsWith("4.")) "4.0.7" else "3.7.0-M11"
   val jclouds = "2.1.0"
 //  val metricsScala = "3.5.4_a2.3"
   val metricsScala = "4.2.9"  // metrics4-scala; metrics-scala 3.5.x has no Scala 2.13 artifact
@@ -37,12 +37,12 @@ object Version {
 //  val scalatra = "2.4.0"
   // scalatra 2.7.1 pulls json4s 3.6.10; 2.8.4 pulls json4s 4.0.x — use 2.8.4 on Spark 4.x so
   // scalatra-json and Spark agree on the json4s 4.0 line. (sys-prop read: see json4s note above.)
-  val scalatra = if (sys.props.getOrElse("SPARK_VERSION", "3.0.0").startsWith("4.")) "2.8.4" else "2.7.1"
+  val scalatra = if (sys.props.getOrElse("SPARK_VERSION", "4.2.0").startsWith("4.")) "2.8.4" else "2.7.1"
   val scoverage = "1.4.6"
 //  val slick = "3.1.1"
   val slick = "3.3.3"  // first slick line with Scala 2.13 artifacts; drops slick.driver package
 
-  val spark = sys.props.getOrElse("SPARK_VERSION", "3.0.0")
+  val spark = sys.props.getOrElse("SPARK_VERSION", "4.2.0")
   val (scala, hadoop, akka, sprayRoutingLib) = spark match {
     // T40: the whole Spark 4.x series on Scala 2.13.18 (matches the workflow-executor build;
     // 2.13.x is binary-compatible across 4.0.x/4.1.x/4.2.x). hadoop kept at "3.3" for now

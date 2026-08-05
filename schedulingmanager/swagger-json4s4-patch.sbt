@@ -13,7 +13,7 @@ val patchSwaggerForJson4s4 = taskKey[Unit](
 
 Compile / patchSwaggerForJson4s4 := {
   val log = streams.value.log
-  val is4x = sys.props.getOrElse("SPARK_VERSION", "3.0.0").startsWith("4.")
+  val is4x = sys.props.getOrElse("SPARK_VERSION", "4.2.0").startsWith("4.")
   if (is4x) {
     val genRoot = (Compile / sourceManaged).value / "swagger-generated"
     val files = (genRoot ** "DefaultApi.scala").get
@@ -50,5 +50,5 @@ Compile / compile := (Compile / compile)
 // recompiling the generated code outside the compile patch). On Spark 4.x, skip doc sources.
 Compile / doc / sources := {
   val prev = (Compile / doc / sources).value
-  if (sys.props.getOrElse("SPARK_VERSION", "3.0.0").startsWith("4.")) Seq.empty else prev
+  if (sys.props.getOrElse("SPARK_VERSION", "4.2.0").startsWith("4.")) Seq.empty else prev
 }
