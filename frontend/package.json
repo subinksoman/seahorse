@@ -37,7 +37,6 @@
     "ace-builds": "^1.4.14",
     "ajv": "^6.12.6",
     "angular": "1.8.3",
-    "angular-debounce": "^1.1.0",
     "angular-mocks": "1.8.3",
     "angular-toastr": "~1.7.0",
     "animate.css": "~3.5.1",

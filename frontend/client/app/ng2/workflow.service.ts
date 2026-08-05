@@ -41,7 +41,6 @@ export class WorkflowService {
     private operations: OperationsService,
     private confirmationModalService: ConfirmationModalService,
     private defaultInnerWorkflowGenerator: DefaultInnerWorkflowGenerator,
-    @Inject('debounce') private debounce: any,
     private sessionManagerApi: SessionManagerApi,
     private sessionManager: SessionManager,
     @Inject('ServerCommunication') private serverCommunication: any,
@@ -50,12 +49,12 @@ export class WorkflowService {
   ) {
     // Save workflow after all intermediate changes are resolved. Intermediate state might be invalid.
     // Debounce takes care of that and additionally reduces unnecessary client-server communication.
-    this._saveWorkflow = this.debounce(200, (newSerializedWorkflow: any, oldSerializedWorkflow: any) => {
+    this._saveWorkflow = _.debounce((newSerializedWorkflow: any, oldSerializedWorkflow: any) => {
       if (newSerializedWorkflow !== oldSerializedWorkflow) {
         this.$log.log('Saving workflow after change...', newSerializedWorkflow);
         this.workflowsApiClient.updateWorkflow(newSerializedWorkflow);
       }
-    });
+    }, 200);
     // All rootScope listeners must go to initRootWorkflow method.
     // Otherwise those would get lost upon cloning workflow.
   }

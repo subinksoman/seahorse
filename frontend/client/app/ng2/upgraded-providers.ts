@@ -19,10 +19,9 @@ export function $httpFactory(i: any): any { return i.get('$http'); }
 // ServerCommunication is a (still-AngularJS) app service; bridge it so migrated api clients can @Inject it.
 export function serverCommunicationFactory(i: any): any { return i.get('ServerCommunication'); }
 // WorkflowService hub deps that stay AngularJS: the deepsense-* graph model (Workflow) + cycle
-// analyser, and the 3rd-party angular-debounce ('debounce'). Bridged so WorkflowService can @Inject them.
+// analyser. Bridged so WorkflowService can @Inject them. (debounce is lodash _.debounce now, not bridged.)
 export function workflowFactory(i: any): any { return i.get('Workflow'); }
 export function deepsenseCycleAnalyserFactory(i: any): any { return i.get('DeepsenseCycleAnalyser'); }
-export function debounceFactory(i: any): any { return i.get('debounce'); }
 export function $documentFactory(i: any): any { return i.get('$document'); }
 // Editor canvas service still AngularJS (migrate later); bridged for the copy/paste visitor.
 export function canvasServiceFactory(i: any): any { return i.get('CanvasService'); }
@@ -64,7 +63,6 @@ export const upgradedProviders: any[] = [
   { provide: 'ServerCommunication', useFactory: serverCommunicationFactory, deps: ['$injector'] },
   { provide: 'Workflow', useFactory: workflowFactory, deps: ['$injector'] },
   { provide: 'DeepsenseCycleAnalyser', useFactory: deepsenseCycleAnalyserFactory, deps: ['$injector'] },
-  { provide: 'debounce', useFactory: debounceFactory, deps: ['$injector'] },
   { provide: '$document', useFactory: $documentFactory, deps: ['$injector'] },
   { provide: 'CanvasService', useFactory: canvasServiceFactory, deps: ['$injector'] },
   { provide: 'DeepsenseNodeParameters', useFactory: deepsenseNodeParametersFactory, deps: ['$injector'] },

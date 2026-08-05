@@ -47,8 +47,7 @@ export class MultiSelectionDirective implements AfterViewInit, OnDestroy {
     @Inject('$timeout') private $timeout: any,
     @Inject('$rootScope') private $rootScope: any,
     private mouseEvent: MouseEventService,
-    private multiSelectionService: MultiSelectionService,
-    @Inject('debounce') private debounce: any
+    private multiSelectionService: MultiSelectionService
   ) {}
 
   ngAfterViewInit(): void {
@@ -57,14 +56,15 @@ export class MultiSelectionDirective implements AfterViewInit, OnDestroy {
     this.selectionElement = this.$document[0].createElement('div');
     this.$selectionElement = $(this.selectionElement);
 
-    this.viewFix = this.debounce(50, () => {
+    // was rt.debounce debounce(50, fn, immediate=true) = leading edge -> lodash leading/no-trailing.
+    this.viewFix = _.debounce(() => {
       const oldRepaintValue = this.$selectionElement[0].style.left;
       const newRepaintValue = parseInt(this.$selectionElement[0].style.left, 10) - 1;
       this.$selectionElement[0].style.left = newRepaintValue ? `${newRepaintValue}px` : 'auto';
       this.$timeout(() => {
         this.$selectionElement[0].style.left = oldRepaintValue;
       }, false);
-    }, true);
+    }, 50, { leading: true, trailing: false });
 
     // Bind lifecycle events (legacy scope.$on -> bridged $rootScope.$on; store unregister fns).
     this.unregisters.push(this.$rootScope.$on('GraphNode.MOUSEDOWN', (e: any, data: any) => this.graphNodeMouseDownHandler(e, data)));
