@@ -31,7 +31,8 @@ import OperationsCatalogueModule from '../operations-catalogue/operations-catalo
 // create-node-invitation migrated to Angular 18 (ng2/create-node-invitation.component.ts) — downgraded as directive 'createNodeInvitation'.
 import AdapterService from './core-canvas/adapter.service.js';
 import CanvasService from './core-canvas/canvas.service.js';
-import GraphStyleService from './core-canvas/graph-node/graph-style.service.js';
+// GraphStyleService migrated to native ng2 (ng2/graph-style.service.ts) — downgraded as 'GraphStyleService'
+// in bootstrap.ts for the AngularJS canvas adapter; ng2 consumers use the class.
 
 const appModule = angular
   .module('editor', [
@@ -39,7 +40,6 @@ const appModule = angular
   ])
   .service('CanvasService', CanvasService)
   .service('AdapterService', AdapterService)
-  .service('GraphStyleService', GraphStyleService)
   // All editor components (editor/coreCanvas/canvasToolbar/newNode/graphNode/statusIcon/portStatusTooltip/
   // createNodeInvitation) migrated to Angular — registered as downgraded directives in ng2/bootstrap.ts.
   // This module now only provides the jsPlumb services (bridged to Angular via upgraded-providers).
