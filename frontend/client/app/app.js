@@ -37,7 +37,8 @@ if (browserValidator.isBrowserSupported()) {
     CommonModule,
     ComponentModule,
     require('./common/deepsense-components/deepsense-attributes-panel/attributes-panel.module.js').name,
-    require('./common/deepsense-components/deepsense-cycle-analyser/deepsense-cycle-analyser.js').name,
+    // deepsense.cycle-analyser removed — migrated to the native ng2 CycleAnalyserService (injected
+    // directly by WorkflowService); the AngularJS factory + module are no longer used.
     require('./common/deepsense-components/deepsense-graph-model/deepsense-graph-model.module.js').name,
     require('./common/deepsense-components/deepsense-loading-spinner/loading-spinner.module.js').name,
     require('./common/deepsense-components/deepsense-node-parameters/deepsense-node-parameters.module.js').name,

@@ -20,7 +20,6 @@ export function serverCommunicationFactory(i: any): any { return i.get('ServerCo
 // WorkflowService hub deps that stay AngularJS: the deepsense-* graph model (Workflow) + cycle
 // analyser. Bridged so WorkflowService can @Inject them. (debounce is lodash _.debounce now, not bridged.)
 export function workflowFactory(i: any): any { return i.get('Workflow'); }
-export function deepsenseCycleAnalyserFactory(i: any): any { return i.get('DeepsenseCycleAnalyser'); }
 export function $documentFactory(i: any): any { return i.get('$document'); }
 // Editor canvas service still AngularJS (migrate later); bridged for the copy/paste visitor.
 export function canvasServiceFactory(i: any): any { return i.get('CanvasService'); }
@@ -42,7 +41,6 @@ export function filterFactory(i: any): any { return i.get('$filter'); }
 // deepsense-attributes: bridged for migrated attribute-types (disabled-mode + panel interactions).
 export function attributesPanelServiceFactory(i: any): any { return i.get('AttributesPanelService'); }
 // attributes-panel: bridged for the Jupyter notebook URL (trustAsResourceUrl).
-export function sceFactory(i: any): any { return i.get('$sce'); }
 // ngFileUpload's Upload service, bridged for the (migrated) upload-workflow modal folded into HomeComponent.
 export function uploadFactory(i: any): any { return i.get('Upload'); }
 // Cluster-settings modals (migrated to CDK): PresetService (preset CRUD/validation) + PresetModalLabels
@@ -60,7 +58,6 @@ export const upgradedProviders: any[] = [
   { provide: '$http', useFactory: $httpFactory, deps: ['$injector'] },
   { provide: 'ServerCommunication', useFactory: serverCommunicationFactory, deps: ['$injector'] },
   { provide: 'Workflow', useFactory: workflowFactory, deps: ['$injector'] },
-  { provide: 'DeepsenseCycleAnalyser', useFactory: deepsenseCycleAnalyserFactory, deps: ['$injector'] },
   { provide: '$document', useFactory: $documentFactory, deps: ['$injector'] },
   { provide: 'CanvasService', useFactory: canvasServiceFactory, deps: ['$injector'] },
   { provide: 'DeepsenseNodeParameters', useFactory: deepsenseNodeParametersFactory, deps: ['$injector'] },
@@ -72,7 +69,6 @@ export const upgradedProviders: any[] = [
   { provide: 'DatasourcesModalsService', useFactory: datasourcesModalsServiceFactory, deps: ['$injector'] },
   { provide: '$filter', useFactory: filterFactory, deps: ['$injector'] },
   { provide: 'AttributesPanelService', useFactory: attributesPanelServiceFactory, deps: ['$injector'] },
-  { provide: '$sce', useFactory: sceFactory, deps: ['$injector'] },
   { provide: 'Upload', useFactory: uploadFactory, deps: ['$injector'] },
   { provide: 'PresetService', useFactory: presetServiceFactory, deps: ['$injector'] },
   { provide: 'PresetModalLabels', useFactory: presetModalLabelsFactory, deps: ['$injector'] }

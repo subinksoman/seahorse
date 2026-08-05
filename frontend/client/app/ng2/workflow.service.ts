@@ -15,6 +15,7 @@ import { DefaultInnerWorkflowGenerator } from './default-inner-workflow-generato
 import { SessionManagerApi } from './session-manager-api.service';
 import { SessionManager } from './session-manager.service';
 import { UserService } from './user.service';
+import { CycleAnalyserService } from './cycle-analyser.service';
 
 const INNER_WORKFLOW_PARAM_NAME = 'inner workflow';
 
@@ -45,7 +46,7 @@ export class WorkflowService {
     private sessionManager: SessionManager,
     @Inject('ServerCommunication') private serverCommunication: any,
     private userService: UserService,
-    @Inject('DeepsenseCycleAnalyser') private deepsenseCycleAnalyser: any
+    private cycleAnalyser: CycleAnalyserService
   ) {
     // Save workflow after all intermediate changes are resolved. Intermediate state might be invalid.
     // Debounce takes care of that and additionally reduces unnecessary client-server communication.
@@ -306,7 +307,7 @@ export class WorkflowService {
 
   doesCycleExist(): boolean {
     const workflow = this.getCurrentWorkflow();
-    return this.deepsenseCycleAnalyser.cycleExists(workflow); // TODO move component's function cycleExists here
+    return this.cycleAnalyser.cycleExists(workflow);
   }
 
   isConnectionValid(connection: any): boolean {
