@@ -30,7 +30,7 @@ import OperationsCatalogueModule from '../operations-catalogue/operations-catalo
 // port-status-tooltip migrated to Angular 18 (ng2/port-status-tooltip.component.ts) — downgraded as directive 'portStatusTooltip'.
 // create-node-invitation migrated to Angular 18 (ng2/create-node-invitation.component.ts) — downgraded as directive 'createNodeInvitation'.
 import AdapterService from './core-canvas/adapter.service.js';
-import CanvasService from './core-canvas/canvas.service.js';
+// CanvasService migrated to native ng2 (ng2/canvas.service.ts) — aliased in bootstrap.ts.
 // GraphStyleService migrated to native ng2 (ng2/graph-style.service.ts) — downgraded as 'GraphStyleService'
 // in bootstrap.ts for the AngularJS canvas adapter; ng2 consumers use the class.
 
@@ -38,7 +38,6 @@ const appModule = angular
   .module('editor', [
     OperationsCatalogueModule
   ])
-  .service('CanvasService', CanvasService)
   .service('AdapterService', AdapterService)
   // All editor components (editor/coreCanvas/canvasToolbar/newNode/graphNode/statusIcon/portStatusTooltip/
   // createNodeInvitation) migrated to Angular — registered as downgraded directives in ng2/bootstrap.ts.

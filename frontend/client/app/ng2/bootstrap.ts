@@ -60,6 +60,7 @@ import { DatasourcesService } from './datasources.service';
 import { DatasourcesPanelService } from './datasources-panel.service';
 import { AttributesPanelService } from './attributes-panel.service';
 import { GraphStyleService } from './graph-style.service';
+import { CanvasService } from './canvas.service';
 import { OperationsApiClient } from './operations-api-client.service';
 import { WorkflowsApiClient } from './workflows-api-client.service';
 import { SessionManagerApi } from './session-manager-api.service';
@@ -259,7 +260,8 @@ angular.module('ds.lab')
     { provide: 'datasourcesService', useExisting: DatasourcesService },
     { provide: 'DatasourcesPanelService', useExisting: DatasourcesPanelService },
     { provide: 'AttributesPanelService', useExisting: AttributesPanelService },
-    { provide: 'GraphStyleService', useExisting: GraphStyleService }]
+    { provide: 'GraphStyleService', useExisting: GraphStyleService },
+    { provide: 'CanvasService', useExisting: CanvasService }]
 })
 export class AppModule implements DoBootstrap {
   constructor(private upgrade: UpgradeModule, private router: Router) {}

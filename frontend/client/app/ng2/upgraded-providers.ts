@@ -21,8 +21,6 @@ export function serverCommunicationFactory(i: any): any { return i.get('ServerCo
 // analyser. Bridged so WorkflowService can @Inject them. (debounce is lodash _.debounce now, not bridged.)
 export function workflowFactory(i: any): any { return i.get('Workflow'); }
 export function $documentFactory(i: any): any { return i.get('$document'); }
-// Editor canvas service still AngularJS (migrate later); bridged for the copy/paste visitor.
-export function canvasServiceFactory(i: any): any { return i.get('CanvasService'); }
 // deepsense-* node-parameters factory stays AngularJS (deepsense-* migrates late); bridged for GraphNodesService.
 export function deepsenseNodeParametersFactory(i: any): any { return i.get('DeepsenseNodeParameters'); }
 // Core-canvas finale: bridged for the migrated core-canvas component + its jsplumb-draggable directive
@@ -51,7 +49,6 @@ export const upgradedProviders: any[] = [
   { provide: 'ServerCommunication', useFactory: serverCommunicationFactory, deps: ['$injector'] },
   { provide: 'Workflow', useFactory: workflowFactory, deps: ['$injector'] },
   { provide: '$document', useFactory: $documentFactory, deps: ['$injector'] },
-  { provide: 'CanvasService', useFactory: canvasServiceFactory, deps: ['$injector'] },
   { provide: 'DeepsenseNodeParameters', useFactory: deepsenseNodeParametersFactory, deps: ['$injector'] },
   { provide: 'AdapterService', useFactory: adapterServiceFactory, deps: ['$injector'] },
   { provide: 'GraphNode', useFactory: graphNodeFactory, deps: ['$injector'] },
