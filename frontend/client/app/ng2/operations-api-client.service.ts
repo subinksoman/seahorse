@@ -18,10 +18,9 @@ export class OperationsApiClient extends BaseApiClient {
 
   constructor(
     @Inject('$http') $http: any,
-    @Inject('$q') $q: any,
     @Inject('config') config: any
   ) {
-    super($http, $q, config);
+    super($http, config);
   }
 
   getAll(): any {

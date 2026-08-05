@@ -4,6 +4,7 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
+import { defer } from './defer';
 import * as _ from 'lodash';
 import { OperationsApiClient } from './operations-api-client.service';
 import { OperationsHierarchyService } from './operations-hierarchy.service';
@@ -27,8 +28,7 @@ export class OperationsService {
 
   constructor(
     private operationsApiClient: OperationsApiClient,
-    private operationsHierarchyService: OperationsHierarchyService,
-    @Inject('$q') private $q: any
+    private operationsHierarchyService: OperationsHierarchyService
   ) {}
 
   private createCategoryMap(catalog: any[], parentId?: string): void {
@@ -107,7 +107,7 @@ export class OperationsService {
 
   load(): any {
     if (this.isLoaded) {
-      const deferred = this.$q.defer();
+      const deferred = defer();
       deferred.resolve();
       return deferred.promise;
     }
@@ -142,7 +142,7 @@ export class OperationsService {
     }
     const operation = this.operationsData[id] || null;
     if (!this.isLoaded || (operation && operation.parameters)) {
-      const deferred = this.$q.defer();
+      const deferred = defer();
       deferred.resolve(operation);
       return deferred.promise;
     }

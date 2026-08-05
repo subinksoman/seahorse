@@ -30,7 +30,6 @@ export class LibraryService {
   private lastSearch: any = { directory: null, parrern: null, results: null };
 
   constructor(
-    @Inject('$q') private $q: any,
     private libraryDataConverterService: LibraryDataConverter,
     private libraryApiService: LibraryApi
   ) {
@@ -203,7 +202,7 @@ export class LibraryService {
     collect(files);
 
     const promisesArray = flat.map((file: any) => this.uploadFile(file));
-    return this.$q.all(promisesArray);
+    return Promise.all(promisesArray);
   }
 
   doesDirectoryAlreadyExists(directoryName: string): boolean {

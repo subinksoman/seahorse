@@ -20,11 +20,10 @@ export class WorkflowsApiClient extends BaseApiClient {
 
   constructor(
     @Inject('$http') $http: any,
-    @Inject('$q') $q: any,
     @Inject('config') config: any,
     @Inject('ServerCommunication') ServerCommunication: any
   ) {
-    super($http, $q, config);
+    super($http, config);
     this.ServerCommunication = ServerCommunication;
   }
 

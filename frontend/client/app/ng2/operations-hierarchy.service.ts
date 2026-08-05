@@ -4,6 +4,7 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
+import { defer } from './defer';
 import * as _ from 'lodash';
 import { OperationsApiClient } from './operations-api-client.service';
 
@@ -83,7 +84,6 @@ export class OperationsHierarchyService {
   private isLoaded = false;
 
   constructor(
-    @Inject('$q') private $q: any,
     private operationsApiClient: OperationsApiClient
   ) {
     // The legacy factory exposed closure functions (no `this`), so callers pass these detached —
@@ -95,7 +95,7 @@ export class OperationsHierarchyService {
 
   load(): any {
     if (this.isLoaded) {
-      const deferred = this.$q.defer();
+      const deferred = defer();
       deferred.resolve();
       return deferred.promise;
     } else {

@@ -4,6 +4,7 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
+import { defer } from './defer';
 
 // Phase C-1: migrated from common/api-clients/base-api-client.factory.js. The legacy factory returned
 // a CONSTRUCTOR that the two subclass factories extended via prototype; here it becomes a plain
@@ -21,7 +22,6 @@ export class BaseApiClient {
 
   constructor(
     @Inject('$http') protected $http: any,
-    @Inject('$q') protected $q: any,
     @Inject('config') protected config: any
   ) {
     this.API_URL = config.apiPort
@@ -30,7 +30,7 @@ export class BaseApiClient {
   }
 
   makeRequest(method: string, url: string, data: any = {}, timeout?: number): any {
-    const deferred = this.$q.defer();
+    const deferred = defer();
     this.$http({
       method: method,
       url: url,

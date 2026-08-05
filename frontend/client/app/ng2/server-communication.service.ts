@@ -29,7 +29,6 @@ export class ServerCommunicationService {
   private socket: any;
 
   constructor(
-    @Inject('$q') private $q: any,
     @Inject('$rootScope') private $rootScope: any,
     @Inject('config') private config: any
   ) {}

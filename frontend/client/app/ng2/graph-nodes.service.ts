@@ -4,6 +4,7 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
+import { defer } from './defer';
 import * as _ from 'lodash';
 import { specialOperations } from '../enums/special-operations.js';
 import { OperationsService } from './operations.service';
@@ -23,7 +24,6 @@ declare const angular: any; // global (expose-loader) — angular.merge/copy/ext
 @Injectable({ providedIn: 'root' })
 export class GraphNodesService {
   constructor(
-    @Inject('$q') private $q: any,
     @Inject('$rootScope') private $rootScope: any,
     @Inject('DeepsenseNodeParameters') private DeepsenseNodeParameters: any,
     private Operations: OperationsService,
@@ -33,7 +33,7 @@ export class GraphNodesService {
   ) {}
 
   getNodeParameters(node: any): any {
-    const deferred = this.$q.defer();
+    const deferred = defer();
 
     if (node.hasParameters()) {
       node.refreshParameters(this.DeepsenseNodeParameters);

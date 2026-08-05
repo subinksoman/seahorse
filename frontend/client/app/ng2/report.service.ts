@@ -4,6 +4,7 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
+import { defer } from './defer';
 import { BottomBarService } from './bottom-bar.service';
 
 // Phase C-1: migrated from workflows/reports/reports.factory.js (registered as 'Report'). Caches
@@ -16,7 +17,6 @@ export class ReportService {
   private reportsStorage = new Map<string, any>();
 
   constructor(
-    @Inject('$q') private $q: any,
     @Inject('$rootScope') private $rootScope: any,
     private bottomBarService: BottomBarService
   ) {}
@@ -40,7 +40,7 @@ export class ReportService {
   }
 
   getReport(reportEntityId: string): any {
-    const deferred = this.$q.defer();
+    const deferred = defer();
 
     try {
       const reportEntity = this.getReportEntity(reportEntityId);

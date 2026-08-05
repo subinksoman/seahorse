@@ -18,7 +18,6 @@ declare const $: any; // jQuery global (expose-loader)
 @Injectable({ providedIn: 'root' })
 export class NodeCopyPasteVisitorService {
   constructor(
-    @Inject('$q') private $q: any,
     @Inject('$rootScope') private $rootScope: any,
     private multiSelectionService: MultiSelectionService,
     private workflowService: WorkflowService,
@@ -52,7 +51,7 @@ export class NodeCopyPasteVisitorService {
       return this.graphNodesService.getNodeParameters(node);
     });
 
-    this.$q.all(nodeParametersPromises).then(
+    Promise.all(nodeParametersPromises).then(
       (nodes: any) => {
         const legalNodesToPaste = _.filter(nodes, (n: any) => !this.graphNodesService.isSinkOrSource(n));
         return this.graphNodesService.cloneNodes(workflow, legalNodesToPaste);
