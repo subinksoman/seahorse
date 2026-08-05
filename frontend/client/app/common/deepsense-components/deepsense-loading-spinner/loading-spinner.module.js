@@ -20,7 +20,7 @@
 const spinner = angular.module('deepsense.spinner', []);
 
 // lg spinner removed — it had zero usages anywhere in the app (dead code).
-require('./processing/loading-spinner-processing.drv.js');
+// processing spinner migrated to native ng2 (ng2/loading-spinner-processing.component.ts), downgraded in bootstrap.ts.
 require('./sm/loading-spinner-sm.drv.js');
 
 module.exports = spinner;
