@@ -138,5 +138,13 @@ ThisBuild / dependencyOverrides ++= Seq(
   "org.json" % "json" % "20240303",
   "com.google.code.gson" % "gson" % "2.10.1",
   "commons-io" % "commons-io" % "2.16.1",
-  "org.slf4j" % "slf4j-ext" % "2.0.7"
+  "org.slf4j" % "slf4j-ext" % "2.0.7",
+  "io.netty" % "netty-codec-http" % "4.2.16.Final",
+  "io.netty" % "netty-codec-http2" % "4.2.16.Final",
+  "io.netty" % "netty-codec-compression" % "4.2.16.Final",
+  "io.netty" % "netty-handler" % "4.2.16.Final",
+  "io.netty" % "netty-resolver-dns" % "4.2.16.Final",
+  "com.amazonaws" % "aws-java-sdk-s3" % "1.12.782",
+  "com.amazonaws" % "aws-java-sdk-core" % "1.12.782",
+  "com.google.oauth-client" % "google-oauth-client" % "1.34.1"
 )
