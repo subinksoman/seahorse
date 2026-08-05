@@ -1,71 +1,85 @@
 /**
  * Copyright (c) 2015, CodiLime Inc.
  *
- * Created by Oleksandr Tserkovnyi on 24.06.15.
+ * Full-screen CENTERED loading indicator (redesigned): a spinning ring + label, vertically and
+ * horizontally centered over the viewport. Replaces the old bottom-right cog cluster.
  */
 
+@dsl-teal: #1dc5a3;
+
 .deepsense-loading-spinner-processing {
-  position: absolute;
-  right: 40px;
-  bottom: 40px;
-  font-size: 30px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.85);
 
-  @keyframes fa-spin-reverse {
-    0% {
-      -webkit-transform: rotate(0deg);
-      transform: rotate(0deg);
-    }
-    100% {
-      -webkit-transform: rotate(-359deg);
-      transform: rotate(-359deg);
-    }
+  &.bg {
+    background: rgba(239, 239, 239, 0.92);
   }
 
-  .fa-spin-reverse {
-    -webkit-animation: fa-spin 2s infinite linear;
-    animation: fa-spin-reverse 2s infinite linear;
+  .dsl-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
-  &.bg:before {
-    background: -moz-linear-gradient(-45deg,  #efefef 50%, #3379b7 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(50%,#efefef), color-stop(100%,#3379b7)); /* Chrome,Safari4+ */
-    background: linear-gradient(135deg,  #efefef 50%,#3379b7 100%); /* W3C */
-    content: " ";
-    display: block;
-    position: absolute;
-    bottom: -40px;
-    right: -40px;
-    width: 350px;
-    height: 350px;
-    opacity: 0.25;
-  }
-
-  .fa {
-    color: #1dc5a3;
+  // A clean rotating ring (four arcs) in the brand teal.
+  .dsl-ring {
+    display: inline-block;
     position: relative;
-    top: -40px;
-    font-size: 90px;
+    width: 64px;
+    height: 64px;
 
-    &:nth-of-type(4) {
+    div {
+      box-sizing: border-box;
+      display: block;
       position: absolute;
-      right: -23px;
-      top: 23px;
-      font-size: 70px;
-      color: inherit;
+      width: 52px;
+      height: 52px;
+      margin: 6px;
+      border: 6px solid @dsl-teal;
+      border-radius: 50%;
+      animation: dsl-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      border-color: @dsl-teal transparent transparent transparent;
     }
 
-    &:nth-of-type(5) {
-      position: absolute;
-      right: 33px;
-      top: 61px;
-      font-size: 40px;
-      color: #337ab7;
-    }
+    div:nth-child(1) { animation-delay: -0.45s; }
+    div:nth-child(2) { animation-delay: -0.3s; }
+    div:nth-child(3) { animation-delay: -0.15s; }
   }
 
-  .dots {
-    margin-left: -9px;
-    position: absolute;
-    bottom: 3px;
+  .dsl-label {
+    margin-top: 18px;
+    font-size: 18px;
+    color: #337ab7;
+    letter-spacing: 0.5px;
   }
+
+  // Animated trailing dots, pure CSS (no JS timer).
+  .dsl-dots::after {
+    display: inline-block;
+    content: '';
+    animation: dsl-dots 1.5s steps(4, end) infinite;
+    width: 1.2em;
+    text-align: left;
+  }
+}
+
+@keyframes dsl-ring {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes dsl-dots {
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
+  100% { content: ''; }
 }
