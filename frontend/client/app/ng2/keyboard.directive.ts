@@ -4,8 +4,8 @@
  */
 
 import { Directive, Inject, OnDestroy } from '@angular/core';
+import { Dialog } from '@angular/cdk/dialog';
 import * as Mousetrap from 'mousetrap';
-import * as _ from 'lodash';
 
 // Phase C / canvas: Angular version of workflows/common-behaviours/common-keyboard.js, for use inside the
 // migrated (Angular) core-canvas template. Binds global del/backspace/esc via Mousetrap and rebroadcasts on
@@ -15,10 +15,11 @@ import * as _ from 'lodash';
 export class KeyboardDirective implements OnDestroy {
   constructor(
     @Inject('$rootScope') private $rootScope: any,
-    @Inject('$uibModalStack') private $uibModalStack: any
+    private dialog: Dialog
   ) {
     Mousetrap.bind(['del', 'backspace'], () => {
-      if (_.isUndefined(this.$uibModalStack.getTop())) {
+      // Only delete the selected node when no modal is open (was $uibModalStack.getTop()).
+      if (this.dialog.openDialogs.length === 0) {
         this.$rootScope.$broadcast('Keyboard.KEY_PRESSED_DEL');
       }
       return false;

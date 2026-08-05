@@ -5,6 +5,7 @@
 
 import { Component, OnInit, OnDestroy, DoCheck, Inject } from '@angular/core';
 import { Router, NavigationStart } from '@angular/router';
+import { Dialog } from '@angular/cdk/dialog';
 import { Subscription } from 'rxjs';
 
 // Phase C / router inversion: the TOP-LEVEL @angular/router outlet host. Downgraded 'routerShell' and
@@ -23,7 +24,7 @@ export class RouterShellComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     @Inject('$rootScope') private $rootScope: any,
-    @Inject('$uibModalStack') private $uibModalStack: any
+    private dialog: Dialog
   ) {}
 
   ngOnInit(): void {
@@ -35,9 +36,7 @@ export class RouterShellComponent implements OnInit, OnDestroy {
         for (const key in listeners) {
           if (key[0] !== '$') { delete listeners[key]; }
         }
-        while (this.$uibModalStack.getTop()) {
-          this.$uibModalStack.dismiss(this.$uibModalStack.getTop().key);
-        }
+        this.dialog.closeAll();
       }
     });
   }

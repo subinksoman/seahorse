@@ -5,18 +5,18 @@
 
 import { Component, Input, Inject, ElementRef, OnChanges, OnDestroy, HostListener } from '@angular/core';
 import * as _ from 'lodash';
-import moment from 'moment';
 import { BottomBarService } from './bottom-bar.service';
-import chartPanelTpl from '../workflows/reports/report-chart-panel.html';
+import { ModalService } from './modal.service';
+import { ReportChartModalComponent } from './report-chart-modal.component';
 
 const SELECT_COLUMN = 'select-column'; // reports.controller EVENTS.SELECT_COLUMN
 
 // Phase C / report subsystem (shell): migrated from workflows/reports (report.directive + reports.controller).
 // The report panel container: close button, no-report message, and the report-type ng-switch ->
 // report-dataframe-full / report-default (both Angular now). Downgraded as directive 'report';
-// workflows-editor.html rebinds [report]. The distribution-chart modal (report-chart-panel.html + the
-// d3/nvd3 charts) stays AngularJS, opened on-demand via the bridged $uibModal with its original inline
-// controller (explicit DI array — ng-annotate does not process .ts). Injects the Angular BottomBarService.
+// workflows-editor.html rebinds [report]. The distribution-chart modal (the nvd3 pie/column charts) is
+// now the native-Angular ReportChartModalComponent, opened on-demand via the CDK ModalService (was the
+// last $uibModal usage). Injects the Angular BottomBarService.
 //  - the '=report' binding -> @Input('report'); the $watch(currentReport) scrollTop reset -> ngOnChanges;
 //    the Chrome-bug mouseout workaround (broadcast OutputPoint.MOUSEOUT on mouseover) -> @HostListener.
 @Component({
@@ -60,7 +60,7 @@ export class ReportComponent implements OnChanges, OnDestroy {
   constructor(
     private host: ElementRef,
     @Inject('$rootScope') private $rootScope: any,
-    @Inject('$uibModal') private $uibModal: any,
+    private modal: ModalService,
     private bottomBarService: BottomBarService
   ) {
     this.removeSelectColumnListener =
@@ -122,7 +122,6 @@ export class ReportComponent implements OnChanges, OnDestroy {
   }
 
   private onSelectColumn(data: any): void {
-    const self = this;
     const distObject = this.getDistributionObject(data.colName);
     const colType = data.colType;
     const colTypesMap = data.colTypesMap;
@@ -136,36 +135,13 @@ export class ReportComponent implements OnChanges, OnDestroy {
     }
 
     if (!_.isUndefined(distObject)) {
-      this.$uibModal.open({
-        size: 'lg',
-        templateUrl: chartPanelTpl,
-        controller: ['$scope', '$uibModalInstance', '$filter',
-          function ($scope: any, $uibModalInstance: any, $filter: any) {
-            _.assign(this, {
-              close: () => { $uibModalInstance.close(); },
-              colType: colType,
-              distObject: distObject,
-              columnNames: _.keys(colTypesWithDistributions),
-              selectedColumn: distObject.name,
-              shortenValues: (value: any) => {
-                if (this.colType === 'numeric') {
-                  return $filter('precision')(value);
-                } else if (this.colType === 'timestamp') {
-                  return moment(new Date(value)).format('YYYY-MM-DD HH:mm:ss');
-                }
-                return value;
-              }
-            });
-
-            $scope.$watch('graphModal.selectedColumn', (newValue: any, oldValue: any) => {
-              if (newValue !== oldValue) {
-                this.distObject = self.getDistributionObject(newValue);
-                this.colType = colTypesMap[newValue];
-              }
-            });
-          }],
-        controllerAs: 'graphModal'
-      });
+      this.modal.open(ReportChartModalComponent, {
+        distObject,
+        colType,
+        colTypesMap,
+        distributions,
+        columnNames: _.keys(colTypesWithDistributions)
+      }, { panelClass: ['ds-modal-panel', 'ds-modal-lg'] });
     }
   }
 }
