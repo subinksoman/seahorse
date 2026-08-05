@@ -98,8 +98,9 @@ module.exports = function (_path) {
             { loader: 'babel-loader', options: { cacheDirectory: true } }
           ]
         },
-        // Expose the single shared angular/jquery instances as globals for legacy code + plugins.
-        { test: require.resolve('angular'), loader: 'expose-loader', options: { exposes: 'angular' } },
+        // Expose the shared jquery instance as a global for jQuery plugins (malihu scrollbar, jsPlumb).
+        // (The `angular` expose rule was removed with AngularJS — THE FLIP; require.resolve('angular')
+        // would now throw at config load anyway since the package is uninstalled.)
         { test: require.resolve('jquery'), loader: 'expose-loader', options: { exposes: ['$', 'jQuery'] } },
         // ng-switchery is a self-contained UMD that bundles `switchery` and, in its GLOBAL/script
         // branch, sets window.Switchery + registers angular.module('NgSwitchery'). Under a plain

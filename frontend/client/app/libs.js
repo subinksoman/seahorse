@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-require('angular');
+// angular removed — THE FLIP: the app is pure Angular; nothing loads AngularJS anymore (the last
+// global angular.copy in the graph-model is now a native lodash clone).
 // angular-cookies removed — DeleteModalService reads/writes its cookie via document.cookie natively.
 // angular-debounce removed — the 2 ng2 debounce users (WorkflowService save, multi-selection viewFix) use lodash _.debounce; the AngularJS debounce injectors are dead/unbundled.
 // angular-sanitize removed — no ngSanitize dependency (see preset-modal $sce.trustAsHtml).
@@ -33,7 +34,8 @@ require('font-awesome/css/font-awesome.css');
 require('jquery');
 require('lodash');
 require('imports-loader?type=commonjs&wrapper=window!malihu-custom-scrollbar-plugin');
-require('ng-file-upload');
+// ng-file-upload removed — the upload-workflow modal uses the native HttpService (XHR) now; the AngularJS
+// Upload service is unused.
 // ng-switchery removed — the only user (attribute-multiple-choice) is an Angular component with a native
 // CSS toggle. (Its loader shim in config/webpack/global.js is now inert — no module matches it.)
 require('sockjs-client');

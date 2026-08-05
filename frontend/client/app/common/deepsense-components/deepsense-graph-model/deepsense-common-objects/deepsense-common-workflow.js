@@ -17,8 +17,11 @@
 'use strict';
 
 // Phase C / AngularJS removal: plain CJS module (was a deepsense.graph-model .factory injecting
-// GraphNode + Edge). `angular.copy` stays a global (angular is exposed via expose-loader).
+// GraphNode + Edge). THE FLIP finale: the last global `angular.copy` is replaced by a native deep clone
+// (lodash cloneDeepWith keeping function properties by reference, matching angular.copy) so nothing in
+// the bundle references the AngularJS global — letting the `angular` package be removed entirely.
 const _ = require('lodash');
+const copy = (value) => _.cloneDeepWith(value, (v) => (typeof v === 'function' ? v : undefined));
 const GraphNode = require('./deepsense-common-graph-node.js');
 const Edge = require('./deepsense-common-edge.js');
 
@@ -80,7 +83,7 @@ const Edge = require('./deepsense-common-edge.js');
       };
 
       that.createNode = function createNode(options) {
-        options = angular.copy(options);
+        options = copy(options);
         let operation = options.operation;
 
         return new GraphNode({
