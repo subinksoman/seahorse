@@ -17,8 +17,7 @@ export class JsplumbDraggableDirective implements AfterViewInit {
 
   constructor(
     private host: ElementRef,
-    @Inject('$rootScope') private $rootScope: any,
-    @Inject('GraphNode') private GraphNode: any
+    @Inject('$rootScope') private $rootScope: any
   ) {}
 
   ngAfterViewInit(): void {
@@ -33,7 +32,10 @@ export class JsplumbDraggableDirective implements AfterViewInit {
       containment: 'parent',
       stop: () => {
         reInit();
-        this.$rootScope.$broadcast(this.GraphNode.MOVE);
+        // was $broadcast(GraphNode.MOVE); GraphNode.MOVE is undefined (never defined) and nothing listens
+        // on the move event, so this is a no-op — broadcast the intended constant name directly, dropping
+        // the 'GraphNode' bridge. (The GraphNode graph-model factory stays AngularJS, migrates with it.)
+        this.$rootScope.$broadcast('GraphNode.MOVE');
       }
     });
     // Legacy listened for MultipleSelection.STOP_DRAG to re-read positions; mirror on the bridged $rootScope.
