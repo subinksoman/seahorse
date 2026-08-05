@@ -14,9 +14,6 @@ export function configFactory(): any { return (window as any).__seahorseConfig; 
 // Core-canvas finale: bridged for the migrated core-canvas component + its jsplumb-draggable directive
 // (AdapterService = jsPlumb adapter, GraphNode = the deepsense graph-node model exposing MOVE event
 // constant). The ng2 KeyboardDirective now checks the CDK overlay directly (no $uibModalStack bridge).
-// attributes-panel: bridged for the Jupyter notebook URL (trustAsResourceUrl).
-// ngFileUpload's Upload service, bridged for the (migrated) upload-workflow modal folded into HomeComponent.
-export function uploadFactory(i: any): any { return i.get('Upload'); }
 // Cluster-settings modals (migrated to CDK): PresetService (preset CRUD/validation) + PresetModalLabels
 // (static field labels) stay AngularJS for now; bridged so the Angular modal components can use them.
 export function presetServiceFactory(i: any): any { return i.get('PresetService'); }
@@ -25,7 +22,6 @@ export function presetModalLabelsFactory(i: any): any { return i.get('PresetModa
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
   { provide: 'config', useFactory: configFactory },
-  { provide: 'Upload', useFactory: uploadFactory, deps: ['$injector'] },
   { provide: 'PresetService', useFactory: presetServiceFactory, deps: ['$injector'] },
   { provide: 'PresetModalLabels', useFactory: presetModalLabelsFactory, deps: ['$injector'] }
 ];
