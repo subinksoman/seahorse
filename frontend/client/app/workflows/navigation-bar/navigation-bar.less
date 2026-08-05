@@ -13,10 +13,11 @@
   }
 
   &__link {
-    // Pin the logo to the SAME spot as the home screen (.deepsense-logo: top:15px left:55px),
-    // anchored to the relatively-positioned .c-main-header, so it's pixel-identical across views.
+    // Vertically centered in the 90px header (25px logo -> top 33 ≈ (90-25)/2), anchored to the
+    // relatively-positioned .c-main-header. Home's .deepsense-logo uses the same top:33/left:55 so the
+    // logo sits at an identical viewport position across both views.
     position: absolute;
-    top: 15px;
+    top: 33px;
     left: 55px;
     width: 140px;
     z-index: 10;
