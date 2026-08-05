@@ -32,7 +32,7 @@ import { ComponentModule } from 'COMPONENTS/components.module';
 if (browserValidator.isBrowserSupported()) {
   let lab = angular.module('ds.lab', [
     // 'ui.router' removed — routing is now @angular/router (see ng2/app-routes.ts + <router-shell>).
-    'ui.bootstrap',
+    // 'ui.bootstrap' removed — all modals are @angular/cdk; tooltips/popovers are native title/CSS.
     // 'ngSanitize' removed — the only ng-bind-html usages (preset-modal) now use $sce.trustAsHtml.
     'ngCookies',
     'rt.debounce',

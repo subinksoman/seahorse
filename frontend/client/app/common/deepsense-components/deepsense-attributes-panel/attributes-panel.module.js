@@ -19,7 +19,8 @@
 const attributesPanel = angular.module('deepsense.attributes-panel', [
   'deepsense.spinner',
   'deepsense.node-parameters',
-  'ui.bootstrap',
+  // 'ui.bootstrap' removed — the panel + attribute-types are Angular components now (CDK modals,
+  // native tooltips); no uib directive is compiled at runtime.
   'xeditable',
   'NgSwitchery',
   'ui.ace',

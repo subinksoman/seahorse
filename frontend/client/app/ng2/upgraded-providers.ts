@@ -14,7 +14,6 @@ export function $logFactory(i: any): any { return i.get('$log'); }
 export function toastrFactory(i: any): any { return i.get('toastr'); } // angular-toastr service
 export function $timeoutFactory(i: any): any { return i.get('$timeout'); }
 export function $intervalFactory(i: any): any { return i.get('$interval'); }
-export function $uibModalFactory(i: any): any { return i.get('$uibModal'); } // angular-ui-bootstrap
 export function $cookiesFactory(i: any): any { return i.get('$cookies'); } // ngCookies
 export function $qFactory(i: any): any { return i.get('$q'); }
 export function $httpFactory(i: any): any { return i.get('$http'); }
@@ -34,11 +33,10 @@ export function deepsenseNodeParametersFactory(i: any): any { return i.get('Deep
 export function graphStyleServiceFactory(i: any): any { return i.get('GraphStyleService'); }
 export function datasourcesServiceFactory(i: any): any { return i.get('datasourcesService'); }
 export function datasourcesPanelServiceFactory(i: any): any { return i.get('DatasourcesPanelService'); }
-// Core-canvas finale: bridged for the migrated core-canvas component + its jsplumb-draggable/keyboard
-// directives (AdapterService = jsPlumb adapter, $uibModalStack = keyboard modal guard, GraphNode = the
-// deepsense graph-node model exposing MOVE event constant).
+// Core-canvas finale: bridged for the migrated core-canvas component + its jsplumb-draggable directive
+// (AdapterService = jsPlumb adapter, GraphNode = the deepsense graph-node model exposing MOVE event
+// constant). The ng2 KeyboardDirective now checks the CDK overlay directly (no $uibModalStack bridge).
 export function adapterServiceFactory(i: any): any { return i.get('AdapterService'); }
-export function uibModalStackFactory(i: any): any { return i.get('$uibModalStack'); }
 export function graphNodeFactory(i: any): any { return i.get('GraphNode'); }
 // Datasources panel: bridged for the migrated datasources-element (opens the add/edit datasource modals).
 export function datasourcesModalsServiceFactory(i: any): any { return i.get('DatasourcesModalsService'); }
@@ -62,7 +60,6 @@ export const upgradedProviders: any[] = [
   { provide: 'toastr', useFactory: toastrFactory, deps: ['$injector'] },
   { provide: '$timeout', useFactory: $timeoutFactory, deps: ['$injector'] },
   { provide: '$interval', useFactory: $intervalFactory, deps: ['$injector'] },
-  { provide: '$uibModal', useFactory: $uibModalFactory, deps: ['$injector'] },
   { provide: '$cookies', useFactory: $cookiesFactory, deps: ['$injector'] },
   { provide: '$q', useFactory: $qFactory, deps: ['$injector'] },
   { provide: '$http', useFactory: $httpFactory, deps: ['$injector'] },
@@ -77,7 +74,6 @@ export const upgradedProviders: any[] = [
   { provide: 'datasourcesService', useFactory: datasourcesServiceFactory, deps: ['$injector'] },
   { provide: 'DatasourcesPanelService', useFactory: datasourcesPanelServiceFactory, deps: ['$injector'] },
   { provide: 'AdapterService', useFactory: adapterServiceFactory, deps: ['$injector'] },
-  { provide: '$uibModalStack', useFactory: uibModalStackFactory, deps: ['$injector'] },
   { provide: 'GraphNode', useFactory: graphNodeFactory, deps: ['$injector'] },
   { provide: 'DatasourcesModalsService', useFactory: datasourcesModalsServiceFactory, deps: ['$injector'] },
   { provide: '$filter', useFactory: filterFactory, deps: ['$injector'] },

@@ -19,12 +19,15 @@
 import Mousetrap from 'mousetrap';
 
 /* @ngInject */
-function Keyboard($rootScope, $uibModalStack) {
+function Keyboard($rootScope) {
   return {
     restrict: 'A',
     link: function(scope, element, attrs) {
       Mousetrap.bind(['del', 'backspace'], () => {
-        if (_.isUndefined($uibModalStack.getTop())) {
+        // Only delete when no modal is open. All modals are CDK now (angular-ui-bootstrap removed),
+        // so check the CDK overlay instead of the old $uibModalStack. (The Angular canvas uses ng2
+        // KeyboardDirective; this AngularJS directive remains only for any legacy AngularJS template.)
+        if (!document.querySelector('.cdk-dialog-container')) {
           $rootScope.$broadcast('Keyboard.KEY_PRESSED_DEL');
         }
         return false;

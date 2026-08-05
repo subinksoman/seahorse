@@ -15,7 +15,9 @@
  */
 
 
-const cataloguePanel = angular.module('deepsense-catalogue-panel', ['ui.bootstrap.tpls', 'ui.bootstrap']);
+// 'ui.bootstrap'/'ui.bootstrap.tpls' removed (angular-ui-bootstrap uninstalled); this module is not wired
+// into ds.lab (the editor palette is the Angular OperationsCatalogueComponent).
+const cataloguePanel = angular.module('deepsense-catalogue-panel', []);
 
 require('./catalogue-panel/catalogue-panel.js');
 require('./catalogue-panel-operation/catalogue-panel-operation.js');

@@ -21,7 +21,8 @@ require('angular-debounce');
 require('angular-toastr');
 require('angular-ui-ace');
 // angular-ui-router removed — routing is now @angular/router (see ng2/app-routes.ts).
-require('angular-ui-bootstrap');
+// angular-ui-bootstrap removed — all modals are @angular/cdk (ng2/modal.service.ts); tooltips/popovers
+// are native title / CSS in the migrated Angular components.
 require('angular-xeditable');
 require('angucomplete-alt');
 require('ace-builds/src-min-noconflict/ace.js');
