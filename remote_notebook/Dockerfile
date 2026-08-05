@@ -12,6 +12,13 @@ USER root
 COPY requirements.txt /tmp/requirements.txt
 RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
 
+# T92 security: patch OS + Python packages flagged by Trivy.
+RUN apt-get update && apt-get -y upgrade && rm -rf /var/lib/apt/lists/*
+RUN pip3 install --no-cache-dir -U \
+      "jupyter_server>=2.20.0" "jupyterlab>=4.5.7" "notebook>=7.5.6" "nbconvert>=7.17.0" \
+      "mistune>=3.2.1" "tornado>=6.5.3" "urllib3>=2.6.0" "cryptography>=46.0.5" "pyjwt>=2.12.0" \
+      "Mako>=1.3.11" "Brotli>=1.2.0" "wheel>=0.46.2" "soupsieve>=2.8.4" "jaraco.context>=6.1.0"
+
 # jupyter_contrib_nbextensions is abandoned and incompatible with Notebook 7 / jupyter-server 2
 # (it targeted the classic notebook). It is intentionally NOT installed anymore.
 
