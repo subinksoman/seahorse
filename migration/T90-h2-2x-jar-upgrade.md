@@ -1,10 +1,21 @@
 # T90 — Upgrade H2 from 1.4.x to latest (2.4.240)
 
-**Status:** `pending` (assessment complete — implementation NOT started)
+**Status:** `deferred` — **decision 2026-08-05: keep H2 at 1.4.192 as-is (accepted risk).** Assessment
+complete; not implemented. Revisit if the H2 server ever becomes network-reachable outside the internal
+Docker network, if the `-web` Console is enabled, or if any JDBC URL becomes user-influenced.
 **Type:** backend + deployment security upgrade
 **Goal:** move H2 off the 1.4.x line (server image `1.4.192`, service JDBC driver `1.4.191`) to the
 latest release **2.4.240**, clearing the two H2-jar criticals `CVE-2021-42392` + `CVE-2022-23221`
 (fixed in H2 2.0.206 / 2.1.210).
+
+## Decision (2026-08-05)
+**Keep H2 1.4.192.** Rationale: the base image is already modernized (Alpine JRE 17, 0 OS CVEs), and
+the two residual H2-jar criticals are **not remotely reachable** in this deployment — the server runs
+`-tcp` only (no `-web` Console, the JNDI/RCE vector) and every JDBC URL is fixed in
+`docker-compose.yml` (no attacker-controlled URL/`INIT`), with port 1521 confined to the internal
+Docker network. The full 2.x upgrade is a coordinated server + all-service-driver + Slick + live-data
+migration (see below) — disproportionate to the (mitigated) residual risk. This doc is retained as the
+ready-to-execute plan should the deployment's exposure change.
 
 > Context: the h2 image base was already modernized (Alpine JRE 17, 0 OS CVEs — see
 > `deployment/h2-docker/README.md`). This task is the **jar** upgrade, which was deliberately deferred
