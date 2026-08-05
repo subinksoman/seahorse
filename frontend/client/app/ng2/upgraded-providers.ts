@@ -27,8 +27,6 @@ export function canvasServiceFactory(i: any): any { return i.get('CanvasService'
 export function deepsenseNodeParametersFactory(i: any): any { return i.get('DeepsenseNodeParameters'); }
 // Canvas: bridged for the migrated graph-node component (border colours + datasource-node behaviour).
 export function graphStyleServiceFactory(i: any): any { return i.get('GraphStyleService'); }
-export function datasourcesServiceFactory(i: any): any { return i.get('datasourcesService'); }
-export function datasourcesPanelServiceFactory(i: any): any { return i.get('DatasourcesPanelService'); }
 // Core-canvas finale: bridged for the migrated core-canvas component + its jsplumb-draggable directive
 // (AdapterService = jsPlumb adapter, GraphNode = the deepsense graph-node model exposing MOVE event
 // constant). The ng2 KeyboardDirective now checks the CDK overlay directly (no $uibModalStack bridge).
@@ -62,8 +60,6 @@ export const upgradedProviders: any[] = [
   { provide: 'CanvasService', useFactory: canvasServiceFactory, deps: ['$injector'] },
   { provide: 'DeepsenseNodeParameters', useFactory: deepsenseNodeParametersFactory, deps: ['$injector'] },
   { provide: 'GraphStyleService', useFactory: graphStyleServiceFactory, deps: ['$injector'] },
-  { provide: 'datasourcesService', useFactory: datasourcesServiceFactory, deps: ['$injector'] },
-  { provide: 'DatasourcesPanelService', useFactory: datasourcesPanelServiceFactory, deps: ['$injector'] },
   { provide: 'AdapterService', useFactory: adapterServiceFactory, deps: ['$injector'] },
   { provide: 'GraphNode', useFactory: graphNodeFactory, deps: ['$injector'] },
   { provide: 'DatasourcesModalsService', useFactory: datasourcesModalsServiceFactory, deps: ['$injector'] },

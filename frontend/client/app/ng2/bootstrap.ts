@@ -56,6 +56,8 @@ import { DefaultInnerWorkflowGenerator } from './default-inner-workflow-generato
 import { ReportService } from './report.service';
 import { ClusterModalService } from './cluster-modal.service';
 import { LibraryModalService } from './library-modal.service';
+import { DatasourcesService } from './datasources.service';
+import { DatasourcesPanelService } from './datasources-panel.service';
 import { OperationsApiClient } from './operations-api-client.service';
 import { WorkflowsApiClient } from './workflows-api-client.service';
 import { SessionManagerApi } from './session-manager-api.service';
@@ -246,7 +248,13 @@ angular.module('ds.lab')
   // string token; but LibraryModalService is a NATIVE Angular service (providedIn root), not an AngularJS
   // bridge, so the string token isn't otherwise in Angular DI — alias it to the class so the modal can
   // construct (importing the class into the component instead would create a component<->service cycle).
-  providers: [...upgradedProviders, { provide: 'LibraryModalService', useExisting: LibraryModalService }]
+  // datasourcesService + DatasourcesPanelService migrated to native ng2 (datasources.service.ts /
+  // datasources-panel.service.ts); their consumers still @Inject the string tokens, so alias them to the
+  // classes (was the AngularJS bridge). All live consumers are ng2 — the AngularJS defs are now unused.
+  providers: [...upgradedProviders,
+    { provide: 'LibraryModalService', useExisting: LibraryModalService },
+    { provide: 'datasourcesService', useExisting: DatasourcesService },
+    { provide: 'DatasourcesPanelService', useExisting: DatasourcesPanelService }]
 })
 export class AppModule implements DoBootstrap {
   constructor(private upgrade: UpgradeModule, private router: Router) {}
