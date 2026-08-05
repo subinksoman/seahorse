@@ -1,5 +1,11 @@
 # Copyright (c) 2016, CodiLime Inc.
-FROM nginx:1.31.3
+# Alpine base: the Debian nginx image drags in perl / ncurses / util-linux etc. (50+ CRITICAL/HIGH CVEs,
+# many with no Debian fix) that are irrelevant to serving static files. nginx-alpine has a tiny package
+# set (busybox), eliminating almost all of them. run.sh is pure POSIX sh (eval/echo template render, no
+# envsubst) so it runs unchanged on busybox. `apk upgrade` patches the remaining Alpine packages.
+FROM nginx:1.31.3-alpine
+
+RUN apk --no-cache upgrade
 
 ENV API_HOST=http://localhost
 ENV API_PORT=9080

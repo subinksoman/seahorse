@@ -134,7 +134,7 @@ import { UploadWorkflowModalComponent } from '../modals/upload-workflow-modal.co
           <div class="container center">
             <div class="no-worfklows">
               <div class="no-worfklows__icon">
-                <span><b>6d Analytical Engine is getting ready.</b></span>
+                <span><b>6D Analytical Engine is getting ready.</b></span>
                 <br/>
                 <span>Please wait a few seconds and <a href="#" (click)="reloadPage()">reload the page</a>.</span>
               </div>
@@ -175,7 +175,7 @@ export class HomeComponent implements OnInit, DoCheck {
 
   ngOnInit(): void {
     this.$rootScope.stateData.dataIsLoaded = true;
-    this.$rootScope.pageTitle = '6d Analytical Engine';
+    this.$rootScope.pageTitle = '6D Analytical Engine';
     this.serverCommunication.unsubscribeFromAllExchanges();
     this.workflows = undefined;
     this.downloadWorkflows();
