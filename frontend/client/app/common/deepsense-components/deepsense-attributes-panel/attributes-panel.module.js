@@ -19,15 +19,12 @@
 const attributesPanel = angular.module('deepsense.attributes-panel', [
   'deepsense.spinner',
   'deepsense.node-parameters',
-  // 'ui.bootstrap' removed — the panel + attribute-types are Angular components now (CDK modals,
-  // native tooltips); no uib directive is compiled at runtime.
-  'xeditable',
   'NgSwitchery'
-  // 'ui.ace' + 'angucomplete-alt' removed — code-snippet drives ACE natively, column-selector is the
-  // native CDK ColumnSelectorModalComponent; neither directive is compiled anymore.
-]).run((editableOptions) => {
-  editableOptions.theme = 'bs3';
-});
+  // Removed (all superseded by Angular components; none of their directives compile at runtime):
+  //   'ui.bootstrap' (CDK modals + native tooltips), 'ui.ace' (code-snippet drives ACE natively),
+  //   'angucomplete-alt' (native CDK column-selector), 'xeditable' (general-data-panel is Angular with
+  //   native inputs — its editableOptions.theme='bs3' .run block went with it).
+]);
 
 require('./attribute-types/attribute-types.js');
 // attributes-list migrated to Angular (ng2/attributes-list.component.ts) — downgraded 'attributesList'.

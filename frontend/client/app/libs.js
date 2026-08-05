@@ -24,7 +24,8 @@ require('angular-toastr');
 // angular-ui-router removed — routing is now @angular/router (see ng2/app-routes.ts).
 // angular-ui-bootstrap removed — all modals are @angular/cdk (ng2/modal.service.ts); tooltips/popovers
 // are native title / CSS in the migrated Angular components.
-require('angular-xeditable');
+// angular-xeditable removed — general-data-panel (the only inline-edit user) is an Angular component
+// with native inputs; no editable-text directive is compiled anymore.
 // angucomplete-alt removed — the only user was the column-selector, now the native Angular
 // ColumnSelectorModalComponent autocomplete (CDK). The directive is unused.
 require('ace-builds/src-min-noconflict/ace.js');
