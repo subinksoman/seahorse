@@ -18,11 +18,18 @@
 
 require('./../deepsense-node-parameters/deepsense-node-parameters.module.js');
 
-const graphModel = angular.module('deepsense.graph-model', ['deepsense.node-parameters']);
+// The graph-model objects are now plain ES6 classes (no AngularJS deps). Import them and register
+// backward-compat AngularJS factories that return the classes, so still-AngularJS consumers keep
+// injecting 'Port'/'Edge'/'GraphNode'/'Workflow' unchanged; ng2 uses the classes via bootstrap.ts.
+const Port = require('./deepsense-common-objects/deepsense-common-port.js');
+const Edge = require('./deepsense-common-objects/deepsense-common-edge.js');
+const GraphNode = require('./deepsense-common-objects/deepsense-common-graph-node.js');
+const Workflow = require('./deepsense-common-objects/deepsense-common-workflow.js');
 
-require('./deepsense-common-objects/deepsense-common-graph-node.js');
-require('./deepsense-common-objects/deepsense-common-port.js');
-require('./deepsense-common-objects/deepsense-common-edge.js');
-require('./deepsense-common-objects/deepsense-common-workflow.js');
+const graphModel = angular.module('deepsense.graph-model', ['deepsense.node-parameters'])
+  .factory('Port', () => Port)
+  .factory('Edge', () => Edge)
+  .factory('GraphNode', () => GraphNode)
+  .factory('Workflow', () => Workflow);
 
 module.exports = graphModel;

@@ -16,10 +16,8 @@
 
 'use strict';
 
-angular
-  .module('deepsense.graph-model')
-  .factory('Edge', function() {
-    class Edge {
+// Phase C / AngularJS removal: plain ES6 class in a CJS module (was a deepsense.graph-model .factory).
+module.exports = class Edge {
       constructor(options) {
         this.startNodeId = options.startNodeId;
         this.endNodeId = options.endNodeId;
@@ -55,10 +53,7 @@ angular
         };
       }
 
-      static get CREATE() { return 'Edge.CREATE'; }
-      static get REMOVE() { return 'Edge.REMOVE'; }
-      static get DRAG() { return 'Edge.DRAG'; }
-    }
-
-    return Edge;
-  });
+  static get CREATE() { return 'Edge.CREATE'; }
+  static get REMOVE() { return 'Edge.REMOVE'; }
+  static get DRAG() { return 'Edge.DRAG'; }
+}

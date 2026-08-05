@@ -16,9 +16,12 @@
 
 'use strict';
 
-angular
-  .module('deepsense.graph-model')
-  .factory('Workflow', /* @ngInject */function (GraphNode, Edge) {
+// Phase C / AngularJS removal: plain CJS module (was a deepsense.graph-model .factory injecting
+// GraphNode + Edge). `angular.copy` stays a global (angular is exposed via expose-loader).
+const _ = require('lodash');
+const GraphNode = require('./deepsense-common-graph-node.js');
+const Edge = require('./deepsense-common-edge.js');
+
     function Workflow() {
       let that = this;
       let internal = {
@@ -389,5 +392,4 @@ angular
       };
     }
 
-    return Workflow;
-  });
+module.exports = Workflow;

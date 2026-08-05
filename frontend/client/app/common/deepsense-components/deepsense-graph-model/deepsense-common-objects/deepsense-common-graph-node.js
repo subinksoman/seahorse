@@ -16,9 +16,9 @@
 
 'use strict';
 
-angular
-  .module('deepsense.graph-model')
-  .factory('GraphNode', /* @ngInject */function(Port) {
+// Phase C / AngularJS removal: plain CJS module (was a deepsense.graph-model .factory injecting Port).
+const _ = require('lodash');
+const Port = require('./deepsense-common-port.js');
 
     function GraphNode(options) {
       this.id = options.id;
@@ -171,5 +171,4 @@ angular
       return undefined;
     };
 
-    return GraphNode;
-  });
+module.exports = GraphNode;

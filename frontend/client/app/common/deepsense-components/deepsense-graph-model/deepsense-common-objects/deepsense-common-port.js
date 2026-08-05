@@ -16,10 +16,8 @@
 
 'use strict';
 
-angular
-  .module('deepsense.graph-model')
-  .factory('Port', function() {
-    class Port {
+// Phase C / AngularJS removal: plain ES6 class in a CJS module (was a deepsense.graph-model .factory).
+module.exports = class Port {
       constructor(options) {
         this.nodeId = options.nodeId;
         this.index = options.portIndex;
@@ -30,10 +28,7 @@ angular
         this.id = this.generateId();
       }
 
-      generateId() {
-        return `${this.type}-${this.index}-${this.nodeId}`;
-      }
-    }
-
-    return Port;
-  });
+  generateId() {
+    return `${this.type}-${this.index}-${this.nodeId}`;
+  }
+}
