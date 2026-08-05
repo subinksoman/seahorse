@@ -4,6 +4,7 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
+import { HttpService } from './http.service';
 import * as _ from 'lodash';
 import { BaseApiClient } from './base-api-client.service';
 
@@ -19,7 +20,7 @@ export class WorkflowsApiClient extends BaseApiClient {
   private ServerCommunication: any;
 
   constructor(
-    @Inject('$http') $http: any,
+    $http: HttpService,
     @Inject('config') config: any,
     @Inject('ServerCommunication') ServerCommunication: any
   ) {

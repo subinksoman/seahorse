@@ -4,6 +4,7 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
+import { HttpService } from './http.service';
 import { BaseApiClient } from './base-api-client.service';
 
 // Phase C-1: migrated from common/api-clients/operations-api-client.factory.js. Extends the Angular
@@ -17,7 +18,7 @@ export class OperationsApiClient extends BaseApiClient {
   private readonly PATH_HIERARCHY = '/operations/hierarchy';
 
   constructor(
-    @Inject('$http') $http: any,
+    $http: HttpService,
     @Inject('config') config: any
   ) {
     super($http, config);

@@ -4,6 +4,7 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
+import { HttpService } from './http.service';
 
 declare const angular: any; // global (expose-loader) — angular.identity for the upload transformRequest
 
@@ -17,7 +18,7 @@ export class LibraryApi {
   private libraryPrefix: string;
 
   constructor(
-    @Inject('$http') private $http: any,
+    private $http: HttpService,
     @Inject('config') config: any
   ) {
     this.url = `${config.apiHost}:${config.apiPort}/library`;

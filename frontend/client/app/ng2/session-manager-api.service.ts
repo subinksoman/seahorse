@@ -4,6 +4,7 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
+import { HttpService } from './http.service';
 
 // Phase C-1: migrated from common/api-clients/session-manager-api.service.js. Standalone $http client
 // for the sessions endpoint (does NOT extend BaseApiClient). Uses bridged $http/$log and the config
@@ -14,7 +15,7 @@ export class SessionManagerApi {
   private readonly URL: string;
 
   constructor(
-    @Inject('$http') private $http: any,
+    private $http: HttpService,
     @Inject('config') config: any
   ) {
     this.URL = config.sessionApiPort

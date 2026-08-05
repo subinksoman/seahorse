@@ -4,6 +4,7 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
+import { HttpService } from './http.service';
 import { defer } from './defer';
 
 // Phase C-1: migrated from common/api-clients/base-api-client.factory.js. The legacy factory returned
@@ -21,7 +22,7 @@ export class BaseApiClient {
   readonly API_URL: string;
 
   constructor(
-    @Inject('$http') protected $http: any,
+    protected $http: HttpService,
     @Inject('config') protected config: any
   ) {
     this.API_URL = config.apiPort
@@ -31,7 +32,7 @@ export class BaseApiClient {
 
   makeRequest(method: string, url: string, data: any = {}, timeout?: number): any {
     const deferred = defer();
-    this.$http({
+    this.$http.request({
       method: method,
       url: url,
       data: data,

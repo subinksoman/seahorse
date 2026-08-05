@@ -11,7 +11,6 @@
 export function $rootScopeFactory(i: any): any { return i.get('$rootScope'); }
 // config is now read from window.__seahorseConfig (set by config.js), NOT the AngularJS $injector.
 export function configFactory(): any { return (window as any).__seahorseConfig; }
-export function $httpFactory(i: any): any { return i.get('$http'); }
 // WorkflowService hub deps that stay AngularJS: the deepsense-* graph model (Workflow) + cycle
 // analyser. Bridged so WorkflowService can @Inject them. (debounce is lodash _.debounce now, not bridged.)
 export function workflowFactory(i: any): any { return i.get('Workflow'); }
@@ -31,7 +30,6 @@ export function presetModalLabelsFactory(i: any): any { return i.get('PresetModa
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
   { provide: 'config', useFactory: configFactory },
-  { provide: '$http', useFactory: $httpFactory, deps: ['$injector'] },
   { provide: 'Workflow', useFactory: workflowFactory, deps: ['$injector'] },
   { provide: 'DeepsenseNodeParameters', useFactory: deepsenseNodeParametersFactory, deps: ['$injector'] },
   { provide: 'Upload', useFactory: uploadFactory, deps: ['$injector'] },

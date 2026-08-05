@@ -4,6 +4,7 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
+import { HttpService } from './http.service';
 
 // Phase C / AngularJS removal: native port of common/api/datasources-api.service.js (the Datasource
 // Manager REST client). The tiny ApiBaseClass (apiUrl from config + getData/makeEndpointUrl) is inlined
@@ -14,7 +15,7 @@ export class DatasourcesApiService {
   private readonly servicePath = '/datasourcemanager/v1';
   private readonly apiUrl: string;
 
-  constructor(@Inject('$http') private $http: any, @Inject('config') config: any) {
+  constructor(private $http: HttpService, @Inject('config') config: any) {
     this.apiUrl = `${config.apiHost}:${config.apiPort}`;
   }
 
