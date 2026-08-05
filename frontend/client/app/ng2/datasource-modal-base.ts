@@ -4,8 +4,7 @@
  */
 
 import { DialogRef } from '@angular/cdk/dialog';
-
-declare const angular: any; // global — angular.copy of the edited datasource
+import { copy } from './ng-compat';
 
 // Phase C / AngularJS removal: Angular port of datasource-modal.class.js — the shared logic behind the
 // datasource modals (name-uniqueness, add/update, cancel). The CDK datasource-modal components extend
@@ -20,7 +19,7 @@ export abstract class DatasourceModalBase {
 
   constructor(protected datasourcesService: any, protected dialogRef: DialogRef<any>, data: any) {
     this.previewMode = data.mode === 'VIEW';
-    this.editedDatasource = data.editedDatasource ? angular.copy(data.editedDatasource) : null;
+    this.editedDatasource = data.editedDatasource ? copy(data.editedDatasource) : null;
   }
 
   doesNameExists(): boolean {

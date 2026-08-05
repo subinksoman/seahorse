@@ -5,8 +5,7 @@
 
 import { Component, Inject } from '@angular/core';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
-
-declare const angular: any; // global (expose-loader) — angular.copy of the workflow
+import { copy } from './ng-compat';
 
 // Phase C / AngularJS removal: clone-workflow modal on CDK/ModalService, was common/modals/workflow-clone
 // -modal. Receives the original workflow via DIALOG_DATA, edits a "Copy of …" copy, close(copy) on save.
@@ -49,7 +48,7 @@ export class WorkflowCloneModalComponent {
 
   constructor(@Inject(DIALOG_DATA) data: any, private dialogRef: DialogRef<any>) {
     this.originalWorkflow = data.workflow;
-    this.workflowCopy = angular.copy(data.workflow);
+    this.workflowCopy = copy(data.workflow);
     this.workflowCopy.name = `Copy of ${this.workflowCopy.name}`;
   }
 

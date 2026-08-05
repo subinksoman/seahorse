@@ -9,8 +9,7 @@ import { Injectable, Inject } from '@angular/core';
 import { sessionStatus } from '../enums/session-status.js';
 import { WorkflowService } from './workflow.service';
 import { UserService } from './user.service';
-
-declare const angular: any; // global (expose-loader) — used for angular.copy of menu-item variants
+import { copy } from './ng-compat';
 
 // Phase C-1: migrated from workflows/workflows-status-bar/workflows-editor-status-bar.service.js.
 // Builds the status-bar menu-item view for the current workflow/session state. Now clean: injects the
@@ -80,19 +79,19 @@ export class WorkflowStatusBarService {
       }
     };
 
-    menuItems.disabledClone = angular.copy(menuItems.clone);
+    menuItems.disabledClone = copy(menuItems.clone);
     menuItems.disabledClone.additionalClass = 'menu-item-disabled';
 
-    menuItems.disabledStartEditing = angular.copy(menuItems.startEditing);
+    menuItems.disabledStartEditing = copy(menuItems.startEditing);
     menuItems.disabledStartEditing.additionalClass = 'menu-item-disabled';
 
-    menuItems.disabledStopEditing = angular.copy(menuItems.stopEditing);
+    menuItems.disabledStopEditing = copy(menuItems.stopEditing);
     menuItems.disabledStopEditing.additionalClass = 'menu-item-disabled';
 
-    menuItems.disabledExport = angular.copy(menuItems.export);
+    menuItems.disabledExport = copy(menuItems.export);
     menuItems.disabledExport.additionalClass = 'menu-item-disabled';
 
-    menuItems.disabledRun = angular.copy(menuItems.run);
+    menuItems.disabledRun = copy(menuItems.run);
     menuItems.disabledRun.additionalClass = 'menu-item-disabled';
 
     this.menuItems = menuItems;

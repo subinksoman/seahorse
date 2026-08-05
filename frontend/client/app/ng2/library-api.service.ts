@@ -5,8 +5,7 @@
 
 import { Injectable, Inject } from '@angular/core';
 import { HttpService } from './http.service';
-
-declare const angular: any; // global (expose-loader) — angular.identity for the upload transformRequest
+import { identity } from './ng-compat';
 
 // Phase C-1: migrated from common/api-clients/library-api.service.js. Thin $http client for the
 // /library endpoint (list/add/remove/upload + resource URI/URL helpers). Uses bridged $http + the
@@ -66,7 +65,7 @@ export class LibraryApi {
     fd.append('file', file);
     return this.$http
       .post(directoryUrl, fd, {
-        transformRequest: angular.identity,
+        transformRequest: identity,
         headers: { 'Content-Type': undefined },
         uploadEventHandlers: {
           progress: function (param: any) {

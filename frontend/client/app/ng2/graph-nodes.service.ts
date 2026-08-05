@@ -11,8 +11,7 @@ import { OperationsService } from './operations.service';
 import { UUIDGenerator } from './uuid-generator.service';
 import { WorkflowsApiClient } from './workflows-api-client.service';
 import { NotificationService } from './notification.service';
-
-declare const angular: any; // global (expose-loader) — angular.merge/copy/extend
+import { copy, merge, extend } from './ng-compat';
 
 // Phase C-1: migrated from workflows/workflows-editor/graph-nodes.service.js. Creates/clones graph
 // nodes (incl. deep inner-workflow id remapping and notebook-node clone) and resolves node parameters.
@@ -78,7 +77,7 @@ export class GraphNodesService {
     const offset = { x: 255, y: 0 };
     const nodeClone = _.cloneDeep(node);
     const newNodeId = this.UUIDGenerator.generateUUID();
-    const nodeParams = angular.merge(
+    const nodeParams = merge(
       nodeClone, {
         id: newNodeId,
         operation: operation,
@@ -89,7 +88,7 @@ export class GraphNodesService {
     );
 
     const createdNode = workflow.createNode(nodeParams);
-    createdNode.parametersValues = angular.copy(node.parameters.serialize());
+    createdNode.parametersValues = copy(node.parameters.serialize());
 
     if (Object.values(specialOperations.NOTEBOOKS).includes(node.operationId)) {
       this.WorkflowsApiClient.cloneNotebookNode(workflow.id, node.id, newNodeId).then(() => {
@@ -120,7 +119,7 @@ export class GraphNodesService {
     innerWorkflow.nodes.forEach((node: any) => {
       if (node.operation.id === specialOperations.CUSTOM_TRANSFORMER.NODE) {
         const mapFromNestedNode = this._mapOldIdsWithNewOnes(node.parameters['inner workflow'].workflow);
-        map = angular.extend(map, mapFromNestedNode);
+        map = extend(map, mapFromNestedNode);
       }
       map[node.id] = this.UUIDGenerator.generateUUID();
     });
@@ -128,7 +127,7 @@ export class GraphNodesService {
   }
 
   private _assignNewIds(map: any, innerWorkflow: any): any {
-    const newInnerWorkflow = angular.copy(innerWorkflow);
+    const newInnerWorkflow = copy(innerWorkflow);
     newInnerWorkflow.connections.forEach((connection: any) => {
       connection.from.nodeId = map[connection.from.nodeId];
       connection.to.nodeId = map[connection.to.nodeId];
@@ -145,7 +144,7 @@ export class GraphNodesService {
   }
 
   private _assingNewIdsThirdPartyData(map: any, thirdPartyData: any): any {
-    const thirdPartyDataCopy = angular.copy(thirdPartyData);
+    const thirdPartyDataCopy = copy(thirdPartyData);
     Object.keys(thirdPartyDataCopy.gui.nodes).forEach((oldId) => {
       thirdPartyDataCopy.gui.nodes[map[oldId]] = thirdPartyDataCopy.gui.nodes[oldId];
       delete thirdPartyDataCopy.gui.nodes[oldId];

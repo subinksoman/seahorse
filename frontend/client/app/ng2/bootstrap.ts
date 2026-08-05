@@ -1,12 +1,10 @@
 import 'reflect-metadata';
 import 'zone.js';
 import '@angular/compiler'; // JIT compiler (no AoT/ngtsc in this custom webpack build) — must load first
-import { NgModule, DoBootstrap } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { UpgradeModule, downgradeInjectable, downgradeComponent } from '@angular/upgrade/static';
-import { RouterModule, Router } from '@angular/router';
-import { setUpLocationSync } from '@angular/router/upgrade';
+import { RouterModule } from '@angular/router';
 import { DialogModule } from '@angular/cdk/dialog';
 // Import the prebuilt CSS by file path (NODE_MODULES webpack alias) — @angular/cdk's package `exports`
 // field doesn't expose the .css subpath, but a direct file path bypasses exports resolution.
@@ -145,128 +143,23 @@ import { HomeComponent } from './home.component';
 import { ResizableDirective, ResizableListenerDirective } from './resizable.directive';
 import { WorkflowsEditorComponent } from './workflows-editor.component';
 import { PublicParamsListComponent } from './public-params-list.component';
-import { WorkflowSchedulesUpgradeDirective } from './workflow-schedules.upgrade';
+import { AppRootComponent } from './app-root.component';
+import { DroppableDirective } from './droppable.directive';
 import { upgradedProviders } from './upgraded-providers';
 
-declare const angular: any;
-
-// Expose Angular services to AngularJS DI (the two frameworks share one injector tree). Each
-// downgraded service replaces its legacy AngularJS registration; consumers are unchanged.
-angular.module('ds.lab')
-  .factory('helloAngular', downgradeInjectable(HelloAngularService) as any)
-  .factory('UserService', downgradeInjectable(UserService) as any) // Phase C-1: migrated to Angular 18
-  .factory('UUIDGenerator', downgradeInjectable(UUIDGenerator) as any) // Phase C-1: migrated to Angular 18
-  .factory('TimeService', downgradeInjectable(TimeService) as any) // Phase C-1: migrated to Angular 18
-  .factory('HelpersService', downgradeInjectable(HelpersService) as any) // Phase C-1: migrated to Angular 18
-  .factory('MouseEvent', downgradeInjectable(MouseEvent) as any) // Phase C-1: migrated to Angular 18
-  .factory('EventsService', downgradeInjectable(EventsService) as any) // Phase C-1: migrated to Angular 18
-  .factory('version', downgradeInjectable(VersionService) as any) // Phase C-1: migrated to Angular 18
-  .factory('ErrorService', downgradeInjectable(ErrorService) as any) // Phase C-1: migrated to Angular 18
-  .factory('NotificationService', downgradeInjectable(NotificationService) as any) // Phase C-1: migrated to Angular 18
-  .factory('MultiSelectionService', downgradeInjectable(MultiSelectionService) as any) // Phase C-1: migrated to Angular 18
-  .factory('BottomBarService', downgradeInjectable(BottomBarService) as any) // Phase C-1: migrated to Angular 18
-  .factory('DragAndDrop', downgradeInjectable(DragAndDrop) as any) // Phase C-1: migrated to Angular 18
-  .factory('ConfirmationModalService', downgradeInjectable(ConfirmationModalService) as any) // Phase C-1: migrated to Angular 18
-  .factory('ExportModalService', downgradeInjectable(ExportModalService) as any) // Phase C-1: migrated to Angular 18
-  .factory('DeleteModalService', downgradeInjectable(DeleteModalService) as any) // Phase C-1: migrated to Angular 18
-  .factory('DefaultInnerWorkflowGenerator', downgradeInjectable(DefaultInnerWorkflowGenerator) as any) // Phase C-1: migrated to Angular 18
-  .factory('Report', downgradeInjectable(ReportService) as any) // Phase C-1: migrated to Angular 18
-  .factory('ClusterModalService', downgradeInjectable(ClusterModalService) as any) // Phase C-1: migrated to Angular 18
-  .factory('LibraryModalService', downgradeInjectable(LibraryModalService) as any) // Phase C-1: migrated to Angular 18
-  .factory('OperationsApiClient', downgradeInjectable(OperationsApiClient) as any) // Phase C-1: migrated to Angular 18
-  .factory('WorkflowsApiClient', downgradeInjectable(WorkflowsApiClient) as any) // Phase C-1: migrated to Angular 18
-  .factory('SessionManagerApi', downgradeInjectable(SessionManagerApi) as any) // Phase C-1: migrated to Angular 18
-  .factory('OperationsHierarchyService', downgradeInjectable(OperationsHierarchyService) as any) // Phase C-1: migrated to Angular 18
-  .factory('WorkflowCloneService', downgradeInjectable(WorkflowCloneService) as any) // Phase C-1: migrated to Angular 18
-  .factory('Operations', downgradeInjectable(OperationsService) as any) // Phase C-1: migrated to Angular 18
-  .factory('SessionManager', downgradeInjectable(SessionManager) as any) // Phase C-1: migrated to Angular 18
-  .factory('WorkflowService', downgradeInjectable(WorkflowService) as any) // Phase C-1: migrated to Angular 18 (the central editor hub)
-  .factory('GraphStyleService', downgradeInjectable(GraphStyleService) as any) // engine cluster: ng2 now; downgraded for the AngularJS canvas adapter
-  .factory('ServerCommunication', downgradeInjectable(ServerCommunicationService) as any) // engine cluster: ng2 now; downgraded for the AngularJS loading-mask
-  .factory('WorkflowStatusBarService', downgradeInjectable(WorkflowStatusBarService) as any) // Phase C-1: migrated to Angular 18
-  .factory('NodeCopyPasteVisitorService', downgradeInjectable(NodeCopyPasteVisitorService) as any) // Phase C-1: migrated to Angular 18
-  .factory('CopyPasteService', downgradeInjectable(CopyPasteService) as any) // Phase C-1: migrated to Angular 18
-  .factory('LibraryApiService', downgradeInjectable(LibraryApi) as any) // Phase C-1: migrated to Angular 18
-  .factory('LibraryDataConverterService', downgradeInjectable(LibraryDataConverter) as any) // Phase C-1: migrated to Angular 18
-  .factory('LibraryService', downgradeInjectable(LibraryService) as any) // Phase C-1: migrated to Angular 18
-  .factory('WorkflowsEditorService', downgradeInjectable(WorkflowsEditorService) as any) // Phase C-1: migrated to Angular 18
-  .factory('GraphNodesService', downgradeInjectable(GraphNodesService) as any) // Phase C-1: migrated to Angular 18
-  // Phase C-2 (UI layer): downgraded Angular COMPONENTS registered as AngularJS directives.
-  .directive('createNodeInvitation', downgradeComponent({ component: CreateNodeInvitationComponent }) as any)
-  .directive('portStatusTooltip', downgradeComponent({ component: PortStatusTooltipComponent }) as any)
-  .directive('loadingMask', downgradeComponent({ component: LoadingMaskComponent }) as any)
-  .directive('deepsenseLoadingSpinnerProcessing', downgradeComponent({ component: LoadingSpinnerProcessingComponent }) as any)
-  .directive('breadcrumbs', downgradeComponent({ component: BreadcrumbsComponent }) as any)
-  .directive('fileElement', downgradeComponent({ component: FileElementComponent }) as any)
-  .directive('fileList', downgradeComponent({ component: FileListComponent }) as any)
-  .directive('recentFilesIndicator', downgradeComponent({ component: RecentFilesIndicatorComponent }) as any)
-  .directive('statusIcon', downgradeComponent({ component: StatusIconComponent }) as any)
-  .directive('graphNode', downgradeComponent({ component: GraphNodeComponent }) as any)
-  // operations-catalogue cluster: only the cap (operationCatalogue) is used from an AngularJS template
-  // (new-node.html); its children operations-list / search-operation live only inside Angular templates.
-  .directive('operationCatalogue', downgradeComponent({ component: OperationsCatalogueComponent }) as any)
-  .directive('newNode', downgradeComponent({ component: NewNodeComponent }) as any)
-  .directive('canvasToolbar', downgradeComponent({ component: CanvasToolbarComponent }) as any)
-  // core-canvas finale: only coreCanvas is downgraded (used from AngularJS editor.html); its
-  // keyboard/jsplumb-draggable/multi-selection directives live only in the Angular core-canvas template.
-  .directive('coreCanvas', downgradeComponent({ component: CoreCanvasComponent }) as any)
-  // editor-view orchestrator: used from workflows-editor.html (still AngularJS); ui-router untouched.
-  .directive('editor', downgradeComponent({ component: EditorComponent }) as any)
-  // editor side panels (incremental): bottom-bar Reports tab.
-  .directive('bottomBar', downgradeComponent({ component: BottomBarComponent }) as any)
-  // general-data-panel: name/description migrated to Angular; schedules + public-params stay AngularJS,
-  // projected in via <ng-content> from workflows-editor.html (keeps the working workflow-schedules widget).
-  .directive('generalDataPanel', downgradeComponent({ component: GeneralDataPanelComponent }) as any)
-  // datasources subsystem (bottom-up): the list row.
-  .directive('datasourcesElement', downgradeComponent({ component: DatasourcesElementComponent }) as any)
-  // datasources: only the panel is used from an AngularJS template (workflows-editor.html); list + toolbar
-  // (and element) live inside Angular templates now.
-  .directive('datasourcesPanel', downgradeComponent({ component: DatasourcesPanelComponent }) as any)
-  // report subsystem (bottom-up): the data-sample grid (cell-viewer modal + charts stay AngularJS).
-  .directive('reportTable', downgradeComponent({ component: ReportTableComponent }) as any)
-  .directive('reportDefault', downgradeComponent({ component: ReportDefaultComponent }) as any)
-  .directive('reportDataframeFull', downgradeComponent({ component: ReportDataframeFullComponent }) as any)
-  .directive('report', downgradeComponent({ component: ReportComponent }) as any)
-  // deepsense-attributes proof-of-pattern leaf (the first of ~38; establishes the [parameter] approach).
-  .directive('attributeStringType', downgradeComponent({ component: AttributeStringTypeComponent }) as any)
-  .directive('attributeNumericType', downgradeComponent({ component: AttributeNumericTypeComponent }) as any)
-  .directive('attributeCreatorType', downgradeComponent({ component: AttributeStringTypeComponent }) as any)
-  .directive('attributePrefixBasedCreatorType', downgradeComponent({ component: AttributeStringTypeComponent }) as any)
-  .directive('attributeMultipleNumericType', downgradeComponent({ component: AttributeMultipleNumericTypeComponent }) as any)
-  .directive('attributeWorkflowType', downgradeComponent({ component: AttributeWorkflowTypeComponent }) as any)
-  .directive('attributeSaveToLibrary', downgradeComponent({ component: AttributeSaveToLibraryTypeComponent }) as any)
-  .directive('attributeLoadFromLibrary', downgradeComponent({ component: AttributeLoadFromLibraryTypeComponent }) as any)
-  .directive('attributeDatasource', downgradeComponent({ component: AttributeDatasourceComponent }) as any)
-  .directive('attributeBooleanType', downgradeComponent({ component: AttributeBooleanTypeComponent }) as any)
-  .directive('attributeCodeSnippetType', downgradeComponent({ component: AttributeCodeSnippetTypeComponent }) as any)
-  .directive('attributeSelectorType', downgradeComponent({ component: AttributeSelectorTypeComponent }) as any)
-  .directive('attributesList', downgradeComponent({ component: AttributesListComponent }) as any)
-  .directive('deepsenseOperationAttributes', downgradeComponent({ component: AttributesPanelComponent }) as any)
-  .directive('selectionItems', downgradeComponent({ component: SelectionItemsComponent }) as any)
-  .directive('workflowEditorStatusBar', downgradeComponent({ component: WorkflowsEditorStatusBarComponent }) as any)
-  .directive('navigationBar', downgradeComponent({ component: NavigationBarComponent }) as any)
-  .directive('errorView', downgradeComponent({ component: ErrorViewComponent }) as any)
-  .directive('homeView', downgradeComponent({ component: HomeComponent }) as any)
-  .directive('workflowsEditor', downgradeComponent({ component: WorkflowsEditorComponent }) as any)
-  .directive('routerShell', downgradeComponent({ component: RouterShellComponent }) as any);
 
 @NgModule({
-  imports: [BrowserModule, UpgradeModule, DialogModule,
-    // initialNavigation 'disabled': we never bootstrap an Angular ROOT component (Angular does
-    // upgrade.bootstrap of ds.lab instead), so the router's automatic initial navigation never fires.
-    // We kick it manually in ngDoBootstrap after the AngularJS app + location sync are up.
-    RouterModule.forRoot(appRoutes, { useHash: true, initialNavigation: 'disabled' })],
-  // Angular components used from AngularJS (via downgradeComponent) must be declared here.
-  declarations: [LoadingMaskComponent, LoadingSpinnerProcessingComponent, CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent, ReportComponent, AttributeStringTypeComponent, AttributeNumericTypeComponent, AttributeMultipleNumericTypeComponent, AttributeWorkflowTypeComponent, AttributeSaveToLibraryTypeComponent, AttributeLoadFromLibraryTypeComponent, LibraryConnectorComponent, AttributeDatasourceComponent, AttributeBooleanTypeComponent, AttributeCodeSnippetTypeComponent, AttributeSelectorTypeComponent, AttributesSerializedViewComponent, AttributesListComponent, AttributeSingleChoiceTypeComponent, AttributeMultipleChoiceTypeComponent, AttributeMultiplierTypeComponent, AttributeDynamicParamTypeComponent, AttributesPanelComponent, TimeDiffComponent, DeepsenseLoadingSpinnerSmComponent, SelectionItemsComponent, WorkflowsEditorStatusBarComponent, MenuItemComponent, StartingPopoverComponent, RunningExecutorPopoverComponent, ExecutorErrorComponent, NavigationBarComponent, ErrorViewComponent, HomeComponent, ResizableDirective, ResizableListenerDirective, WorkflowsEditorComponent, PublicParamsListComponent, WorkflowSchedulesUpgradeDirective, RouterShellComponent, WorkflowsShellComponent, ConfirmationModalComponent, DeleteModalComponent, ExportModalComponent, WorkflowCloneModalComponent, NewWorkflowModalComponent, UploadWorkflowModalComponent, CellViewerModalComponent, CodeSnippetModalComponent, ChooseClusterModalComponent, PresetModalComponent, NotebookModalComponent, ErrorMessageModalComponent, DatabaseModalComponent, GoogleSpreadsheetModalComponent, ExternalFileModalComponent, HdfsModalComponent, FileSettingsComponent, LibraryDatasourceModalComponent, LibraryModalComponent, FileUploadSectionComponent, ColumnSelectorModalComponent, ReportChartModalComponent, PiePlotComponent, ColumnPlotComponent],
-  // Bridge AngularJS core (e.g. $rootScope) and constants (config) into the Angular injector so
-  // migrated services can inject them by string token. See upgraded-providers.ts.
-  // LibraryModalComponent (built by CDK) injects LibraryModalService by the '@Inject("LibraryModalService")'
-  // string token; but LibraryModalService is a NATIVE Angular service (providedIn root), not an AngularJS
-  // bridge, so the string token isn't otherwise in Angular DI — alias it to the class so the modal can
-  // construct (importing the class into the component instead would create a component<->service cycle).
-  // datasourcesService + DatasourcesPanelService migrated to native ng2 (datasources.service.ts /
-  // datasources-panel.service.ts); their consumers still @Inject the string tokens, so alias them to the
-  // classes (was the AngularJS bridge). All live consumers are ng2 — the AngularJS defs are now unused.
+  imports: [BrowserModule, DialogModule,
+    // THE FLIP: Angular now owns the app end-to-end. AppRootComponent is the bootstrapped root
+    // (see index.html <app-root>), so the router's initial navigation fires automatically — no more
+    // initialNavigation:'disabled' + manual kick, no UpgradeModule, no AngularJS.
+    RouterModule.forRoot(appRoutes, { useHash: true })],
+  declarations: [AppRootComponent, DroppableDirective, LoadingMaskComponent, LoadingSpinnerProcessingComponent, CreateNodeInvitationComponent, PortStatusTooltipComponent, BreadcrumbsComponent, FileElementComponent, FileListComponent, RecentFilesIndicatorComponent, StatusIconComponent, GraphNodeComponent, SearchOperationComponent, OperationsListComponent, OperationsCatalogueComponent, NewNodeComponent, CanvasToolbarComponent, CoreCanvasComponent, KeyboardDirective, JsplumbDraggableDirective, MultiSelectionDirective, EditorComponent, BottomBarComponent, FocusElementDirective, CustomScrollBarDirective, GeneralDataPanelComponent, DatasourcesElementComponent, DatasourcesListComponent, DatasourcesToolbarComponent, DatasourcesPanelComponent, ReportTableComponent, ReportDefaultComponent, ReportDataframeFullComponent, ReportComponent, AttributeStringTypeComponent, AttributeNumericTypeComponent, AttributeMultipleNumericTypeComponent, AttributeWorkflowTypeComponent, AttributeSaveToLibraryTypeComponent, AttributeLoadFromLibraryTypeComponent, LibraryConnectorComponent, AttributeDatasourceComponent, AttributeBooleanTypeComponent, AttributeCodeSnippetTypeComponent, AttributeSelectorTypeComponent, AttributesSerializedViewComponent, AttributesListComponent, AttributeSingleChoiceTypeComponent, AttributeMultipleChoiceTypeComponent, AttributeMultiplierTypeComponent, AttributeDynamicParamTypeComponent, AttributesPanelComponent, TimeDiffComponent, DeepsenseLoadingSpinnerSmComponent, SelectionItemsComponent, WorkflowsEditorStatusBarComponent, MenuItemComponent, StartingPopoverComponent, RunningExecutorPopoverComponent, ExecutorErrorComponent, NavigationBarComponent, ErrorViewComponent, HomeComponent, ResizableDirective, ResizableListenerDirective, WorkflowsEditorComponent, PublicParamsListComponent, RouterShellComponent, WorkflowsShellComponent, ConfirmationModalComponent, DeleteModalComponent, ExportModalComponent, WorkflowCloneModalComponent, NewWorkflowModalComponent, UploadWorkflowModalComponent, CellViewerModalComponent, CodeSnippetModalComponent, ChooseClusterModalComponent, PresetModalComponent, NotebookModalComponent, ErrorMessageModalComponent, DatabaseModalComponent, GoogleSpreadsheetModalComponent, ExternalFileModalComponent, HdfsModalComponent, FileSettingsComponent, LibraryDatasourceModalComponent, LibraryModalComponent, FileUploadSectionComponent, ColumnSelectorModalComponent, ReportChartModalComponent, PiePlotComponent, ColumnPlotComponent],
+  // String-token providers the migrated code still injects. '$rootScope' + 'config' are now NATIVE
+  // (the RootScopeService emulator + window.__seahorseConfig — see upgraded-providers.ts), not AngularJS
+  // bridges. The rest alias string tokens onto native Angular classes so @Inject('X') resolves without
+  // AngularJS: LibraryModalService/datasources*/AttributesPanel/GraphStyle/Canvas/Adapter/ServerComm are
+  // providedIn-root classes; Workflow + DeepsenseNodeParameters are framework-agnostic CJS values.
   providers: [...upgradedProviders,
     { provide: 'LibraryModalService', useExisting: LibraryModalService },
     { provide: 'datasourcesService', useExisting: DatasourcesService },
@@ -277,26 +170,12 @@ angular.module('ds.lab')
     { provide: 'GraphStyleService', useExisting: GraphStyleService },
     { provide: 'CanvasService', useExisting: CanvasService },
     { provide: 'AdapterService', useExisting: AdapterService },
-    { provide: 'ServerCommunication', useExisting: ServerCommunicationService }]
+    { provide: 'ServerCommunication', useExisting: ServerCommunicationService }],
+  bootstrap: [AppRootComponent]
 })
-export class AppModule implements DoBootstrap {
-  constructor(private upgrade: UpgradeModule, private router: Router) {}
-  ngDoBootstrap(): void {
-    // Bootstrap the existing AngularJS app under Angular's control (strict DI preserved).
-    this.upgrade.bootstrap(document.documentElement, ['ds.lab'], { strictDi: true });
-    // ui-router removed: @angular/router now owns routing (rendered into the downgraded <router-shell>
-    // in index.html). setUpLocationSync keeps the Angular Router and AngularJS $location on ONE URL
-    // (hash mode) so they don't fight.
-    setUpLocationSync(this.upgrade, 'hash');
-    // Kick the router's initial navigation manually (disabled in forRoot) — there is no Angular root
-    // component to trigger it automatically in this hybrid.
-    this.router.initialNavigation();
-    // eslint-disable-next-line no-console
-    console.log('[hybrid] Angular', '18', 'bootstrapped ds.lab; helloAngular =', (angular.element(document.documentElement).injector() ? 'wired' : '?'));
-  }
-}
+export class AppModule {}
 
 platformBrowserDynamic().bootstrapModule(AppModule).catch((err) => {
   // eslint-disable-next-line no-console
-  console.error('[hybrid] bootstrap failed', err);
+  console.error('[bootstrap] Angular bootstrap failed', err);
 });

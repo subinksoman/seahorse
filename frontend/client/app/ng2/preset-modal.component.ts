@@ -7,8 +7,7 @@ import { Component, Inject } from '@angular/core';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { PresetService } from './preset.service';
 import { PRESET_MODAL_LABELS } from './preset-modal-labels';
-
-declare const angular: any; // global — angular.copy of the preset
+import { copy } from './ng-compat';
 
 // Phase C / AngularJS removal: cluster preset editor on CDK/ModalService (was preset-modal). Form
 // bindings are manual ([value]/(input)/(focus), no @angular/forms); name "dirty" is tracked by hand.
@@ -112,7 +111,7 @@ export class PresetModalComponent {
     this.type = data.type;
     this.isSnapshot = data.isSnapshot;
     this.labels = PRESET_MODAL_LABELS[this.type];
-    this.preset = angular.copy(data.preset) || { isEditable: true, isDefault: false };
+    this.preset = copy(data.preset) || { isEditable: true, isDefault: false };
   }
 
   isPresetNameUsed(): boolean {

@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title ng-bind="pageTitle"></title>
+  <!-- Title is set at runtime from the (native) $rootScope emulator's pageTitle by AppRootComponent. -->
+  <title></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Deploy-time config (window.dockerConfig); loaded before the webpack bundles, which
@@ -10,22 +11,8 @@
   <script src="docker-config.js"></script>
 </head>
 <body>
-<loading-mask
-  type="warning"
-  string="Reconnecting">
-</loading-mask>
-<!-- ui-router removed: <router-shell> is a downgraded Angular component hosting the @angular/router
-     <router-outlet>. This element stays in the (still AngularJS-bootstrapped) index.html so the
-     AngularJS droppable directive still applies to it. -->
-<router-shell id="wrapper"
-         class="animated fadeIn"
-         droppable
-         droppable-type="frame">
-</router-shell>
-<feedback></feedback>
-<deepsense-loading-spinner-processing ng-if="!stateData.dataIsLoaded">
-  Loading
-</deepsense-loading-spinner-processing>
-
+<!-- THE FLIP: Angular owns the page. AppRootComponent (bootstrapped) renders the loading-mask, the
+     <router-shell> frame (@angular/router outlet + native [droppable]) and the processing spinner. -->
+<app-root></app-root>
 </body>
 </html>

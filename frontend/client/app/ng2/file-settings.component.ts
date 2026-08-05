@@ -4,8 +4,7 @@
  */
 
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
-
-declare const angular: any; // global — angular.copy
+import { copy } from './ng-compat';
 
 const DEFAULT_CSV_FILE_FORMAT_PARAMS = {
   includeHeader: true, convert01ToBoolean: false, separatorType: 'comma', customSeparator: ''
@@ -103,7 +102,7 @@ export class FileSettingsComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.fileSettings && this.fileSettings) {
       this.fileFormat = this.fileSettings.fileFormat;
-      this.csvFileFormatParams = angular.copy(this.fileSettings.csvFileFormatParams || DEFAULT_CSV_FILE_FORMAT_PARAMS);
+      this.csvFileFormatParams = copy(this.fileSettings.csvFileFormatParams || DEFAULT_CSV_FILE_FORMAT_PARAMS);
     }
   }
 

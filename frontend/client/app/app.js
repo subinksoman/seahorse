@@ -17,53 +17,23 @@
 'use strict';
 
 // Libs
-let angular = require('angular');
 let browserValidator = require('./browser.validator.js');
 
 // Resources
 import '../css/app.less';
 import '../less/app.less';
 
-// App
-import { CommonModule } from 'COMMON/common.module';
-import { ComponentModule } from 'COMPONENTS/components.module';
 
-
+// THE FLIP: AngularJS is gone. The app is now a pure Angular application — there is no ds.lab module,
+// no ngUpgrade hybrid and no `require('angular')`. This entry just validates the browser, exposes the
+// runtime config on window (config.js side effect, read by the native ng2 'config' provider), then
+// bootstraps the Angular AppModule (ng2/bootstrap.ts bootstraps AppRootComponent into <app-root>).
 if (browserValidator.isBrowserSupported()) {
-  let lab = angular.module('ds.lab', [
-    // 'ui.router' removed — routing is now @angular/router (see ng2/app-routes.ts + <router-shell>).
-    // 'ui.bootstrap' removed — all modals are @angular/cdk; tooltips/popovers are native title/CSS.
-    // 'ngSanitize' removed — the only ng-bind-html usages (preset-modal) now use $sce.trustAsHtml.
-    CommonModule,
-    ComponentModule,
-    require('./common/deepsense-components/deepsense-attributes-panel/attributes-panel.module.js').name,
-    // deepsense.cycle-analyser removed — migrated to the native ng2 CycleAnalyserService (injected
-    // directly by WorkflowService); the AngularJS factory + module are no longer used.
-    require('./common/deepsense-components/deepsense-graph-model/deepsense-graph-model.module.js').name,
-    require('./common/deepsense-components/deepsense-loading-spinner/loading-spinner.module.js').name,
-    require('./common/deepsense-components/deepsense-node-parameters/deepsense-node-parameters.module.js').name,
-    'ngFileUpload',
-    require('./home/home.module.js').name,
-    require('./workflows/workflows.module.js').name,
-    require('./enums/enums.module.js').name,
-    require('./common/common.module.js').name,
-    require('./errors/errors.module.js').name,
-    require('./server-communication/server-communication.module.js').name,
-    require('./workflows/library/library.module.js')
-  ]);
-  require('./app.config.js').inject(lab);
-  // version.factory migrated to Angular 18 (ng2/version.service.ts) — downgraded as 'version' in
-  // bootstrap.ts. config.js self-registers the 'config' constant on ds.lab as a side effect and was
-  // previously loaded transitively via version.factory.js; require it explicitly now that it is gone.
   require('../config.js');
-  require('./app.run.js').inject(lab);
-
-  // Phase C: boot AngularJS ds.lab through the Angular (ngUpgrade) hybrid instead of ng-app.
   require('./ng2/bootstrap.ts');
 } else {
   document.addEventListener('DOMContentLoaded', function() {
     document.body.innerHTML = browserValidator.getErrorMessageHTML();
   });
-  angular.module('ds.lab', []); // so config is not throwing exceptions that ds.lab is not available
 }
 

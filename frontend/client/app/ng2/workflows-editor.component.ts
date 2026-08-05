@@ -80,12 +80,8 @@ import { MouseEvent as MouseEventService } from './mouse-event.service';
           resizable-panel-name="rightPanel"
           resizable-position="left"
           resizable-add-shift="-10">
-          <section class="ibox-content o-general-data-panel__content">
-            <header>
-              <p class="o-general-data-panel__header">Schedules:</p>
-              <workflow-schedules [workflow]="getWorkflow()"></workflow-schedules>
-            </header>
-          </section>
+          <!-- THE FLIP: the AngularJS <workflow-schedules> UpgradeComponent (a non-existent directive)
+               is removed with AngularJS; the public-params island remains, now pure Angular. -->
           <section *ngIf="getWorkflow().publicParams?.length > 0">
             <public-params-list
               [workflow]="getWorkflow()"

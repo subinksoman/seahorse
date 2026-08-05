@@ -35,9 +35,8 @@ const config = {
   'libraryPrefix': 'library://'
 };
 
-// The merged runtime config (defaults + docker-config.js's window.dockerConfig). Registered as the
-// AngularJS 'config' constant for still-AngularJS consumers, and exposed on window so the ng2 'config'
-// provider can read it without the AngularJS $injector bridge (a step toward dropping @angular/upgrade).
+// The merged runtime config (defaults + docker-config.js's window.dockerConfig), exposed on window so
+// the native ng2 'config' provider (upgraded-providers.ts) reads it directly. THE FLIP: AngularJS is
+// gone, so the old `angular.module('ds.lab').constant('config', ...)` registration is dropped.
 const mergedConfig = Object.assign({}, config, window.dockerConfig);
 window.__seahorseConfig = mergedConfig;
-angular.module('ds.lab').constant('config', mergedConfig);

@@ -9,8 +9,6 @@ import CurrentDirectory from '../common/services/current-directory';
 import { LibraryDataConverter } from './library-data-converter.service';
 import { LibraryApi } from './library-api.service';
 
-declare const angular: any; // global (expose-loader) — angular.isArray
-
 const STATUS_UPLOADING = 'uploading';
 const STATUS_ERROR = 'error';
 const STATUS_COMPLETE = 'complete';
