@@ -41,10 +41,11 @@ export class MultiSelectionDirective implements AfterViewInit, OnDestroy {
     y: { original: 'top', opposite: 'bottom', dimension: 'height' }
   };
 
+  // was the bridged $document (angular.element(document)); $(document) is the identical jQuery wrapper.
+  private $document: any = $(document);
+
   constructor(
     private host: ElementRef,
-    @Inject('$document') private $document: any,
-    @Inject('$timeout') private $timeout: any,
     @Inject('$rootScope') private $rootScope: any,
     private mouseEvent: MouseEventService,
     private multiSelectionService: MultiSelectionService
@@ -61,9 +62,9 @@ export class MultiSelectionDirective implements AfterViewInit, OnDestroy {
       const oldRepaintValue = this.$selectionElement[0].style.left;
       const newRepaintValue = parseInt(this.$selectionElement[0].style.left, 10) - 1;
       this.$selectionElement[0].style.left = newRepaintValue ? `${newRepaintValue}px` : 'auto';
-      this.$timeout(() => {
+      setTimeout(() => { // was $timeout(fn, false) — a zero-delay defer
         this.$selectionElement[0].style.left = oldRepaintValue;
-      }, false);
+      });
     }, 50, { leading: true, trailing: false });
 
     // Bind lifecycle events (legacy scope.$on -> bridged $rootScope.$on; store unregister fns).

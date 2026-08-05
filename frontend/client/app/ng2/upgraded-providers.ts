@@ -11,13 +11,11 @@
 export function $rootScopeFactory(i: any): any { return i.get('$rootScope'); }
 export function configFactory(i: any): any { return i.get('config'); }
 export function $logFactory(i: any): any { return i.get('$log'); }
-export function $timeoutFactory(i: any): any { return i.get('$timeout'); }
 export function $qFactory(i: any): any { return i.get('$q'); }
 export function $httpFactory(i: any): any { return i.get('$http'); }
 // WorkflowService hub deps that stay AngularJS: the deepsense-* graph model (Workflow) + cycle
 // analyser. Bridged so WorkflowService can @Inject them. (debounce is lodash _.debounce now, not bridged.)
 export function workflowFactory(i: any): any { return i.get('Workflow'); }
-export function $documentFactory(i: any): any { return i.get('$document'); }
 // deepsense-* node-parameters factory stays AngularJS (deepsense-* migrates late); bridged for GraphNodesService.
 export function deepsenseNodeParametersFactory(i: any): any { return i.get('DeepsenseNodeParameters'); }
 // Core-canvas finale: bridged for the migrated core-canvas component + its jsplumb-draggable directive
@@ -35,11 +33,9 @@ export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
   { provide: 'config', useFactory: configFactory, deps: ['$injector'] },
   { provide: '$log', useFactory: $logFactory, deps: ['$injector'] },
-  { provide: '$timeout', useFactory: $timeoutFactory, deps: ['$injector'] },
   { provide: '$q', useFactory: $qFactory, deps: ['$injector'] },
   { provide: '$http', useFactory: $httpFactory, deps: ['$injector'] },
   { provide: 'Workflow', useFactory: workflowFactory, deps: ['$injector'] },
-  { provide: '$document', useFactory: $documentFactory, deps: ['$injector'] },
   { provide: 'DeepsenseNodeParameters', useFactory: deepsenseNodeParametersFactory, deps: ['$injector'] },
   { provide: 'Upload', useFactory: uploadFactory, deps: ['$injector'] },
   { provide: 'PresetService', useFactory: presetServiceFactory, deps: ['$injector'] },

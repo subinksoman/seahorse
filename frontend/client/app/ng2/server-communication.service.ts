@@ -31,7 +31,6 @@ export class ServerCommunicationService {
   constructor(
     @Inject('$log') private $log: any,
     @Inject('$q') private $q: any,
-    @Inject('$timeout') private $timeout: any,
     @Inject('$rootScope') private $rootScope: any,
     @Inject('config') private config: any
   ) {}
@@ -74,7 +73,7 @@ export class ServerCommunicationService {
 
   reconnect(): void {
     this.$log.info('ServerCommunication reconnect');
-    this.$timeout(() => { this._connectToWebSocket(); }, this.config.socketReconnectionInterval, false);
+    setTimeout(() => { this._connectToWebSocket(); }, this.config.socketReconnectionInterval);
   }
 
   sendSynchronize(): void {

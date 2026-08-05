@@ -19,8 +19,10 @@ const OBJECT_TYPE = 'application/seahorseObjects/';
 export class CopyPasteService {
   private enabled = true;
 
+  // was the bridged $document (angular.element(document)); $(document) is the identical jQuery wrapper.
+  private $document: any = (window as any).jQuery(document);
+
   constructor(
-    @Inject('$document') private $document: any,
     @Inject('$rootScope') private $rootScope: any,
     private nodeCopyPasteVisitorService: NodeCopyPasteVisitorService,
     private workflowService: WorkflowService,

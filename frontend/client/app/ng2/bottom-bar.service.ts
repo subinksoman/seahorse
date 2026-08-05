@@ -15,8 +15,7 @@ export class BottomBarService {
   };
 
   constructor(
-    @Inject('$rootScope') private $rootScope: any,
-    @Inject('$timeout') private $timeout: any
+    @Inject('$rootScope') private $rootScope: any
   ) {}
 
   activatePanel(panelName: string): void {

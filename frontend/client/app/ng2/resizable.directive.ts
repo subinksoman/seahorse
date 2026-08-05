@@ -34,10 +34,12 @@ export class ResizableDirective implements OnInit, OnDestroy {
     '<%= position %> no-selection <% if (invisible) { %> o-resizable--invisible' +
     '<% } %>"></aside>');
 
+  // was the bridged $document (angular.element(document)); $(document) is the identical jQuery wrapper.
+  private $document: any = $(document);
+
   constructor(
     private elementRef: ElementRef,
-    @Inject('$rootScope') private $rootScope: any,
-    @Inject('$document') private $document: any
+    @Inject('$rootScope') private $rootScope: any
   ) {}
 
   private attr(name: string): string { return this.el.getAttribute(name); }
