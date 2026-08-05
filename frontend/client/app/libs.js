@@ -34,9 +34,8 @@ require('jquery');
 require('lodash');
 require('imports-loader?type=commonjs&wrapper=window!malihu-custom-scrollbar-plugin');
 require('ng-file-upload');
-// ng-switchery: loader config (shadow module/exports/define so its UMD self-loads bundled switchery)
-// is in config/webpack/global.js — a plain require here so the config rule applies (no inline override).
-require('ng-switchery/dist/ng-switchery.js');
+// ng-switchery removed — the only user (attribute-multiple-choice) is an Angular component with a native
+// CSS toggle. (Its loader shim in config/webpack/global.js is now inert — no module matches it.)
 require('sockjs-client');
 require('stompjs');
 require('d3');

@@ -18,12 +18,11 @@
 
 const attributesPanel = angular.module('deepsense.attributes-panel', [
   'deepsense.spinner',
-  'deepsense.node-parameters',
-  'NgSwitchery'
+  'deepsense.node-parameters'
   // Removed (all superseded by Angular components; none of their directives compile at runtime):
   //   'ui.bootstrap' (CDK modals + native tooltips), 'ui.ace' (code-snippet drives ACE natively),
   //   'angucomplete-alt' (native CDK column-selector), 'xeditable' (general-data-panel is Angular with
-  //   native inputs — its editableOptions.theme='bs3' .run block went with it).
+  //   native inputs), 'NgSwitchery' (multiple-choice is Angular with a native CSS toggle).
 ]);
 
 require('./attribute-types/attribute-types.js');
