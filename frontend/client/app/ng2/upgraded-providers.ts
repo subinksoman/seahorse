@@ -11,17 +11,11 @@
 export function $rootScopeFactory(i: any): any { return i.get('$rootScope'); }
 // config is now read from window.__seahorseConfig (set by config.js), NOT the AngularJS $injector.
 export function configFactory(): any { return (window as any).__seahorseConfig; }
-// Core-canvas finale: bridged for the migrated core-canvas component + its jsplumb-draggable directive
-// (AdapterService = jsPlumb adapter, GraphNode = the deepsense graph-node model exposing MOVE event
-// constant). The ng2 KeyboardDirective now checks the CDK overlay directly (no $uibModalStack bridge).
-// Cluster-settings modals (migrated to CDK): PresetService (preset CRUD/validation) + PresetModalLabels
-// (static field labels) stay AngularJS for now; bridged so the Angular modal components can use them.
-export function presetServiceFactory(i: any): any { return i.get('PresetService'); }
-export function presetModalLabelsFactory(i: any): any { return i.get('PresetModalLabels'); }
 
+// $rootScope is the last bridge remaining: it is the inter-framework event bus and can only be dropped
+// atomically with the bootstrap flip (step 6). Everything else (preset CRUD/labels, canvas, graph model,
+// datasources, $http/$q/$timeout/…) has been ported to native ng2 services.
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
-  { provide: 'config', useFactory: configFactory },
-  { provide: 'PresetService', useFactory: presetServiceFactory, deps: ['$injector'] },
-  { provide: 'PresetModalLabels', useFactory: presetModalLabelsFactory, deps: ['$injector'] }
+  { provide: 'config', useFactory: configFactory }
 ];

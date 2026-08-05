@@ -16,63 +16,8 @@
 
 'use strict';
 
-const SCHEMA = require('./preset.schema.json');
-const Ajv = require('ajv');
-
-// jsen (unmaintained, no security fix) replaced with ajv. jsen exposed validate(data) -> bool
-// plus a stateful validate.errors of {path, message}, where `message` was pulled from the
-// schema's custom invalidMessage/requiredMessage keywords. ajv uses a different error shape and
-// ignores those custom keywords, so:
-//   1) build a field -> {invalid, required} message map from the schema, and
-//   2) wrap ajv's validator to re-emit errors in jsen's {path, message} shape.
-// This keeps validate()/validate.errors — and the consumer (preset-modal formatErrors, which
-// reads error.path / error.message) — unchanged. The schema is declared draft-04 but only uses
-// keywords identical in draft-07 (type/properties/oneOf/required-array/minLength/minimum/enum),
-// so the draft-04 $schema is stripped and ajv (draft-07) validates it identically.
-// NOTE: ajv 6.x is used (not 8.x): ajv 8 ships ES2018+ and the legacy webpack-2 + UglifyJS-2
-// (`webpack -p`) pipeline cannot minify it. ajv 6.12.6 has an ES5 dist and is security-clean
-// (the ajv prototype-pollution ReDoS is fixed in >= 6.12.3). Revisit once T80 Phase B lands
-// a modern minifier.
-const CUSTOM_MESSAGES = (() => {
-  const map = {};
-  (SCHEMA.oneOf || [SCHEMA]).forEach((branch) => {
-    const props = (branch && branch.properties) || {};
-    Object.keys(props).forEach((field) => {
-      map[field] = map[field] || {};
-      if (props[field].invalidMessage) { map[field].invalid = props[field].invalidMessage; }
-      if (props[field].requiredMessage) { map[field].required = props[field].requiredMessage; }
-    });
-  });
-  return map;
-})();
-
-function buildPresetValidator() {
-  const schema = Object.assign({}, SCHEMA);
-  delete schema.$schema;
-  const ajv = new Ajv({allErrors: true});
-  const compiled = ajv.compile(schema);
-  const validate = (data) => {
-    const valid = compiled(data);
-    validate.errors = valid ? [] : (compiled.errors || [])
-      // keep field-level errors; drop the oneOf/anyOf/if/not combinator meta-errors
-      .filter((e) => ['oneOf', 'anyOf', 'if', 'not'].indexOf(e.keyword) === -1)
-      .map((e) => {
-        // ajv 6 reports the failing location in `dataPath` (e.g. ".name"); required errors
-        // carry the field in params.missingProperty.
-        const path = e.keyword === 'required'
-          ? e.params.missingProperty
-          : (e.dataPath || '').replace(/^\./, '').replace(/\[['"]?|['"]?\]/g, '.').replace(/\.$/, '');
-        const custom = CUSTOM_MESSAGES[path] || {};
-        const message = e.keyword === 'required'
-          ? (custom.required || e.message)
-          : (custom.invalid || e.message);
-        return {path, message};
-      });
-    return valid;
-  };
-  validate.errors = [];
-  return validate;
-}
+// The ajv-based validator is shared with the native ng2 PresetService (see preset-validator.js).
+const buildPresetValidator = require('./preset-validator.js');
 
 /* @ngInject */
 function PresetService(PresetsApiService, WorkflowService) {

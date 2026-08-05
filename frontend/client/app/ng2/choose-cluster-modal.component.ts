@@ -3,8 +3,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { Component, OnInit, DoCheck, Inject } from '@angular/core';
+import { Component, OnInit, DoCheck } from '@angular/core';
 import { DialogRef } from '@angular/cdk/dialog';
+import { PresetService } from './preset.service';
 import { DeleteModalService } from './delete-modal.service';
 import { ClusterModalService } from './cluster-modal.service';
 import { WorkflowService } from './workflow.service';
@@ -93,7 +94,7 @@ export class ChooseClusterModalComponent implements OnInit, DoCheck {
 
   constructor(
     private dialogRef: DialogRef<any>,
-    @Inject('PresetService') private presetService: any,
+    private presetService: PresetService,
     private deleteModalService: DeleteModalService,
     private clusterModalService: ClusterModalService,
     private workflowService: WorkflowService
