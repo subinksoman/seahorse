@@ -1,6 +1,12 @@
 # T91 — Modernize the proxy image (Node 6 → latest LTS) + fix all vulnerabilities
 
-**Status:** `pending` (assessment complete — implementation NOT started)
+**Status:** `completed` (2026-08-05). Base `node:6.11-alpine` → `node:22-alpine`; webpack/babel build
+dropped (runs `node app/server/server.js` directly, non-root `node` user); dependency tree overhauled
+(removed `crypto`/`request`/`lodash`/`moment`/etc., `passport-cloudfoundry` → `passport-oauth2`, all
+others to clean latest); npm/corepack CLIs stripped from the runtime image. **Result: `npm audit` 0,
+Trivy 0 CRITICAL / 0 HIGH** (was 2 OS HIGH + 22 CRITICAL/145 HIGH npm). Deployed + verified end-to-end
+through `:9093` (frontend, workflows, sessions, datasources, library, docs, editor websockets — 0
+console errors). See the T91 commit for details.
 **Type:** gateway modernization + security (highest-exposure component)
 **Goal:** update `seahorse-proxy` to the latest Node LTS base and remove all fixable vulnerabilities
 (`npm audit` → 0, Trivy CRITICAL/HIGH → 0).
