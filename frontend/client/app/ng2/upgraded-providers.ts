@@ -15,8 +15,6 @@ export function $timeoutFactory(i: any): any { return i.get('$timeout'); }
 export function $intervalFactory(i: any): any { return i.get('$interval'); }
 export function $qFactory(i: any): any { return i.get('$q'); }
 export function $httpFactory(i: any): any { return i.get('$http'); }
-// ServerCommunication is a (still-AngularJS) app service; bridge it so migrated api clients can @Inject it.
-export function serverCommunicationFactory(i: any): any { return i.get('ServerCommunication'); }
 // WorkflowService hub deps that stay AngularJS: the deepsense-* graph model (Workflow) + cycle
 // analyser. Bridged so WorkflowService can @Inject them. (debounce is lodash _.debounce now, not bridged.)
 export function workflowFactory(i: any): any { return i.get('Workflow'); }
@@ -45,7 +43,6 @@ export const upgradedProviders: any[] = [
   { provide: '$interval', useFactory: $intervalFactory, deps: ['$injector'] },
   { provide: '$q', useFactory: $qFactory, deps: ['$injector'] },
   { provide: '$http', useFactory: $httpFactory, deps: ['$injector'] },
-  { provide: 'ServerCommunication', useFactory: serverCommunicationFactory, deps: ['$injector'] },
   { provide: 'Workflow', useFactory: workflowFactory, deps: ['$injector'] },
   { provide: '$document', useFactory: $documentFactory, deps: ['$injector'] },
   { provide: 'DeepsenseNodeParameters', useFactory: deepsenseNodeParametersFactory, deps: ['$injector'] },

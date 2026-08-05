@@ -191,6 +191,7 @@ class ServerCommunication {
   }
 }
 
-exports.inject = function(module) {
-  module.service('ServerCommunication', ServerCommunication);
-};
+// ServerCommunication migrated to native ng2 (ng2/server-communication.service.ts) — downgraded as
+// 'ServerCommunication' in bootstrap.ts for the AngularJS loading-mask; ng2 consumers use the class.
+// This registration is disabled so the two don't collide on ds.lab. (Class kept for reference/history.)
+exports.inject = function(/* module */) {};

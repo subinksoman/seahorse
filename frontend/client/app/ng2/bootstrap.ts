@@ -62,6 +62,7 @@ import { AttributesPanelService } from './attributes-panel.service';
 import { GraphStyleService } from './graph-style.service';
 import { CanvasService } from './canvas.service';
 import { AdapterService } from './adapter.service';
+import { ServerCommunicationService } from './server-communication.service';
 import { OperationsApiClient } from './operations-api-client.service';
 import { WorkflowsApiClient } from './workflows-api-client.service';
 import { SessionManagerApi } from './session-manager-api.service';
@@ -174,6 +175,7 @@ angular.module('ds.lab')
   .factory('SessionManager', downgradeInjectable(SessionManager) as any) // Phase C-1: migrated to Angular 18
   .factory('WorkflowService', downgradeInjectable(WorkflowService) as any) // Phase C-1: migrated to Angular 18 (the central editor hub)
   .factory('GraphStyleService', downgradeInjectable(GraphStyleService) as any) // engine cluster: ng2 now; downgraded for the AngularJS canvas adapter
+  .factory('ServerCommunication', downgradeInjectable(ServerCommunicationService) as any) // engine cluster: ng2 now; downgraded for the AngularJS loading-mask
   .factory('WorkflowStatusBarService', downgradeInjectable(WorkflowStatusBarService) as any) // Phase C-1: migrated to Angular 18
   .factory('NodeCopyPasteVisitorService', downgradeInjectable(NodeCopyPasteVisitorService) as any) // Phase C-1: migrated to Angular 18
   .factory('CopyPasteService', downgradeInjectable(CopyPasteService) as any) // Phase C-1: migrated to Angular 18
@@ -263,7 +265,8 @@ angular.module('ds.lab')
     { provide: 'AttributesPanelService', useExisting: AttributesPanelService },
     { provide: 'GraphStyleService', useExisting: GraphStyleService },
     { provide: 'CanvasService', useExisting: CanvasService },
-    { provide: 'AdapterService', useExisting: AdapterService }]
+    { provide: 'AdapterService', useExisting: AdapterService },
+    { provide: 'ServerCommunication', useExisting: ServerCommunicationService }]
 })
 export class AppModule implements DoBootstrap {
   constructor(private upgrade: UpgradeModule, private router: Router) {}
