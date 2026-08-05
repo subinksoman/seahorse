@@ -4,11 +4,11 @@
  */
 
 import { Routes } from '@angular/router';
-import { HomeComponent } from './home.component';
-import { WorkflowsShellComponent } from './router-shell.component';
-import { WorkflowsEditorComponent } from './workflows-editor.component';
-import { ErrorViewComponent } from './error-view.component';
-import { workflowResolver } from './workflow.resolver';
+import { HomeComponent } from './components/home.component';
+import { WorkflowsShellComponent } from './components/router-shell.component';
+import { WorkflowsEditorComponent } from './components/workflows-editor.component';
+import { ErrorViewComponent } from './components/error-view.component';
+import { workflowResolver } from './core/workflow.resolver';
 
 // Phase C / router inversion: the @angular/router route table, replacing the 4 ui-router $stateProvider
 // configs (home / workflows / workflows.editor / errors). useHash keeps the existing #/… URLs; the
