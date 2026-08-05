@@ -1,6 +1,5 @@
 .c-navbar {
-  margin: 5px 0;
-  justify-content: center;
+  margin: 0;
 
   &__title {
     margin: 0 0 4px 0;
@@ -14,8 +13,13 @@
   }
 
   &__link {
+    // Pin the logo to the SAME spot as the home screen (.deepsense-logo: top:15px left:55px),
+    // anchored to the relatively-positioned .c-main-header, so it's pixel-identical across views.
+    position: absolute;
+    top: 15px;
+    left: 55px;
     width: 140px;
-    align-self: center;
+    z-index: 10;
   }
 }
 

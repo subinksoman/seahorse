@@ -42,11 +42,14 @@
   align-items: center;
   flex-direction: row;
   width: 100%;
+  // Anchor for the absolutely-positioned logo (.c-navbar__link) so it lands at (55,15) like home.
+  position: relative;
 
   &__nav-bar {
     height: 100%;
     width: 100%;
-    max-width: ~"calc(100vw - 270px)";
+    // Logo rail trimmed 270px -> 200px, so the status bar reclaims the wasted header space.
+    max-width: ~"calc(100vw - 200px)";
     margin-left: 10px;
   }
 
@@ -120,9 +123,10 @@
 }
 
 .c-navigation-bar {
-  margin-top: 10px;
-  width: @panel-logo-width;
-  min-width: @panel-logo-width;
+  // Trimmed from @panel-logo-width (270px) to 200px — enough for the logo (left:55 + 140px) plus a
+  // small gap — reclaiming the excess header space the logo used to reserve.
+  width: 200px;
+  min-width: 200px;
 }
 
 textarea.editable-has-buttons.editable-input {
