@@ -60,6 +60,11 @@ import { DatasourcesService } from './datasources.service';
 import { DatasourcesPanelService } from './datasources-panel.service';
 import { AttributesPanelService } from './attributes-panel.service';
 import { GraphStyleService } from './graph-style.service';
+// The graph-model + node-parameters are framework-agnostic CJS classes now — import them directly to
+// provide 'Workflow' / 'DeepsenseNodeParameters' natively (no AngularJS $injector bridge). Same module
+// instances the AngularJS backward-compat factories use (webpack dedupes).
+import WorkflowClass from '../common/deepsense-components/deepsense-graph-model/deepsense-common-objects/deepsense-common-workflow.js';
+import ParameterFactory from '../common/deepsense-components/deepsense-node-parameters/common-parameters/common-parameter-factory.js';
 import { CanvasService } from './canvas.service';
 import { AdapterService } from './adapter.service';
 import { ServerCommunicationService } from './server-communication.service';
@@ -267,6 +272,8 @@ angular.module('ds.lab')
     { provide: 'datasourcesService', useExisting: DatasourcesService },
     { provide: 'DatasourcesPanelService', useExisting: DatasourcesPanelService },
     { provide: 'AttributesPanelService', useExisting: AttributesPanelService },
+    { provide: 'Workflow', useValue: WorkflowClass },
+    { provide: 'DeepsenseNodeParameters', useValue: { factory: ParameterFactory } },
     { provide: 'GraphStyleService', useExisting: GraphStyleService },
     { provide: 'CanvasService', useExisting: CanvasService },
     { provide: 'AdapterService', useExisting: AdapterService },

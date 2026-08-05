@@ -11,11 +11,6 @@
 export function $rootScopeFactory(i: any): any { return i.get('$rootScope'); }
 // config is now read from window.__seahorseConfig (set by config.js), NOT the AngularJS $injector.
 export function configFactory(): any { return (window as any).__seahorseConfig; }
-// WorkflowService hub deps that stay AngularJS: the deepsense-* graph model (Workflow) + cycle
-// analyser. Bridged so WorkflowService can @Inject them. (debounce is lodash _.debounce now, not bridged.)
-export function workflowFactory(i: any): any { return i.get('Workflow'); }
-// deepsense-* node-parameters factory stays AngularJS (deepsense-* migrates late); bridged for GraphNodesService.
-export function deepsenseNodeParametersFactory(i: any): any { return i.get('DeepsenseNodeParameters'); }
 // Core-canvas finale: bridged for the migrated core-canvas component + its jsplumb-draggable directive
 // (AdapterService = jsPlumb adapter, GraphNode = the deepsense graph-node model exposing MOVE event
 // constant). The ng2 KeyboardDirective now checks the CDK overlay directly (no $uibModalStack bridge).
@@ -30,8 +25,6 @@ export function presetModalLabelsFactory(i: any): any { return i.get('PresetModa
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
   { provide: 'config', useFactory: configFactory },
-  { provide: 'Workflow', useFactory: workflowFactory, deps: ['$injector'] },
-  { provide: 'DeepsenseNodeParameters', useFactory: deepsenseNodeParametersFactory, deps: ['$injector'] },
   { provide: 'Upload', useFactory: uploadFactory, deps: ['$injector'] },
   { provide: 'PresetService', useFactory: presetServiceFactory, deps: ['$injector'] },
   { provide: 'PresetModalLabels', useFactory: presetModalLabelsFactory, deps: ['$injector'] }
