@@ -39,6 +39,7 @@ keras
 kmodes==0.12.2
 flask
 matplotlib
+mlflow
 
 # Arrow: pyspark <-> pandas conversion. Spark 4.2 requires PyArrow >= 18.0.0 for the optimized
 # Arrow path (with 15.x it warns and falls back to slow non-Arrow). 18.x has cp312 wheels.
