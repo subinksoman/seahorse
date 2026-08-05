@@ -21,12 +21,12 @@ export class SessionManager {
   sessions: any[] = [];
 
   constructor(
-    @Inject('$interval') private $interval: any,
     @Inject('config') private config: any,
     private sessionManagerApi: SessionManagerApi
   ) {
     this.pollSessionManager();
-    this.$interval(() => { // SM polling
+    // was $interval; native setInterval is zone-patched so the poll still drives Angular change detection.
+    setInterval(() => { // SM polling
       this.pollSessionManager();
     }, this.config.sessionPollingInterval);
   }

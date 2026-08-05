@@ -12,7 +12,6 @@ export function $rootScopeFactory(i: any): any { return i.get('$rootScope'); }
 export function configFactory(i: any): any { return i.get('config'); }
 export function $logFactory(i: any): any { return i.get('$log'); }
 export function $timeoutFactory(i: any): any { return i.get('$timeout'); }
-export function $intervalFactory(i: any): any { return i.get('$interval'); }
 export function $qFactory(i: any): any { return i.get('$q'); }
 export function $httpFactory(i: any): any { return i.get('$http'); }
 // WorkflowService hub deps that stay AngularJS: the deepsense-* graph model (Workflow) + cycle
@@ -24,8 +23,6 @@ export function deepsenseNodeParametersFactory(i: any): any { return i.get('Deep
 // Core-canvas finale: bridged for the migrated core-canvas component + its jsplumb-draggable directive
 // (AdapterService = jsPlumb adapter, GraphNode = the deepsense graph-node model exposing MOVE event
 // constant). The ng2 KeyboardDirective now checks the CDK overlay directly (no $uibModalStack bridge).
-// Report table: bridged for the migrated report-table (uses the AngularJS `precision` / `cut` filters).
-export function filterFactory(i: any): any { return i.get('$filter'); }
 // attributes-panel: bridged for the Jupyter notebook URL (trustAsResourceUrl).
 // ngFileUpload's Upload service, bridged for the (migrated) upload-workflow modal folded into HomeComponent.
 export function uploadFactory(i: any): any { return i.get('Upload'); }
@@ -39,13 +36,11 @@ export const upgradedProviders: any[] = [
   { provide: 'config', useFactory: configFactory, deps: ['$injector'] },
   { provide: '$log', useFactory: $logFactory, deps: ['$injector'] },
   { provide: '$timeout', useFactory: $timeoutFactory, deps: ['$injector'] },
-  { provide: '$interval', useFactory: $intervalFactory, deps: ['$injector'] },
   { provide: '$q', useFactory: $qFactory, deps: ['$injector'] },
   { provide: '$http', useFactory: $httpFactory, deps: ['$injector'] },
   { provide: 'Workflow', useFactory: workflowFactory, deps: ['$injector'] },
   { provide: '$document', useFactory: $documentFactory, deps: ['$injector'] },
   { provide: 'DeepsenseNodeParameters', useFactory: deepsenseNodeParametersFactory, deps: ['$injector'] },
-  { provide: '$filter', useFactory: filterFactory, deps: ['$injector'] },
   { provide: 'Upload', useFactory: uploadFactory, deps: ['$injector'] },
   { provide: 'PresetService', useFactory: presetServiceFactory, deps: ['$injector'] },
   { provide: 'PresetModalLabels', useFactory: presetModalLabelsFactory, deps: ['$injector'] }

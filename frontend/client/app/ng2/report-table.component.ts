@@ -6,6 +6,21 @@
 import { Component, Input, Inject, OnInit, DoCheck } from '@angular/core';
 import { ModalService } from './modal.service';
 import { CellViewerModalComponent } from './cell-viewer-modal.component';
+import { precision } from './report-chart-modal.component';
+
+// Native port of the AngularJS 'cut' filter (common/filters/cut-words.js) — truncate to `max` chars,
+// optionally at a word boundary, appending a tail. Replaces the bridged $filter('cut').
+function cut(value: any, wordwise: boolean, max: any, tail?: string): any {
+  if (!value) { return ''; }
+  max = parseInt(max, 10);
+  if (!max || value.length <= max) { return value; }
+  value = value.substr(0, max);
+  if (wordwise) {
+    const lastspace = value.lastIndexOf(' ');
+    if (lastspace !== -1) { value = value.substr(0, lastspace); }
+  }
+  return value + (tail || ' ...');
+}
 
 // The reports.controller EVENTS.SELECT_COLUMN string (inlined to avoid importing the AngularJS controller,
 // which has registration side effects). Kept in sync with reports.controller.js.
@@ -75,7 +90,6 @@ export class ReportTableComponent implements OnInit, DoCheck {
 
   constructor(
     @Inject('$rootScope') private $rootScope: any,
-    @Inject('$filter') private $filter: any,
     private modal: ModalService
   ) {}
 
@@ -122,9 +136,9 @@ export class ReportTableComponent implements OnInit, DoCheck {
 
   shortenValues(value: any, index: number): any {
     if (this.columnTypes[index] === 'numeric') {
-      return this.$filter('precision')(value);
+      return precision(value);
     }
-    return this.$filter('cut')(value, true, this.maxLength, ' ...');
+    return cut(value, true, this.maxLength, ' ...');
   }
 
   showDistribution(columnName: string): void {
