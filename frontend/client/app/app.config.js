@@ -17,7 +17,7 @@
 'use strict';
 
 /* @ngInject */
-function AppConfig(toastrConfig, $cookiesProvider, $locationProvider, $qProvider) {
+function AppConfig(toastrConfig, $locationProvider, $qProvider) {
   // Keep unhandled-rejection console logging off — modal dismissals (uib-modal) reject their result
   // promises, which AngularJS 1.6+ would otherwise log as "Possibly unhandled rejection". Benign.
   $qProvider.errorOnUnhandledRejections(false);
@@ -48,10 +48,8 @@ function AppConfig(toastrConfig, $cookiesProvider, $locationProvider, $qProvider
   });
   // ($urlRouterProvider.otherwise('/') removed — @angular/router's { path: '**', redirectTo: '' } route
   //  now handles the fallback.)
-
-  const expiresDate = new Date();
-  expiresDate.setFullYear(expiresDate.getFullYear() + 2);
-  $cookiesProvider.defaults.expires = expiresDate;
+  // ($cookiesProvider default-expiry removed — ngCookies is gone; DeleteModalService writes its
+  //  "don't ask again" cookie natively with the same +2yr expiry.)
 }
 
 exports.inject = function(module) {

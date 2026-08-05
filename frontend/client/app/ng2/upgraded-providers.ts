@@ -14,7 +14,6 @@ export function $logFactory(i: any): any { return i.get('$log'); }
 export function toastrFactory(i: any): any { return i.get('toastr'); } // angular-toastr service
 export function $timeoutFactory(i: any): any { return i.get('$timeout'); }
 export function $intervalFactory(i: any): any { return i.get('$interval'); }
-export function $cookiesFactory(i: any): any { return i.get('$cookies'); } // ngCookies
 export function $qFactory(i: any): any { return i.get('$q'); }
 export function $httpFactory(i: any): any { return i.get('$http'); }
 // ServerCommunication is a (still-AngularJS) app service; bridge it so migrated api clients can @Inject it.
@@ -60,7 +59,6 @@ export const upgradedProviders: any[] = [
   { provide: 'toastr', useFactory: toastrFactory, deps: ['$injector'] },
   { provide: '$timeout', useFactory: $timeoutFactory, deps: ['$injector'] },
   { provide: '$interval', useFactory: $intervalFactory, deps: ['$injector'] },
-  { provide: '$cookies', useFactory: $cookiesFactory, deps: ['$injector'] },
   { provide: '$q', useFactory: $qFactory, deps: ['$injector'] },
   { provide: '$http', useFactory: $httpFactory, deps: ['$injector'] },
   { provide: 'ServerCommunication', useFactory: serverCommunicationFactory, deps: ['$injector'] },

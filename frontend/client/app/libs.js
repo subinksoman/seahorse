@@ -15,7 +15,7 @@
  */
 
 require('angular');
-require('angular-cookies');
+// angular-cookies removed — DeleteModalService reads/writes its cookie via document.cookie natively.
 require('angular-debounce');
 // angular-sanitize removed — no ngSanitize dependency (see preset-modal $sce.trustAsHtml).
 require('angular-toastr');
