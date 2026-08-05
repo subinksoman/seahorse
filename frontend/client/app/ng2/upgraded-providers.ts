@@ -32,12 +32,8 @@ export function graphStyleServiceFactory(i: any): any { return i.get('GraphStyle
 // constant). The ng2 KeyboardDirective now checks the CDK overlay directly (no $uibModalStack bridge).
 export function adapterServiceFactory(i: any): any { return i.get('AdapterService'); }
 export function graphNodeFactory(i: any): any { return i.get('GraphNode'); }
-// Datasources panel: bridged for the migrated datasources-element (opens the add/edit datasource modals).
-export function datasourcesModalsServiceFactory(i: any): any { return i.get('DatasourcesModalsService'); }
 // Report table: bridged for the migrated report-table (uses the AngularJS `precision` / `cut` filters).
 export function filterFactory(i: any): any { return i.get('$filter'); }
-// deepsense-attributes: bridged for migrated attribute-types (disabled-mode + panel interactions).
-export function attributesPanelServiceFactory(i: any): any { return i.get('AttributesPanelService'); }
 // attributes-panel: bridged for the Jupyter notebook URL (trustAsResourceUrl).
 // ngFileUpload's Upload service, bridged for the (migrated) upload-workflow modal folded into HomeComponent.
 export function uploadFactory(i: any): any { return i.get('Upload'); }
@@ -62,9 +58,7 @@ export const upgradedProviders: any[] = [
   { provide: 'GraphStyleService', useFactory: graphStyleServiceFactory, deps: ['$injector'] },
   { provide: 'AdapterService', useFactory: adapterServiceFactory, deps: ['$injector'] },
   { provide: 'GraphNode', useFactory: graphNodeFactory, deps: ['$injector'] },
-  { provide: 'DatasourcesModalsService', useFactory: datasourcesModalsServiceFactory, deps: ['$injector'] },
   { provide: '$filter', useFactory: filterFactory, deps: ['$injector'] },
-  { provide: 'AttributesPanelService', useFactory: attributesPanelServiceFactory, deps: ['$injector'] },
   { provide: 'Upload', useFactory: uploadFactory, deps: ['$injector'] },
   { provide: 'PresetService', useFactory: presetServiceFactory, deps: ['$injector'] },
   { provide: 'PresetModalLabels', useFactory: presetModalLabelsFactory, deps: ['$injector'] }
