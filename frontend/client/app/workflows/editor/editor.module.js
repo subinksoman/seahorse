@@ -29,7 +29,7 @@ import OperationsCatalogueModule from '../operations-catalogue/operations-catalo
 // status-icon migrated to Angular (ng2/status-icon.component.ts) — downgraded as directive 'statusIcon'.
 // port-status-tooltip migrated to Angular 18 (ng2/port-status-tooltip.component.ts) — downgraded as directive 'portStatusTooltip'.
 // create-node-invitation migrated to Angular 18 (ng2/create-node-invitation.component.ts) — downgraded as directive 'createNodeInvitation'.
-import AdapterService from './core-canvas/adapter.service.js';
+// AdapterService migrated to native ng2 (ng2/adapter.service.ts) — aliased in bootstrap.ts.
 // CanvasService migrated to native ng2 (ng2/canvas.service.ts) — aliased in bootstrap.ts.
 // GraphStyleService migrated to native ng2 (ng2/graph-style.service.ts) — downgraded as 'GraphStyleService'
 // in bootstrap.ts for the AngularJS canvas adapter; ng2 consumers use the class.
@@ -38,10 +38,9 @@ const appModule = angular
   .module('editor', [
     OperationsCatalogueModule
   ])
-  .service('AdapterService', AdapterService)
-  // All editor components (editor/coreCanvas/canvasToolbar/newNode/graphNode/statusIcon/portStatusTooltip/
-  // createNodeInvitation) migrated to Angular — registered as downgraded directives in ng2/bootstrap.ts.
-  // This module now only provides the jsPlumb services (bridged to Angular via upgraded-providers).
+  // All editor components AND services (canvas/adapter/graph-style) migrated to Angular (ng2/) — the
+  // components are downgraded directives, the services are native ng2 aliased/downgraded in bootstrap.ts.
+  // This AngularJS module now only re-exports the (still-AngularJS) OperationsCatalogueModule.
   .name;
 
 export default appModule;
