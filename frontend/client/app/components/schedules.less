@@ -1,0 +1,122 @@
+@import "../../css/variables";
+@import "../mixins";
+
+@workflow-spacing: 15px;
+@add-new-height: 25px;
+@base-margin: 8px;
+@base-left-margin: 12px;
+@schedule-action-size: 25px;
+
+.workflow-schedules {
+  position: relative;
+
+  &__add-new {
+    position: absolute;
+    margin: 0;
+    padding: 0 10px;
+    right: 0;
+    top: -(@workflow-spacing + @add-new-height);
+    height: @add-new-height;
+    line-height: (@add-new-height - 2px);
+    font-size: 12px;
+
+    &.btn-info { background-color: @seahorse-blue; }
+    &.btn-gray { background-color: #666; color: #fff; }
+  }
+
+  &__item {
+    background-color: #f2f2f2;
+    margin: @workflow-spacing 0 0;
+    padding: @base-margin @base-margin @base-margin @base-left-margin;
+  }
+
+  &__status-message {
+    margin: @workflow-spacing @base-margin @base-margin @base-left-margin;
+  }
+}
+
+.schedule {
+  position: relative;
+
+  &__actions {
+    position: absolute;
+    top: -@base-margin;
+    right: -@base-margin;
+    display: flex;
+  }
+}
+
+.schedule-action {
+  width: @schedule-action-size;
+  height: @schedule-action-size;
+  line-height: @schedule-action-size;
+  text-align: center;
+  cursor: pointer;
+  font-size: 16px;
+  color: #ffffff;
+  background-color: @seahorse-blue;
+
+  &:hover { background-color: @seahorse-light-blue; }
+}
+
+.schedule-attribute {
+  border-bottom: 2px solid #fff;
+  padding: @base-margin 0;
+
+  &:first-child { padding-top: 0; }
+  &:last-child { padding-bottom: 0; border-bottom: none; }
+
+  &__value {
+    font-weight: bold;
+    &--invalid { color: @seahorse-error-red; }
+    &--clickable { cursor: pointer; }
+  }
+}
+
+.schedule-attribute-error {
+  color: @seahorse-error-red;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 4px 0 2px;
+}
+
+.schedule-cron__hint {
+  font-size: 10px;
+  color: #999;
+  margin-top: 2px;
+}
+
+.edit-schedule {
+  & .schedule__actions {
+    position: initial;
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__btn {
+    margin-left: 8px;
+    padding: 0 10px;
+    height: 25px;
+    line-height: 23px;
+    font-weight: bold;
+    font-size: 12px;
+  }
+}
+
+.schedule-attribute {
+  & &__input {
+    height: 26px;
+    width: 100%;
+    margin: 0;
+    padding: 0 5px;
+    font-size: inherit;
+    border: 1px solid #e5e6e7;
+    border-radius: 1px;
+    transition: box-shadow .3s, border .3s;
+
+    &:hover { border: 1px solid @color-active; }
+    &:focus { outline: none; border: 1px solid @color-active; box-shadow: 0 0 1px 0 @color-active; }
+    &--invalid { border-color: @seahorse-error-red; }
+  }
+}
