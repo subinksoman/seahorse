@@ -17,7 +17,7 @@
 'use strict';
 
 /* @ngInject */
-function AppConfig(toastrConfig, $locationProvider, $qProvider) {
+function AppConfig($locationProvider, $qProvider) {
   // Keep unhandled-rejection console logging off — modal dismissals (uib-modal) reject their result
   // promises, which AngularJS 1.6+ would otherwise log as "Possibly unhandled rejection". Benign.
   $qProvider.errorOnUnhandledRejections(false);
@@ -31,21 +31,8 @@ function AppConfig(toastrConfig, $locationProvider, $qProvider) {
   // them in $onInit instead (see T81 notes).
   $locationProvider.hashPrefix('');
 
-  angular.extend(toastrConfig, {
-    'allowHtml': true,
-    'newestOnTop': false,
-    'positionClass': 'toast-bottom-left',
-    'closeButton': true,
-    'progressBar': true,
-    'timeOut': 3500,
-    'maxOpened': 5,
-    'iconClasses': {
-      'error': 'notification--error fa-exclamation-circle',
-      'info': 'toast-info',
-      'success': 'toast-success',
-      'warning': 'toast-warning'
-    }
-  });
+  // (toastrConfig removed — notifications are the native ng2 ToastService now; its bottom-left / close /
+  //  progress-bar / 3.5s-timeout look is baked into toast.css.)
   // ($urlRouterProvider.otherwise('/') removed — @angular/router's { path: '**', redirectTo: '' } route
   //  now handles the fallback.)
   // ($cookiesProvider default-expiry removed — ngCookies is gone; DeleteModalService writes its

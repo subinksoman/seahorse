@@ -1,0 +1,62 @@
+/* Phase C / AngularJS removal: styling for the native ToastService (replaces angular-toastr.min.css).
+   Bottom-left stack, colored by type, close button + timeout progress bar, matching the old toastr look. */
+.ds-toast-container {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  z-index: 1200; /* above CDK modals (1100) so notifications stay visible */
+  display: flex;
+  flex-direction: column-reverse; /* newest at the bottom (toastr newestOnTop: false) */
+  gap: 8px;
+  max-width: 340px;
+  pointer-events: none;
+}
+.ds-toast {
+  position: relative;
+  pointer-events: auto;
+  padding: 12px 30px 12px 14px;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  opacity: 0.96;
+  animation: ds-toast-in 0.25s ease;
+  word-wrap: break-word;
+}
+.ds-toast:hover { opacity: 1; }
+.ds-toast--out { animation: ds-toast-out 0.3s ease forwards; }
+.ds-toast--success { background: #51a351; }
+.ds-toast--info    { background: #2f96b4; }
+.ds-toast--warning { background: #f89406; }
+.ds-toast--error   { background: #bd362f; }
+.ds-toast__title { font-weight: 700; margin-bottom: 2px; }
+.ds-toast__msg   { white-space: pre-line; }
+.ds-toast__close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.8;
+}
+.ds-toast__close:hover { opacity: 1; }
+.ds-toast__bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.5);
+  transform-origin: left;
+  animation-name: ds-toast-bar;
+  animation-timing-function: linear;
+}
+@keyframes ds-toast-in { from { transform: translateX(-110%); opacity: 0; } to { transform: none; opacity: 0.96; } }
+@keyframes ds-toast-out { to { transform: translateX(-110%); opacity: 0; } }
+@keyframes ds-toast-bar { from { transform: scaleX(1); } to { transform: scaleX(0); } }

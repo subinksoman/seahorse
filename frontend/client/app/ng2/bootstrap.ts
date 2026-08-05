@@ -12,6 +12,7 @@ import { DialogModule } from '@angular/cdk/dialog';
 // field doesn't expose the .css subpath, but a direct file path bypasses exports resolution.
 import 'NODE_MODULES/@angular/cdk/overlay-prebuilt.css';
 import './modal.css';
+import './toast.css';
 import { ConfirmationModalComponent } from './confirmation-modal.component';
 import { DeleteModalComponent } from './delete-modal.component';
 import { ExportModalComponent } from './export-modal.component';

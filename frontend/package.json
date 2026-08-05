@@ -38,7 +38,6 @@
     "ajv": "^6.12.6",
     "angular": "1.8.3",
     "angular-mocks": "1.8.3",
-    "angular-toastr": "~1.7.0",
     "animate.css": "~3.5.1",
     "autosize": "~3.0.11",
     "bootstrap": "3.4.1",

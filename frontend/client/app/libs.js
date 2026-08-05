@@ -18,7 +18,7 @@ require('angular');
 // angular-cookies removed — DeleteModalService reads/writes its cookie via document.cookie natively.
 // angular-debounce removed — the 2 ng2 debounce users (WorkflowService save, multi-selection viewFix) use lodash _.debounce; the AngularJS debounce injectors are dead/unbundled.
 // angular-sanitize removed — no ngSanitize dependency (see preset-modal $sce.trustAsHtml).
-require('angular-toastr');
+// angular-toastr removed — notifications are the native ng2 ToastService (toast.service.ts + toast.css).
 // angular-ui-ace removed — the code-snippet + cell-viewer editors are Angular now and drive ACE
 // (ace-builds, still required below) directly via ace.edit(); the ui-ace directive is unused.
 // angular-ui-router removed — routing is now @angular/router (see ng2/app-routes.ts).

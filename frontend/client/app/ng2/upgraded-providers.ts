@@ -11,7 +11,6 @@
 export function $rootScopeFactory(i: any): any { return i.get('$rootScope'); }
 export function configFactory(i: any): any { return i.get('config'); }
 export function $logFactory(i: any): any { return i.get('$log'); }
-export function toastrFactory(i: any): any { return i.get('toastr'); } // angular-toastr service
 export function $timeoutFactory(i: any): any { return i.get('$timeout'); }
 export function $intervalFactory(i: any): any { return i.get('$interval'); }
 export function $qFactory(i: any): any { return i.get('$q'); }
@@ -55,7 +54,6 @@ export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
   { provide: 'config', useFactory: configFactory, deps: ['$injector'] },
   { provide: '$log', useFactory: $logFactory, deps: ['$injector'] },
-  { provide: 'toastr', useFactory: toastrFactory, deps: ['$injector'] },
   { provide: '$timeout', useFactory: $timeoutFactory, deps: ['$injector'] },
   { provide: '$interval', useFactory: $intervalFactory, deps: ['$injector'] },
   { provide: '$q', useFactory: $qFactory, deps: ['$injector'] },

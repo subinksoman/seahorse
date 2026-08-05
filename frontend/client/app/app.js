@@ -42,7 +42,6 @@ if (browserValidator.isBrowserSupported()) {
     require('./common/deepsense-components/deepsense-loading-spinner/loading-spinner.module.js').name,
     require('./common/deepsense-components/deepsense-node-parameters/deepsense-node-parameters.module.js').name,
     'ngFileUpload',
-    'toastr',
     require('./home/home.module.js').name,
     require('./workflows/workflows.module.js').name,
     require('./enums/enums.module.js').name,
