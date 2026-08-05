@@ -1,5 +1,5 @@
 # Copyright (c) 2016, CodiLime Inc.
-FROM nginx:latest
+FROM nginx:1.31.3
 
 ENV API_HOST=http://localhost
 ENV API_PORT=9080
