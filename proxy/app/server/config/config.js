@@ -17,7 +17,9 @@
 const _ = require('underscore');
 const defaults = require('./default-config.json');
 const serviceMapping = require('./service-mapping');
-const thr = require('throw');
+
+// was the `throw` package — inlined to drop the (unmaintained) dependency.
+function thr(message) { throw new Error(message); }
 
 const oauth = {
   "clientSecret": "seahorse01",

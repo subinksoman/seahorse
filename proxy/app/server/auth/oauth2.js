@@ -15,10 +15,11 @@
  */
 
 var passport = require('passport');
-var OAUTH2Strategy = require('passport-cloudfoundry').Strategy;
+// Was the unmaintained github dep `passport-cloudfoundry` -> maintained generic `passport-oauth2`.
+var OAuth2Strategy = require('passport-oauth2');
 var config = require('../config/config');
 
-var strategy = new OAUTH2Strategy({
+var strategy = new OAuth2Strategy({
   authorizationURL: config.oauth.authorizationUri,
   tokenURL: config.oauth.tokenUri,
   clientID: config.oauth.clientId,
@@ -26,12 +27,27 @@ var strategy = new OAUTH2Strategy({
   callbackURL: '/oauth/callback',
   passReqToCallback: false
 }, function (accessToken, refreshToken, profile, done) {
+  profile = profile || {};
   profile.accessToken = accessToken;
   done(null, profile);
 });
 
-strategy.setUserProfileURI(config.oauth.userInfoUri);
-passport.use(strategy);
+// passport-cloudfoundry exposed setUserProfileURI(); passport-oauth2 fetches the profile via
+// userProfile(accessToken, done) — hit the configured user-info endpoint with the bearer token
+// (native fetch, Node 18+).
+strategy.userProfile = function (accessToken, done) {
+  fetch(config.oauth.userInfoUri, { headers: { 'Authorization': 'Bearer ' + accessToken } })
+    .then(function (r) { return r.json(); })
+    .then(function (json) { done(null, json); })
+    .catch(function (err) { done(err); });
+};
+
+// passport-cloudfoundry exposed strategy.reset(); passport-oauth2 has none, and auth.js calls it on
+// login/logout — provide a no-op so that path keeps working.
+strategy.reset = function () {};
+
+// Keep the 'cloudfoundry' strategy name so auth.js's passport.authenticate('cloudfoundry') is unchanged.
+passport.use('cloudfoundry', strategy);
 
 passport.serializeUser(function (user, done) {
   done(null, user);

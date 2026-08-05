@@ -1,32 +1,32 @@
-# ────────────────────────────────────────────────────
-# Legacy build on Node 6 (Alpine)
-# ────────────────────────────────────────────────────
-FROM node:6.11-alpine
+# ──────────────────────────────────────────────────────────────
+# seahorse-proxy — the API gateway. Node current LTS on Alpine.
+# Modernized from node:6.11-alpine (EOL 2019): the runtime is a plain Node/Express server, so the
+# webpack/babel build was dropped — the server is run directly (node app/server/server.js). Combined
+# with the dependency overhaul (see package.json), this takes the image to 0 CRITICAL/HIGH.
+# ──────────────────────────────────────────────────────────────
+FROM node:22-alpine
 
-# 1) Install Git via Alpine’s apk (no update step needed)
-RUN apk add --no-cache git
+# Patch any remaining Alpine packages to their latest security releases.
+RUN apk --no-cache upgrade
 
-# 2) Clean npm’s cache and remove any broken staging folder
-RUN npm cache clean --force \
- && rm -rf /usr/local/lib/node_modules/.staging
-
-# 3) Globally install the last Webpack + externals versions that support Node 6
-RUN npm install -g webpack@3.12.0 webpack-node-externals@1.7.2
-
-# 4) Set working directory
+ENV NODE_ENV=production
 WORKDIR /opt/docker
 
-# 5) Copy only your manifest files and install all dependencies
-#    (using a wildcard so it works with or without a lockfile)
+# Install production dependencies only, reproducibly from the lockfile, then remove the npm/corepack
+# CLIs: the app's own deps are clean (npm audit 0), and the only remaining CVEs are in npm's own
+# bundled transitive deps (tar/sigstore/brace-expansion/…). npm is a build-time tool — the container
+# runs `node` directly — so deleting it eliminates those from the runtime image entirely.
 COPY package*.json ./
-RUN npm config set registry=http://registry.npmjs.org/ \
- && npm install
+RUN npm ci --omit=dev \
+ && npm cache clean --force \
+ && rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+           /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /root/.npm
 
-# 6) Copy the rest of your source, build, then optionally clean up
-COPY . .
-RUN npm run build \
- && rm -rf app
+# App source (no build step — server runs directly). --chown so the non-root `node` user can read it
+# (the repo files carry restrictive 640/750 perms with no world-read).
+COPY --chown=node:node . .
 
-# 7) Default command
-CMD ["npm", "start"]
+# Drop root — the base image ships a non-privileged `node` user.
+USER node
 
+CMD ["node", "app/server/server.js"]

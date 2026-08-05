@@ -49,10 +49,12 @@ function init(app) {
 
   app.get('/logout', function (req, res) {
     req.session.destroy();
-    req.logout();
-    strategy.reset();
-    var oauthPage = url.format({protocol: req.protocol, host: req.get("host"), pathname: "oauth"})
-    res.redirect(config.oauth.logoutUri+"?redirect=" + oauthPage);
+    // passport >= 0.6 made req.logout async (callback required).
+    req.logout(function () {
+      strategy.reset();
+      var oauthPage = url.format({protocol: req.protocol, host: req.get("host"), pathname: "oauth"})
+      res.redirect(config.oauth.logoutUri+"?redirect=" + oauthPage);
+    });
   });
 }
 
@@ -61,9 +63,11 @@ function login(req, res, next) {
     if(req.session) {
       req.session.destroy();
     }
-    req.logout();
-    strategy.reset();
-    res.redirect('/oauth');
+    // passport >= 0.6 made req.logout async (callback required).
+    req.logout(function () {
+      strategy.reset();
+      res.redirect('/oauth');
+    });
   } else {
     next();
   }

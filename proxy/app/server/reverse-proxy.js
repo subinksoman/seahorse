@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-const request = require('request'),
-    _ = require('underscore'),
+const _ = require('underscore'),
     url = require('url'),
     util = require('util'),
 
@@ -24,7 +23,7 @@ const request = require('request'),
     httpException = require('./utils/http-exception'),
     gatewayErrors = require('./gateway-errors');
 
-const basicAuthCredentials = new Buffer(
+const basicAuthCredentials = Buffer.from(
       config.get('WM_AUTH_USER') + ':' + config.get('WM_AUTH_PASS')
     ).toString('base64');
 
