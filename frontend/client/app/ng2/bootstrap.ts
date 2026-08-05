@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import 'zone.js';
 import '@angular/compiler'; // JIT compiler (no AoT/ngtsc in this custom webpack build) — must load first
-import { NgModule } from '@angular/core';
+import { NgModule, enableProdMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { RouterModule } from '@angular/router';
@@ -175,6 +175,13 @@ import { upgradedProviders } from './upgraded-providers';
 })
 export class AppModule {}
 
+// Production bundle: run Angular in prod mode. Besides the perf win, it disables the dev-mode
+// double-check that asserts NG0100 (ExpressionChangedAfterItHasBeenCheckedError) — essential now that
+// RootScopeService drives change detection on a periodic appRef.tick(), which legitimately catches
+// async state (session/loading flags) mid-settle between ticks; prod mode does one clean CD pass and
+// the next tick reconciles. (The hybrid never hit this because AngularJS's own digest kept the zone
+// busy so Angular's zone-driven CD always ran at stable moments.)
+enableProdMode();
 platformBrowserDynamic().bootstrapModule(AppModule).catch((err) => {
   // eslint-disable-next-line no-console
   console.error('[bootstrap] Angular bootstrap failed', err);

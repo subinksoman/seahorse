@@ -3,7 +3,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable, NgZone, ApplicationRef } from '@angular/core';
 import * as _ from 'lodash';
 
 // Phase C / bootstrap inversion (THE FLIP): a native, framework-agnostic replacement for the AngularJS
@@ -36,14 +36,26 @@ export class RootScopeService {
   private applyQueue: Array<() => void> = [];
   private digesting = false;
 
-  constructor(private zone: NgZone) {
-    // Replaces the AngularJS digest cadence: run the watchers on a fixed tick inside the Angular zone
-    // (so bindings that read watched values are re-checked). 60ms ~ AngularJS's interaction-driven
-    // digest frequency; comparisons are cheap dirty-checks. Runs outside the zone to schedule, inside
-    // to execute (a bare in-zone setInterval would itself keep CD churning even with no work to do).
+  constructor(private zone: NgZone, private appRef: ApplicationRef) {
+    // Replaces the AngularJS digest cadence. Now that neither AngularJS's $digest nor (reliably) zone
+    // events drive the app, a fixed tick must both (a) evaluate the emulator's $watch listeners and
+    // (b) drive Angular change detection. For (b) we call changeDetectorRef.detectChanges() directly on
+    // each root view — the imperative CD primitive, which (unlike NgZone.onMicrotaskEmpty or
+    // ApplicationRef.tick(), both coalesced/guarded in Angular 21) runs a full synchronous CD pass every
+    // time. Run outside the Angular zone (manual-CD pattern); single-threaded JS means ticks never
+    // overlap. 60ms ~ AngularJS's interaction-driven digest frequency.
     this.zone.runOutsideAngular(() => {
-      setInterval(() => this.zone.run(() => this.$digest()), 60);
+      setInterval(() => this.tick(), 60);
     });
+  }
+
+  // One synchronous CD cycle: evaluate the emulator watchers, then force-detect the Angular view tree.
+  private tick(): void {
+    try { this.$digest(); } catch (e) { /* eslint-disable-next-line no-console */ console.error(e); }
+    const comps = (this.appRef as any).components || [];
+    for (const c of comps) {
+      try { c.changeDetectorRef.detectChanges(); } catch (e) { /* eslint-disable-next-line no-console */ console.error(e); }
+    }
   }
 
   // ---------------- event bus ----------------
@@ -131,8 +143,8 @@ export class RootScopeService {
 
   $applyAsync(fn?: () => void): void {
     if (fn) { this.applyQueue.push(fn); }
-    // Flush on a microtask inside the zone (prompt, and coalesces bursts). The 60ms tick is only a floor.
-    Promise.resolve().then(() => this.zone.run(() => this.$digest()));
+    // Flush + CD on a microtask (prompt; the 60ms tick is only a floor).
+    Promise.resolve().then(() => this.tick());
   }
 
   $digest(): void {
