@@ -19,12 +19,14 @@ require('angular-cookies');
 require('angular-debounce');
 // angular-sanitize removed — no ngSanitize dependency (see preset-modal $sce.trustAsHtml).
 require('angular-toastr');
-require('angular-ui-ace');
+// angular-ui-ace removed — the code-snippet + cell-viewer editors are Angular now and drive ACE
+// (ace-builds, still required below) directly via ace.edit(); the ui-ace directive is unused.
 // angular-ui-router removed — routing is now @angular/router (see ng2/app-routes.ts).
 // angular-ui-bootstrap removed — all modals are @angular/cdk (ng2/modal.service.ts); tooltips/popovers
 // are native title / CSS in the migrated Angular components.
 require('angular-xeditable');
-require('angucomplete-alt');
+// angucomplete-alt removed — the only user was the column-selector, now the native Angular
+// ColumnSelectorModalComponent autocomplete (CDK). The directive is unused.
 require('ace-builds/src-min-noconflict/ace.js');
 require('font-awesome/css/font-awesome.css');
 require('jquery');

@@ -22,9 +22,9 @@ const attributesPanel = angular.module('deepsense.attributes-panel', [
   // 'ui.bootstrap' removed — the panel + attribute-types are Angular components now (CDK modals,
   // native tooltips); no uib directive is compiled at runtime.
   'xeditable',
-  'NgSwitchery',
-  'ui.ace',
-  'angucomplete-alt'
+  'NgSwitchery'
+  // 'ui.ace' + 'angucomplete-alt' removed — code-snippet drives ACE natively, column-selector is the
+  // native CDK ColumnSelectorModalComponent; neither directive is compiled anymore.
 ]).run((editableOptions) => {
   editableOptions.theme = 'bs3';
 });
