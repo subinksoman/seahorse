@@ -15,8 +15,7 @@ export class SessionManagerApi {
 
   constructor(
     @Inject('$http') private $http: any,
-    @Inject('config') config: any,
-    @Inject('$log') private $log: any
+    @Inject('config') config: any
   ) {
     this.URL = config.sessionApiPort
       ? `${config.apiHost}:${config.sessionApiPort}/${config.urlApiVersion}/sessions`

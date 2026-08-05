@@ -31,7 +31,6 @@ export class LibraryService {
 
   constructor(
     @Inject('$q') private $q: any,
-    @Inject('$log') private $log: any,
     private libraryDataConverterService: LibraryDataConverter,
     private libraryApiService: LibraryApi
   ) {
@@ -47,7 +46,7 @@ export class LibraryService {
   }
 
   addDirectory(directoryName: string): any {
-    this.$log.info(`LibraryService.addDirectory(${directoryName})`);
+    console.info(`LibraryService.addDirectory(${directoryName})`);
     return this.libraryApiService
       .addDirectory(directoryName, this.currentDirectory.path)
       .then((result: any) => {
@@ -112,7 +111,7 @@ export class LibraryService {
   }
 
   removeDirectory(directory: any): any {
-    this.$log.info(`LibraryService.removeDirectory(${directory})`);
+    console.info(`LibraryService.removeDirectory(${directory})`);
     return this.libraryApiService
       .removeDirectory(directory.path)
       .then((result: any) => {
@@ -122,7 +121,7 @@ export class LibraryService {
   }
 
   removeFile(file: any): any {
-    this.$log.info(`LibraryService.removeFile(${file})`);
+    console.info(`LibraryService.removeFile(${file})`);
     return this.libraryApiService
       .removeFile(file.downloadUrl)
       .then((result: any) => {
@@ -136,13 +135,13 @@ export class LibraryService {
   }
 
   setFilter(filter: any): void {
-    this.$log.info(`LibraryService.setFilter(${filter})`);
+    console.info(`LibraryService.setFilter(${filter})`);
     this.currentDirectory.setFilter(filter);
-    this.$log.info(`> filter set to [${this.currentDirectory.filter}]`);
+    console.info(`> filter set to [${this.currentDirectory.filter}]`);
   }
 
   private uploadFile(file: any): any {
-    this.$log.info(`LibraryService.uploadFile(${file})`);
+    console.info(`LibraryService.uploadFile(${file})`);
 
     const uploadingFile = this.libraryDataConverterService.makeLibraryFile({
       kind: 'file',
@@ -178,13 +177,13 @@ export class LibraryService {
         return result;
       }, (error: any) => {
         uploadingFile.status = STATUS_ERROR;
-        this.$log.error('Uplading failed for file ', file, error);
+        console.error('Uplading failed for file ', file, error);
         throw error;
       });
   }
 
   uploadFiles(files: any): any {
-    this.$log.info(`LibraryService.uploadFiles(${files})`);
+    console.info(`LibraryService.uploadFiles(${files})`);
 
     // Normalize to a flat array of File. The upload directives pass `[...input.files]` (an array of File),
     // but a FileList can also arrive directly or wrapped in an array — recursively expand any FileList/array

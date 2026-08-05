@@ -35,7 +35,6 @@ export class WorkflowService {
 
   constructor(
     @Inject('$rootScope') private $rootScope: any,
-    @Inject('$log') private $log: any,
     @Inject('Workflow') private Workflow: any,
     private operationsHierarchyService: OperationsHierarchyService,
     private workflowsApiClient: WorkflowsApiClient,
@@ -52,7 +51,7 @@ export class WorkflowService {
     // Debounce takes care of that and additionally reduces unnecessary client-server communication.
     this._saveWorkflow = _.debounce((newSerializedWorkflow: any, oldSerializedWorkflow: any) => {
       if (newSerializedWorkflow !== oldSerializedWorkflow) {
-        this.$log.log('Saving workflow after change...', newSerializedWorkflow);
+        console.log('Saving workflow after change...', newSerializedWorkflow);
         this.workflowsApiClient.updateWorkflow(newSerializedWorkflow);
       }
     }, 200);
@@ -112,7 +111,7 @@ export class WorkflowService {
 
     const unregisterSynchronization = this.$rootScope.$on('ServerCommunication.MESSAGE.heartbeat', (event: any, data: any) => {
       if (data.workflowId === workflow.id) {
-        this.$log.log('Received first hearbeat. Synchronizing with executor...');
+        console.log('Received first hearbeat. Synchronizing with executor...');
         this.serverCommunication.sendSynchronize();
         unregisterSynchronization();
       }
@@ -294,7 +293,7 @@ export class WorkflowService {
           workflow.cluster = result;
         })
         .catch((error: any) => {
-          this.$log.error('Cluster information is not available for workflow!', error);
+          console.error('Cluster information is not available for workflow!', error);
         });
     } else {
       return false;

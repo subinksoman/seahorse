@@ -19,28 +19,27 @@ export class DatasourcesService {
   constructor(
     private datasourcesApi: DatasourcesApiService,
     private uuid: UUIDGenerator,
-    private userService: UserService,
-    @Inject('$log') private $log: any
+    private userService: UserService
   ) {}
 
   addDatasource(params: any): any {
-    this.$log.info('DatasourcesService.addDatasource()', params);
+    console.info('DatasourcesService.addDatasource()', params);
     const datasourceId = this.uuid.generateUUID();
     return this.datasourcesApi.putDatasource(datasourceId, params).then(() => this.fetchDatasources());
   }
 
   deleteDatasource(datasourceId: string): any {
-    this.$log.info(`DatasourcesService.deleteDatasource(${datasourceId})`);
+    console.info(`DatasourcesService.deleteDatasource(${datasourceId})`);
     return this.datasourcesApi.deleteDatasource(datasourceId).then(() => this.fetchDatasources());
   }
 
   fetchDatasources(): any {
-    this.$log.info('DatasourcesService.fetchDatasources()');
+    console.info('DatasourcesService.fetchDatasources()');
     return this.datasourcesApi.getDatasources().then((datasources: any[]) => { this.datasources = datasources; });
   }
 
   updateDatasource(datasource: any): any {
-    this.$log.info('DatasourcesService.updateDatasource()', datasource);
+    console.info('DatasourcesService.updateDatasource()', datasource);
     return this.datasourcesApi.putDatasource(datasource.id, datasource.params).then(() => this.fetchDatasources());
   }
 

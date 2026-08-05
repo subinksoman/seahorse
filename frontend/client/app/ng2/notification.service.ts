@@ -16,7 +16,6 @@ export class NotificationService {
   private messages: Array<{ name: string; toast: ToastHandle }> = [];
 
   constructor(
-    @Inject('$log') private $log: any,
     private toast: ToastService
   ) {}
 
@@ -27,7 +26,7 @@ export class NotificationService {
   }
 
   showError(data: any, error?: any): void {
-    this.$log.error(data.title, error);
+    console.error(data.title, error);
     const toast = this.toast.show('error', data.message, data.title, { timeOut: 10000 });
     this.handleSameMessages(data.message, toast);
     this.replaceInfoMessagesWithSuccess(data.message, toast);

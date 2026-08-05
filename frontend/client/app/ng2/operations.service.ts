@@ -28,8 +28,7 @@ export class OperationsService {
   constructor(
     private operationsApiClient: OperationsApiClient,
     private operationsHierarchyService: OperationsHierarchyService,
-    @Inject('$q') private $q: any,
-    @Inject('$log') private $log: any
+    @Inject('$q') private $q: any
   ) {}
 
   private createCategoryMap(catalog: any[], parentId?: string): void {
@@ -68,7 +67,7 @@ export class OperationsService {
         }
         return this.operationsData[id];
       }, (error: any) => {
-        this.$log.error('error', error);
+        console.error('error', error);
       });
   }
 
@@ -123,7 +122,7 @@ export class OperationsService {
 
   getData(id?: string): any {
     if (!this.isLoaded) {
-      this.$log.error('Operations not loaded!');
+      console.error('Operations not loaded!');
       return null;
     }
     return this.operationsData;
@@ -131,7 +130,7 @@ export class OperationsService {
 
   get(id: string): any {
     if (!this.isLoaded) {
-      this.$log.error('Operations not loaded!');
+      console.error('Operations not loaded!');
       return null;
     }
     return this.operationsData[id] || null;
@@ -139,7 +138,7 @@ export class OperationsService {
 
   getWithParams(id: string): any {
     if (!this.isLoaded) {
-      this.$log.error('Operations not loaded!');
+      console.error('Operations not loaded!');
     }
     const operation = this.operationsData[id] || null;
     if (!this.isLoaded || (operation && operation.parameters)) {
@@ -157,7 +156,7 @@ export class OperationsService {
 
   getCatalog(id?: string): any {
     if (!this.isLoaded) {
-      this.$log.error('Operations not loaded!');
+      console.error('Operations not loaded!');
       return null;
     }
     return this.catalogData;
@@ -165,7 +164,7 @@ export class OperationsService {
 
   getCategory(id: string): any {
     if (!this.isLoaded) {
-      this.$log.error('Operations not loaded!');
+      console.error('Operations not loaded!');
       return null;
     }
     return this.categoryMap[id] || null;
@@ -173,7 +172,7 @@ export class OperationsService {
 
   filterCatalog(catalog: any[], filter: (item: any) => boolean): any {
     if (!this.isLoaded) {
-      this.$log.error('Operations not loaded!');
+      console.error('Operations not loaded!');
       return null;
     }
     return catalog.map((catalog: any) => {

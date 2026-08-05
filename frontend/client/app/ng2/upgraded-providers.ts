@@ -10,7 +10,6 @@
 // is first constructed (long after upgrade bootstrap), so the AngularJS injector is ready.
 export function $rootScopeFactory(i: any): any { return i.get('$rootScope'); }
 export function configFactory(i: any): any { return i.get('config'); }
-export function $logFactory(i: any): any { return i.get('$log'); }
 export function $qFactory(i: any): any { return i.get('$q'); }
 export function $httpFactory(i: any): any { return i.get('$http'); }
 // WorkflowService hub deps that stay AngularJS: the deepsense-* graph model (Workflow) + cycle
@@ -32,7 +31,6 @@ export function presetModalLabelsFactory(i: any): any { return i.get('PresetModa
 export const upgradedProviders: any[] = [
   { provide: '$rootScope', useFactory: $rootScopeFactory, deps: ['$injector'] },
   { provide: 'config', useFactory: configFactory, deps: ['$injector'] },
-  { provide: '$log', useFactory: $logFactory, deps: ['$injector'] },
   { provide: '$q', useFactory: $qFactory, deps: ['$injector'] },
   { provide: '$http', useFactory: $httpFactory, deps: ['$injector'] },
   { provide: 'Workflow', useFactory: workflowFactory, deps: ['$injector'] },

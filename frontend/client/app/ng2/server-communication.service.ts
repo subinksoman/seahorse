@@ -29,7 +29,6 @@ export class ServerCommunicationService {
   private socket: any;
 
   constructor(
-    @Inject('$log') private $log: any,
     @Inject('$q') private $q: any,
     @Inject('$rootScope') private $rootScope: any,
     @Inject('config') private config: any
@@ -52,7 +51,7 @@ export class ServerCommunicationService {
   messageHandler(uri: string, message: any): void {
     const parsedBody = JSON.parse(message.body);
     if (!ServerCommunicationService.isMessageKnown(parsedBody.messageType)) {
-      this.$log.error('ServerCommunication messageHandler. Unknown message type "' + parsedBody.messageType + '"');
+      console.error('ServerCommunication messageHandler. Unknown message type "' + parsedBody.messageType + '"');
       return;
     }
     this.$rootScope.$broadcast(`ServerCommunication.MESSAGE.${parsedBody.messageType}`, parsedBody.messageBody);
@@ -60,11 +59,11 @@ export class ServerCommunicationService {
 
   errorHandler(connectionAttemptId: number, error: any): void {
     if (connectionAttemptId !== this.connectionAttemptId) {
-      this.$log.info('ServerCommunication onWebSocketConnectError. Ignoring old error.');
+      console.info('ServerCommunication onWebSocketConnectError. Ignoring old error.');
       return;
     }
-    this.$log.info('ServerCommunication onWebSocketConnectError. Error: ', error);
-    this.$log.error('An error has occurred: ', error);
+    console.info('ServerCommunication onWebSocketConnectError. Error: ', error);
+    console.error('An error has occurred: ', error);
     this.$rootScope.$broadcast('ServerCommunication.CONNECTION_LOST');
     this.connectionStatus$.next(false);
     this.client = this.socket = null;
@@ -72,7 +71,7 @@ export class ServerCommunicationService {
   }
 
   reconnect(): void {
-    this.$log.info('ServerCommunication reconnect');
+    console.info('ServerCommunication reconnect');
     setTimeout(() => { this._connectToWebSocket(); }, this.config.socketReconnectionInterval);
   }
 
@@ -81,7 +80,7 @@ export class ServerCommunicationService {
   }
 
   send(uri: string, headers: any = {}, message: any = {}): any {
-    this.$log.info('ServerCommunication send, uri ', uri);
+    console.info('ServerCommunication send, uri ', uri);
     return this.client.send(uri, headers, message);
   }
 
@@ -100,7 +99,7 @@ export class ServerCommunicationService {
   }
 
   sendUpdateWorkflowToWorkflowExchange(data: any): void {
-    this.$log.info('ServerCommunication updateWorkflow');
+    console.info('ServerCommunication updateWorkflow');
     this.send(this.workflowTopicSendingUri(), {}, JSON.stringify({ messageType: 'updateWorkflow', messageBody: data }));
   }
 
@@ -109,7 +108,7 @@ export class ServerCommunicationService {
     if (previousSubscription) { previousSubscription.unsubscribe(); }
     const newSubscription = this.client.subscribe(uri, this.messageHandler.bind(this, uri));
     this.exchangeSubscriptions[uri] = newSubscription;
-    this.$log.info('Subscribe to exchange ' + uri + ', subscription: ', newSubscription);
+    console.info('Subscribe to exchange ' + uri + ', subscription: ', newSubscription);
   }
 
   unsubscribeFromAllExchanges(): void {
@@ -122,7 +121,7 @@ export class ServerCommunicationService {
   }
 
   private _onWebSocketConnect(): void {
-    this.$log.info('ServerCommunication onWebSocketConnect');
+    console.info('ServerCommunication onWebSocketConnect');
     this._subscribeToExchange(this.seahorseTopicListeningUri());
     this._subscribeToExchange(this.workflowTopicListeningUri());
     this.$rootScope.$broadcast('ServerCommunication.CONNECTION_ESTABLISHED');
@@ -145,7 +144,7 @@ export class ServerCommunicationService {
   }
 
   init(workflowId: string): void {
-    this.$log.log('ServerCommunication init', 'Server communication initialized with workflow id ' + workflowId);
+    console.log('ServerCommunication init', 'Server communication initialized with workflow id ' + workflowId);
     this.workflowId = workflowId; // TODO There should be no state here.
     this._connectToWebSocket();
   }

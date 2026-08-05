@@ -25,10 +25,10 @@ const CDK_CONFIGS: { [k: string]: any } = {
 // datasources toolbar / element / attribute-datasource components.
 @Injectable({ providedIn: 'root' })
 export class DatasourcesModalsService {
-  constructor(private modal: ModalService, @Inject('$log') private $log: any) {}
+  constructor(private modal: ModalService) {}
 
   openModal(datasourceType: string, mode: any, datasource?: any): any {
-    this.$log.info('DatasourcesModalsService.openModal()', mode, datasourceType);
+    console.info('DatasourcesModalsService.openModal()', mode, datasourceType);
     return this.modal.open(CDK_CONFIGS[datasourceType], { editedDatasource: datasource, mode },
       { panelClass: ['ds-modal-panel', 'ds-modal-lg'] });
   }

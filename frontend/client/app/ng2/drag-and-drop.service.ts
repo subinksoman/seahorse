@@ -22,7 +22,6 @@ export class DragAndDrop {
 
   constructor(
     @Inject('$rootScope') private $rootScope: any,
-    @Inject('$log') private $log: any,
     private mouseEvent: MouseEvent
   ) {}
 
@@ -39,7 +38,7 @@ export class DragAndDrop {
         this.saveExactElementData(event, element);
         break;
       default:
-        this.$log.error('Unknown type %s', type);
+        console.error('Unknown type %s', type);
     }
 
     this.$rootScope.$broadcast('Drag.START', event, element);
@@ -56,7 +55,7 @@ export class DragAndDrop {
         this.publishExactEvent(event, this.draggableElement.element);
         break;
       default:
-        this.$log.error('Unknown type %s', type);
+        console.error('Unknown type %s', type);
     }
 
     this.$rootScope.$broadcast('Drop.DROP', event, element);

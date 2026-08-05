@@ -25,7 +25,6 @@ export class GraphNodesService {
   constructor(
     @Inject('$q') private $q: any,
     @Inject('$rootScope') private $rootScope: any,
-    @Inject('$log') private $log: any,
     @Inject('DeepsenseNodeParameters') private DeepsenseNodeParameters: any,
     private Operations: OperationsService,
     private UUIDGenerator: UUIDGenerator,
@@ -47,7 +46,7 @@ export class GraphNodesService {
             deferred.resolve(node, 'async');
           });
         }, (error: any) => {
-          this.$log.error('operation fetch error', error);
+          console.error('operation fetch error', error);
           deferred.reject(error);
         });
     }
