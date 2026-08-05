@@ -113,12 +113,11 @@ class WMContentsManager(ContentsManager):
             "mimetype": None,
             "size": len(content_json.encode("utf-8")) if content_json is not None else None,
         }
-        # Only include hash/hash_algorithm when a hash was actually requested and computed.
-        # Jupyter Server's validate_model rejects them being present-but-None when require_hash
-        # is false ("Keys unexpectedly None: ['hash', 'hash_algorithm']").
-        if require_hash:
-            model["hash"] = hashlib.sha256((content_json or "").encode("utf-8")).hexdigest()
-            model["hash_algorithm"] = "sha256"
+        # Always include a real (non-None) hash: the JupyterLab/Notebook 7 frontend requires
+        # hash/hash_algorithm in the content model ("Missing Model Keys"), and jupyter_server only
+        # rejects them when present-but-None.
+        model["hash"] = hashlib.sha256((content_json or "").encode("utf-8")).hexdigest()
+        model["hash_algorithm"] = "sha256"
         return model
 
     def _create_notebook(self, seahorse_notebook_path):
