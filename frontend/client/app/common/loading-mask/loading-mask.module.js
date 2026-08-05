@@ -16,7 +16,6 @@
 
 'use strict';
 
-exports.inject = function(module) {
-  require('./loading-mask.drv.js').inject(module);
-  require('./loading-mask.ctrl.js').inject(module);
-};
+// loading-mask migrated to native ng2 (ng2/loading-mask.component.ts), downgraded 'loadingMask' in
+// bootstrap.ts; the AngularJS directive/ctrl registration is disabled so the two do not collide.
+exports.inject = function(/* module */) {};

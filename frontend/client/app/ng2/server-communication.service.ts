@@ -4,6 +4,7 @@
  */
 
 import { Injectable, Inject } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 declare const Stomp: any; // stompjs (global)
 
@@ -18,6 +19,9 @@ const _messages = ['executionStatus', 'inferredState', 'ready', 'terminated', 'h
 
 @Injectable({ providedIn: 'root' })
 export class ServerCommunicationService {
+  // Native connection-status stream (true = connected). Replaces the $rootScope broadcast for the ng2
+  // loading-mask (the only listener) — sidesteps AngularJS scope propagation to downgraded components.
+  readonly connectionStatus$ = new BehaviorSubject<boolean>(true);
   private connectionAttemptId = Math.floor(Math.random() * 1000000);
   private exchangeSubscriptions: { [uri: string]: any } = {};
   private workflowId: string;
@@ -63,6 +67,7 @@ export class ServerCommunicationService {
     this.$log.info('ServerCommunication onWebSocketConnectError. Error: ', error);
     this.$log.error('An error has occurred: ', error);
     this.$rootScope.$broadcast('ServerCommunication.CONNECTION_LOST');
+    this.connectionStatus$.next(false);
     this.client = this.socket = null;
     this.reconnect();
   }
@@ -122,6 +127,7 @@ export class ServerCommunicationService {
     this._subscribeToExchange(this.seahorseTopicListeningUri());
     this._subscribeToExchange(this.workflowTopicListeningUri());
     this.$rootScope.$broadcast('ServerCommunication.CONNECTION_ESTABLISHED');
+    this.connectionStatus$.next(true);
   }
 
   private _connectToWebSocket(user: string = `${this.config.mqUser}`, pass: string = `${this.config.mqPass}`): void {
