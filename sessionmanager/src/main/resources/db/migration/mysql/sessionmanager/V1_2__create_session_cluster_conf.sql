@@ -1,0 +1,1 @@
+ALTER TABLE `SESSIONS` ADD COLUMN `serializedClusterConfig` LONGTEXT;
