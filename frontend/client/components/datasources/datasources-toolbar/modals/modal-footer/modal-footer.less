@@ -2,7 +2,7 @@
 
 .datasources-modal__footer {
   width: 100%;
-  padding: 10px 20px 35px 20px;
+  padding: 14px 20px 18px 20px;
   background-color: @seahorse-light-blue;
   display: flex;
   align-items: flex-end;
@@ -29,16 +29,35 @@
     font-weight: 600;
     padding: 0 30px;
     height: 34px;
+    border-radius: 4px;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+
+    &:active {
+      transform: translateY(1px);
+    }
   }
 
   .btn-blue {
     margin: 0 10px;
     color: @color-white;
     background-color: @seahorse-blue;
+
+    &:hover {
+      background-color: darken(@seahorse-blue, 8%);
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
   }
 
   .btn-white {
     color: @color-darker-gray;
     background-color: @color-white;
+
+    &:hover {
+      background-color: #eef2f4;
+    }
   }
 }

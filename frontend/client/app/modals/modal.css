@@ -33,6 +33,20 @@
   outline: none;
   display: block;
 }
+/* Modern focus feedback for every text input / select / textarea inside a CDK modal — the forms
+   previously had no visible focus state, so it was unclear which field was active. */
+.ds-modal-panel input:not([type="checkbox"]):not([type="radio"]),
+.ds-modal-panel select,
+.ds-modal-panel textarea {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.ds-modal-panel input:not([type="checkbox"]):not([type="radio"]):focus,
+.ds-modal-panel select:focus,
+.ds-modal-panel textarea:focus {
+  border-color: #0197c8;
+  box-shadow: 0 0 0 3px rgba(1, 151, 200, 0.15);
+  outline: none;
+}
 /* Keep CDK modals ABOVE any not-yet-converted angular-ui-bootstrap modal (uib is z-index ~1050), so a
    CDK modal opened over/under a uib one stacks correctly during the transition. */
 .cdk-overlay-container {
