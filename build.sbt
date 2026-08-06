@@ -146,5 +146,19 @@ ThisBuild / dependencyOverrides ++= Seq(
   "io.netty" % "netty-resolver-dns" % "4.2.16.Final",
   "com.amazonaws" % "aws-java-sdk-s3" % "1.12.782",
   "com.amazonaws" % "aws-java-sdk-core" % "1.12.782",
-  "com.google.oauth-client" % "google-oauth-client" % "1.34.1"
+  "com.google.oauth-client" % "google-oauth-client" % "1.34.1",
+  "com.squareup.retrofit2" % "retrofit" % "2.11.0",
+  "com.squareup.retrofit2" % "converter-jackson" % "2.11.0",
+  "com.squareup.retrofit2" % "converter-scalars" % "2.11.0",
+  "com.squareup.retrofit2" % "converter-gson" % "2.11.0",
+  "com.squareup.okhttp3" % "okhttp" % "4.12.0",
+  "com.squareup.okhttp3" % "logging-interceptor" % "4.12.0",
+  "org.yaml" % "snakeyaml" % "2.3",
+  "com.mchange" % "c3p0" % "0.12.0",
+  "com.mchange" % "mchange-commons-java" % "0.4.0"
+)
+
+ThisBuild / excludeDependencies ++= Seq(
+  ExclusionRule("org.jline", "jline"),
+  ExclusionRule("org.jline", "jline-remote-telnet")
 )

@@ -17,7 +17,13 @@ RUN apt-get update && apt-get -y upgrade && rm -rf /var/lib/apt/lists/*
 RUN pip3 install --no-cache-dir -U \
       "jupyter_server>=2.20.0" "jupyterlab>=4.5.7" "notebook>=7.5.6" "nbconvert>=7.17.0" \
       "mistune>=3.2.1" "tornado>=6.5.3" "urllib3>=2.6.0" "cryptography>=46.0.5" "pyjwt>=2.12.0" \
-      "Mako>=1.3.11" "Brotli>=1.2.0" "wheel>=0.46.2" "soupsieve>=2.8.4" "jaraco.context>=6.1.0"
+      "Mako>=1.3.11" "Brotli>=1.2.0" "wheel>=0.46.2" "soupsieve>=2.8.4" "jaraco.context>=6.1.0" \
+      "setuptools>=80"
+
+# nbclassic (legacy classic-notebook shim) is an orphan here — Notebook 7 does not require it and
+# Seahorse serves notebooks through jupyter-server + Notebook 7, not the classic /tree UI. It bundles
+# an EOL MathJax 2.x (no fix) and an old underscore.js; removing it clears both CVEs.
+RUN pip3 uninstall -y nbclassic 2>/dev/null || true
 
 # jupyter_contrib_nbextensions is abandoned and incompatible with Notebook 7 / jupyter-server 2
 # (it targeted the classic notebook). It is intentionally NOT installed anymore.

@@ -108,7 +108,7 @@ object Library {
   val pekkoHttpTestkit = "org.apache.pekko" %% "pekko-http-testkit" % Version.pekkoHttp
   val apacheCommons = "org.apache.commons" % "commons-lang3" % Version.apacheCommons
   val apacheCommonsExec = "org.apache.commons" % "commons-exec" % "1.3"
-  val cronUtils = "com.cronutils" % "cron-utils" % "5.0.4"
+  val cronUtils = "com.cronutils" % "cron-utils" % "9.2.1"
   val guava = "com.google.guava"  % "guava" % Version.guava
   val guice = "com.google.inject" % "guice" % Version.guice
   val guiceMultibindings = "com.google.inject.extensions" % "guice-multibindings" % Version.guice
@@ -118,7 +118,7 @@ object Library {
   val metricsScala = "nl.grons" %% "metrics4-scala" % Version.metricsScala excludeAkkaActor
   val mockitoCore = "org.mockito" % "mockito-core" % Version.mockito
   val nscalaTime = "com.github.nscala-time" %% "nscala-time" % Version.nsscalaTime
-  val quartz = "org.quartz-scheduler" % "quartz" % "2.3.0"
+  val quartz = "org.quartz-scheduler" % "quartz" % "2.3.2"
   //val rabbitmq = "com.thenewmotion" % "akka-rabbitmq_2.11" % "3.0.0" excludeAkkaActor
   val rabbitmq = "com.thenewmotion" % "akka-rabbitmq_2.12" % "3.0.0" excludeAkkaActor
   //val rabbitmq = "com.thenewmotion.akka" %% "akka-rabbitmq" % "2.2" excludeAkkaActor

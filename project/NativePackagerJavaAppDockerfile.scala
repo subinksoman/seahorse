@@ -41,6 +41,7 @@ object NativePackagerJavaAppDockerfile {
 
   def apply(appDir: File, executableScriptName: String): Dockerfile = new Dockerfile()
     .from("eclipse-temurin:17-jre-alpine")
+    .run("apk", "upgrade", "--no-cache")
     .run("apk", "add", "--no-cache", "bash")
     .env("JDK_JAVA_OPTIONS", jdk17ModuleOpts)
     .env("JAVA_OPTS", jdk17ModuleOpts)

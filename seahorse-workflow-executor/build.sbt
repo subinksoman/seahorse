@@ -212,3 +212,17 @@ ThisBuild / libraryDependencies ++= Seq(
 // Keep Mockito at 1.10.19 (a transitive dep otherwise evicts it up to 3.x/5.x on 2.13, which
 // removed org.mockito.Matchers -> the specs' `any(...)` matchers stop resolving).
 ThisBuild / dependencyOverrides += "org.mockito" % "mockito-core" % "1.10.19"
+
+// T92 security: pin the on-classpath jackson to the patched 2.18.8 and drop the scala-compiler
+// jline (unused REPL/telnet). Note the residual jackson 2.18.6 / 2.19.2 and jline-remote-telnet
+// Trivy still reports are RELOCATED copies shaded inside hadoop-client-runtime / parquet-jackson
+// (Spark 4.2.0's stack) — not on the app classpath and only fixable by an upstream Spark bump.
+ThisBuild / dependencyOverrides ++= Seq(
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.18.8",
+  "com.fasterxml.jackson.core" % "jackson-core" % "2.18.8",
+  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.18.8"
+)
+ThisBuild / excludeDependencies ++= Seq(
+  ExclusionRule("org.jline", "jline"),
+  ExclusionRule("org.jline", "jline-remote-telnet")
+)
