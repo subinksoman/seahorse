@@ -1,16 +1,29 @@
 .report-table-header {
+  h2 {
+    margin: 6px 0;
+    font-size: 20px;
+  }
+
   .report-stats {
     text-align: center;
     width: 200px;
     float: right;
+
+    h4 {
+      margin: 2px 0;
+    }
   }
 }
 
 .report-table-body {
-  margin-bottom: 50px;
+  margin-bottom: 16px;
 
-  .has-distribution:hover {
-    cursor: pointer;
+  .has-distribution {
+    margin-right: 6px;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   .col-icon {
@@ -41,8 +54,15 @@
     margin-bottom: 0;
 
     th {
-      font-size: 1.2em;
-      min-width: 150px;
+      font-size: 1em;
+      min-width: 120px;
+    }
+
+    // Child-combinator selectors so these out-specify Bootstrap's `.table > thead > tr > th`
+    // (which otherwise forces 8px cells and keeps the report table from being compact).
+    > thead > tr > th,
+    > tbody > tr > td {
+      padding: 5px 8px;
     }
   }
 }

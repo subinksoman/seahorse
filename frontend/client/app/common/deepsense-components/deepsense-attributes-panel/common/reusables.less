@@ -50,14 +50,33 @@
     font-size: 12px;
     height: auto;
     line-height: 1;
-    padding: 10px 0;
+    padding: 7px 0;
   }
 
   &__time {
     margin: @main-space / 2 0;
-    display: block;
-    padding: 2px 5px;
+    // Justify: label on the left, icon + timestamp on the right, with breathing room around the
+    // clock icon (previously label/icon/time were crammed together with no spacing).
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
     border-radius: .25em;
+
+    .block {
+      display: inline;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    i {
+      margin-left: auto;
+      margin-right: 6px;
+    }
+
+    time {
+      text-align: right;
+      white-space: nowrap;
+    }
   }
 }
 
