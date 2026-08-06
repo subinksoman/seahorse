@@ -132,8 +132,8 @@ object Library {
   val jsonLenses = "net.virtual-void" %% "json-lenses" % "0.6.2"
   val javaMail = "javax.mail" % "mail" % "1.4.7"
   // Explicit Jackson dependencies
-  val jacksonDatabind = "com.fasterxml.jackson.core" % "jackson-databind" % "2.15.2"
-  val jacksonModuleScala = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.15.2"
+  val jacksonDatabind = "com.fasterxml.jackson.core" % "jackson-databind" % "2.18.8"
+  val jacksonModuleScala = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.8"
   // Dependencies for swagger-client generated code
   val retrofit = Seq(
     "com.squareup.retrofit2" % "retrofit" % "2.0.2",

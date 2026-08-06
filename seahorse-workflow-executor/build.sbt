@@ -220,7 +220,10 @@ ThisBuild / dependencyOverrides += "org.mockito" % "mockito-core" % "1.10.19"
 ThisBuild / dependencyOverrides ++= Seq(
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.18.8",
   "com.fasterxml.jackson.core" % "jackson-core" % "2.18.8",
-  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.18.8"
+  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.18.8",
+  // jackson-module-scala must track databind's minor (it enforces >=2.18.0 <2.19.0); leaving it at
+  // 2.15.2 makes Spark's Scala serialization throw at workflow-run time against databind 2.18.8.
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.8"
 )
 ThisBuild / excludeDependencies ++= Seq(
   ExclusionRule("org.jline", "jline"),
