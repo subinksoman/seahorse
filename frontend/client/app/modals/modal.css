@@ -4,6 +4,8 @@
 .ds-modal-panel {
   width: 600px;
   max-width: 92vw;
+  /* Every modal adjusts to the view pane: never taller than the viewport; content scrolls inside. */
+  max-height: 92vh;
 }
 /* larger modals (was uib size:'lg') — cell viewer, column selector, library, cluster settings */
 .ds-modal-panel.ds-modal-lg {
@@ -11,8 +13,10 @@
 }
 /* near-fullscreen notebook modal (was uib windowClass o-modal--notebook) */
 .ds-modal-panel.ds-modal-notebook {
-  width: 92vw;
-  height: 92vh;
+  width: 80vw;
+  max-width: 1100px;
+  height: 78vh;
+  max-height: 720px;
 }
 .ds-modal-panel.ds-modal-notebook .modal-content {
   height: 100%;
@@ -20,6 +24,10 @@
 .ds-modal-panel .modal-content {
   border-radius: 6px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  /* Cap to the viewport and scroll internally so tall modals (e.g. the fixed-height datasource
+     forms) never overflow the screen on shorter displays. */
+  max-height: 92vh;
+  overflow-y: auto;
 }
 .cdk-dialog-container {
   outline: none;
