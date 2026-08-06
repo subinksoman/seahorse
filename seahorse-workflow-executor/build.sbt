@@ -223,9 +223,20 @@ ThisBuild / dependencyOverrides ++= Seq(
   "com.fasterxml.jackson.core" % "jackson-annotations" % "2.18.8",
   // jackson-module-scala must track databind's minor (it enforces >=2.18.0 <2.19.0); leaving it at
   // 2.15.2 makes Spark's Scala serialization throw at workflow-run time against databind 2.18.8.
-  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.8"
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.8",
+  // T92 security: patched versions of the vulnerable libs the workflowexecutor assembly (we.jar)
+  // otherwise bundles (Trivy CRITICAL/HIGH). These are transitive/generated-client deps, not used
+  // via hand-written APIs, so the bumps are drop-in.
+  "com.squareup.okhttp3" % "okhttp" % "4.12.0",
+  "org.yaml" % "snakeyaml" % "2.3",
+  "com.google.code.gson" % "gson" % "2.10.1",
+  "commons-io" % "commons-io" % "2.16.1",
+  "org.json" % "json" % "20240303"
 )
 ThisBuild / excludeDependencies ++= Seq(
   ExclusionRule("org.jline", "jline"),
-  ExclusionRule("org.jline", "jline-remote-telnet")
+  ExclusionRule("org.jline", "jline-remote-telnet"),
+  // slf4j-ext (extended logging: EventData/MDCStrLookup) is an unused transitive carrying
+  // CVE-2018-8088; nothing on the classpath references it.
+  ExclusionRule("org.slf4j", "slf4j-ext")
 )

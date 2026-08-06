@@ -37,7 +37,7 @@ object Version {
     case unknown => sys.error(s"Unsupported Spark version: $unknown")
   }
 
-  val amazonS3 = "1.10.16"
+  val amazonS3 = "1.12.782"
   val googleApi = "1.22.0"
   val mockito = "1.10.19"
   val nsscalaTime = "2.30.0"  // 2.14.0 has no Scala 2.13 artifact
@@ -136,9 +136,9 @@ object Library {
   val jacksonModuleScala = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.8"
   // Dependencies for swagger-client generated code
   val retrofit = Seq(
-    "com.squareup.retrofit2" % "retrofit" % "2.0.2",
-    "com.squareup.retrofit2" % "converter-scalars" % "2.0.2",
-    "com.squareup.retrofit2" % "converter-gson" % "2.0.2"
+    "com.squareup.retrofit2" % "retrofit" % "2.9.0",
+    "com.squareup.retrofit2" % "converter-scalars" % "2.9.0",
+    "com.squareup.retrofit2" % "converter-gson" % "2.9.0"
   )
   val oauth2Client = "org.apache.oltu.oauth2" % "org.apache.oltu.oauth2.client" % "1.0.1"
   val swaggerAnnotations = "io.swagger" % "swagger-annotations" % "1.5.8"
