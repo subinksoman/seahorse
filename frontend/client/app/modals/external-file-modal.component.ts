@@ -34,6 +34,22 @@ const URL_REGEX = /(http|https|ftp):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\\.,@?^=%&:/~
 
           <file-settings [disabledMode]="previewMode" [fileSettings]="p"
                          (onChange)="onFileSettingsChange($event)"></file-settings>
+
+          <div class="datasources-modal__body-row">
+            <div class="public-param-row">
+              <div class="checkbox-wrapper">
+                <label [ngClass]="{'active': p.visibility === 'publicVisibility'}" class="format-form-label">
+                  <input [disabled]="previewMode" type="checkbox"
+                         [checked]="p.visibility === 'publicVisibility'"
+                         (change)="p.visibility = $any($event.target).checked ? 'publicVisibility' : 'privateVisibility'"/>
+                  <span>Public</span>
+                </label>
+              </div>
+              <div class="public-param-row__label">
+                (Public data sources are accessible by all users of this instance of Seahorse)
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="datasources-modal__footer">
