@@ -28,8 +28,14 @@ import ai.deepsense.deeplang.params.Param
 import ai.deepsense.deeplang.params.wrappers.spark.BooleanParamWrapper
 
 // Wrapper to adapt Spark's OneHotEncoder to single-column interface
-class SingleColumnOneHotEncoder(override val uid: String = Identifiable.randomUID("SingleColumnOneHotEncoder"))
+class SingleColumnOneHotEncoder(override val uid: String)
   extends Transformer with DefaultParamsWritable {
+
+  // deeplang instantiates transformers reflectively via a PARAMETERLESS constructor
+  // (TypeUtils.constructorForClass -> getParameterTypes.isEmpty). A single primary constructor with a
+  // defaulted uid compiles to a (String) constructor only — no no-arg ctor in bytecode — so deeplang
+  // throws NoArgumentConstructorRequiredException at run time. Provide an explicit no-arg constructor.
+  def this() = this(Identifiable.randomUID("SingleColumnOneHotEncoder"))
 
   private var sparkEncoderModel: Option[OneHotEncoderModel] = None
   private val sparkEncoder = new SparkOneHotEncoder(uid)
@@ -73,8 +79,16 @@ class SingleColumnOneHotEncoder(override val uid: String = Identifiable.randomUI
   override def copy(extra: ParamMap): Transformer = {
     val copied = new SingleColumnOneHotEncoder(uid)
     copyValues(copied, extra)
-    copied.sparkEncoder.setInputCols(sparkEncoder.getInputCols)
-    copied.sparkEncoder.setOutputCols(sparkEncoder.getOutputCols)
+    // Spark's OneHotEncoder inputCols/outputCols have no default, so getInputCols/getOutputCols throw
+    // NoSuchElementException when unset. The deeplang inference framework copies the transformer
+    // BEFORE configuring columns (sparkTransformerWithParams -> copy), so guard with isSet — otherwise
+    // every One Hot Encoder node fails schema inference ("Node contains errors: SingleColumnOneHotEncoder").
+    if (sparkEncoder.isSet(sparkEncoder.inputCols)) {
+      copied.sparkEncoder.setInputCols(sparkEncoder.getInputCols)
+    }
+    if (sparkEncoder.isSet(sparkEncoder.outputCols)) {
+      copied.sparkEncoder.setOutputCols(sparkEncoder.getOutputCols)
+    }
     copied.sparkEncoder.setDropLast(sparkEncoder.getDropLast)
     copied.sparkEncoderModel = sparkEncoderModel
     copied
