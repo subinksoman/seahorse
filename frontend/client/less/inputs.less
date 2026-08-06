@@ -106,3 +106,37 @@
   background-color: @color-grey;
   transition: background ease-in 0.2s;
 }
+
+// Layout for the native file-settings component (format + separator rows). The classes exist in the
+// template but had no rules after the AngularJS->Angular 21 port, so the options stacked vertically.
+.file-settings {
+  &__row-wrapper {
+    margin: 12px 0;
+  }
+
+  .title-row {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+
+  .inputs-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+
+    &.vertical-align-bottom {
+      align-items: flex-end;
+    }
+
+    &.space-between {
+      justify-content: space-between;
+    }
+
+    .checkboxes-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+  }
+}
