@@ -15,7 +15,7 @@ import { LibraryModalService } from '../services/library-modal.service';
 @Component({
   standalone: false,
   template: `
-    <div class="modal-content">
+    <div class="modal-content" *ngIf="!browsing">
       <div class="datasources-modal">
         <div class="datasources-modal__header"><div class="modal-title">Library</div></div>
         <div class="datasources-modal__body">
@@ -77,6 +77,7 @@ import { LibraryModalService } from '../services/library-modal.service';
 })
 export class LibraryDatasourceModalComponent extends DatasourceModalBase implements OnInit, DoCheck {
   private isNew = false;
+  browsing = false;
 
   constructor(
     @Inject('datasourcesService') datasourcesService: any,
@@ -112,14 +113,19 @@ export class LibraryDatasourceModalComponent extends DatasourceModalBase impleme
     this.canAddNewDatasource = this.canAddDatasource() && this.isCsvSeparatorValid(this.p) && this.p.libraryPath !== '';
   }
 
+  // Hide this form's body while the file picker is open on top of it, so only the "Select data frame"
+  // browser shows (the taller form otherwise peeks above the picker). Restored when the picker closes.
   openLibrary(): void {
+    this.browsing = true;
     if (this.datasourcesPanelService.isOpenedForWrite()) {
       (this.libraryModalService as any).openLibraryModal('write-to-file').then((fullFilePath: any) => {
+        this.browsing = false;
         if (fullFilePath) { this.setDatasourceParams(fullFilePath); }
         else if (!fullFilePath && !this.p.libraryPath) { this.dialogRef.close(undefined); }
       });
     } else {
       (this.libraryModalService as any).openLibraryModal('read-file').then((file: any) => {
+        this.browsing = false;
         if (file) { this.setDatasourceParams(file.uri); }
         else if (!file && !this.p.libraryPath) { this.dialogRef.close(undefined); }
       });
