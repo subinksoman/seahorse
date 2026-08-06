@@ -3,6 +3,18 @@
 @exclamation-mark: "\0021";
 
 .datasources-modal {
+  // Standard height across the whole datasource-modal family (external file / database / HDFS /
+  // Google Spreadsheet / library) so switching type doesn't jump the window size. Covers the tallest
+  // form (external file / HDFS with the separator options); shorter forms pad to the same height.
+  // Flex column so the teal Name footer stays pinned to the bottom and the slack lands above it.
+  min-height: 700px;
+  display: flex;
+  flex-direction: column;
+
+  &__body {
+    flex: 1 1 auto;
+  }
+
   &__header {
     padding: 20px;
 
