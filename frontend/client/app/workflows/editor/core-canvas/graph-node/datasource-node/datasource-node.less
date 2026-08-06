@@ -8,12 +8,14 @@
 
   .datasource-name {
     line-height: 12px;
-  }
-
-  .datasource-name {
     color: @seahorse-blue;
     font-weight: 700;
     text-align: center;
+    display: block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     &:hover {
       text-decoration: underline;

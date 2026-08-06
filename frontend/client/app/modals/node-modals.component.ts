@@ -14,9 +14,11 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 @Component({
   standalone: false,
   template: `
-    <div class="modal-content" style="height: 100%;">
-      <iframe style="height: calc(100% - 60px); width: 100%;" frameborder="0" [src]="url"></iframe>
-      <button type="button" class="btn btn-default pull-right" (click)="close()">Close</button>
+    <div class="modal-content ds-modal-notebook__content">
+      <iframe class="ds-modal-notebook__frame" frameborder="0" [src]="url"></iframe>
+      <div class="ds-modal-notebook__footer">
+        <button type="button" class="btn btn-default" (click)="close()">Close</button>
+      </div>
     </div>
   `
 })

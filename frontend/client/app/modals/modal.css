@@ -20,6 +20,24 @@
 }
 .ds-modal-panel.ds-modal-notebook .modal-content {
   height: 100%;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.ds-modal-notebook__frame {
+  flex: 1 1 auto;
+  width: 100%;
+  border: 0;
+  min-height: 0;
+}
+.ds-modal-notebook__footer {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 14px;
+  border-top: 1px solid #ececec;
+  background: #fff;
 }
 .ds-modal-panel .modal-content {
   border-radius: 6px;
