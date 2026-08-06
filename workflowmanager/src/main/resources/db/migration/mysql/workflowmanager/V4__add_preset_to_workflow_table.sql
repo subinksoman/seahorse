@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `WORKFLOWSPRESETS` (
-  `workflow_id` BINARY(16) NOT NULL,
+  `workflow_id` CHAR(36) NOT NULL,
   `preset_id` BIGINT NOT NULL,
   PRIMARY KEY (`workflow_id`),
   FOREIGN KEY (`workflow_id`) REFERENCES `WORKFLOWS`(`id`) ON DELETE CASCADE,

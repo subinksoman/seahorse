@@ -81,6 +81,9 @@ class SchedulingManagerApi extends DefaultApi {
       } match {
         case Success(value) => value
         case Failure(commonEx: CommonApiExceptions.ApiException) => throw ApiExceptionFromCommon(commonEx)
+        // Re-throw any other failure (e.g. a DB TimeoutException) instead of falling through to a
+        // MatchError, so handleErrors turns it into a proper 500 with the real cause.
+        case Failure(ex) => throw ex
       }
     }
     implicit def durationJavaToScala(d: java.time.Duration): Duration = Duration.fromNanos(d.toNanos)

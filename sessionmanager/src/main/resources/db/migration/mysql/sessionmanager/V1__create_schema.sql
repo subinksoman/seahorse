@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `SESSIONS` (
-  `workflow` BINARY(16) NOT NULL,
+  `workflow` CHAR(36) NOT NULL,
   `event` VARCHAR(255) NOT NULL,
   `at` DATETIME NOT NULL,
   PRIMARY KEY (`workflow`)

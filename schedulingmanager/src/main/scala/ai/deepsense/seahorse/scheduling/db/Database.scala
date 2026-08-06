@@ -17,6 +17,7 @@
 package ai.deepsense.seahorse.scheduling.db
 
 import slick.jdbc.JdbcProfile
+import slick.util.AsyncExecutor
 
 import ai.deepsense.commons.service.db.JdbcVendor
 import ai.deepsense.seahorse.scheduling.SchedulingManagerConfig
@@ -31,7 +32,14 @@ object Database {
 
   val driver: JdbcProfile = vendor.profile
   val api = driver.api
-  val db = driver.api.Database.forURL(url, user = user, password = pass, driver = vendor.driver)
+  // Bound the executor so maxConnections == maxThreads. Slick's default for forURL leaves
+  // maxConnections > numThreads, which "can result in deadlocks" (Slick's own warning) — and on the
+  // slower MySQL backend, alongside Quartz's concurrent DB use, the workflow_schedule query would
+  // deadlock/starve and time out. Matching the two eliminates that.
+  val db = driver.api.Database.forURL(
+    url, user = user, password = pass, driver = vendor.driver,
+    executor = AsyncExecutor("schedulingmanager-db", minThreads = 20, maxThreads = 20,
+      queueSize = 1000, maxConnections = 20))
 
   def forceInitialization(): Unit = {
     // Force initialization here to work around bug https://github.com/slick/slick/issues/1400

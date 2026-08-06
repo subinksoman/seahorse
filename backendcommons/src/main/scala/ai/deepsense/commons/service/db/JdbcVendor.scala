@@ -16,7 +16,7 @@
 
 package ai.deepsense.commons.service.db
 
-import slick.jdbc.{H2Profile, JdbcProfile, MySQLProfile}
+import slick.jdbc.{H2Profile, JdbcProfile}
 
 // Selects the backend DB by JDBC URL prefix: jdbc:mysql -> MySQL, anything else -> H2.
 // A single URL (databaseSlick.db.url / JDBC_URL) therefore drives the Slick profile, the JDBC
@@ -25,7 +25,7 @@ sealed abstract class JdbcVendor(val name: String, val profile: JdbcProfile, val
 
 object JdbcVendor {
   case object H2 extends JdbcVendor("h2", H2Profile, "org.h2.Driver")
-  case object MySQL extends JdbcVendor("mysql", MySQLProfile, "com.mysql.cj.jdbc.Driver")
+  case object MySQL extends JdbcVendor("mysql", MySQLStringUuidProfile, "com.mysql.cj.jdbc.Driver")
 
   def fromUrl(url: String): JdbcVendor =
     if (Option(url).exists(_.startsWith("jdbc:mysql"))) MySQL else H2

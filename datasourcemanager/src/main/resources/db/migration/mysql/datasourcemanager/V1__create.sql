@@ -1,6 +1,6 @@
 CREATE TABLE `datasourcemanager`.`datasource` (
-  `id` BINARY(16) NOT NULL PRIMARY KEY,
-  `ownerId` BINARY(16) NOT NULL,
+  `id` CHAR(36) NOT NULL PRIMARY KEY,
+  `ownerId` CHAR(36) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `ownerName` VARCHAR(255) NOT NULL,
   `creationDateTime` DATETIME NOT NULL,
