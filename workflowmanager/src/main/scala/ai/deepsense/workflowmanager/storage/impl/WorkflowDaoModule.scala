@@ -18,19 +18,25 @@ package ai.deepsense.workflowmanager.storage.impl
 
 import com.google.inject.name.Names
 import com.google.inject.{PrivateModule, Scopes}
-import slick.jdbc.H2Profile.api.Database
-import slick.jdbc.{H2Profile, JdbcProfile}
+import com.typesafe.config.ConfigFactory
+import slick.jdbc.JdbcProfile
 
+import ai.deepsense.commons.service.db.JdbcVendor
 import ai.deepsense.workflowmanager.storage.{NotebookStorage, WorkflowStateStorage, WorkflowStorage}
 
 class WorkflowDaoModule extends PrivateModule {
   override def configure(): Unit = {
+    val config = ConfigFactory.load
+    val url = config.getString("db.url")
+    val vendor = JdbcVendor.fromUrl(url)
+    val user = if (config.hasPath("db.user")) config.getString("db.user") else ""
+    val pass = if (config.hasPath("db.password")) config.getString("db.password") else ""
     bind(classOf[JdbcProfile])
       .annotatedWith(Names.named("workflowmanager"))
-      .toInstance(H2Profile)
+      .toInstance(vendor.profile)
     bind(classOf[JdbcProfile#API#Database])
       .annotatedWith(Names.named("workflowmanager"))
-      .toInstance(Database.forConfig("db"))
+      .toInstance(vendor.profile.api.Database.forURL(url, user = user, password = pass, driver = vendor.driver))
 
     bind(classOf[WorkflowStorage])
       .to(classOf[WorkflowDaoImpl])

@@ -19,15 +19,22 @@ package ai.deepsense.workflowmanager
 import com.typesafe.config.ConfigFactory
 import org.flywaydb.core.Flyway
 
+import ai.deepsense.commons.service.db.JdbcVendor
+
 object FlywayMigration {
 
   private val config = ConfigFactory.load
 
   def run(): Unit = {
-    val flyway = new Flyway
-    flyway.setBaselineOnMigrate(true)
-    flyway.setLocations("db.migration.workflowmanager")
-    flyway.setDataSource(config.getString("db.url"), "", "")
-    flyway.migrate()
+    val url = config.getString("db.url")
+    val vendor = JdbcVendor.fromUrl(url)
+    val user = if (config.hasPath("db.user")) config.getString("db.user") else ""
+    val pass = if (config.hasPath("db.password")) config.getString("db.password") else ""
+    Flyway.configure()
+      .dataSource(url, user, pass)
+      .locations(s"classpath:db/migration/${vendor.name}/workflowmanager")
+      .baselineOnMigrate(true)
+      .load()
+      .migrate()
   }
 }

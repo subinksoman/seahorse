@@ -20,7 +20,8 @@ object Version {
   val avro = "1.7.7"
   val guava = "19.0"
   val guice = "4.0"
-  val h2 = "1.4.191"
+  val h2 = "2.2.224"
+  val mysql = "8.4.0"
 //  val json4s = "3.3.0"
    // Align json4s with the running Spark: Spark 3.4.4 bundles 3.7.x, Spark 4.x bundles 4.0.7.
    // Mixing lines causes classpath skew (JValue missing / MappingException + losslessDate changes).
@@ -62,7 +63,7 @@ object Version {
   val pekko = "1.1.3"
   val pekkoHttp = "1.1.0"
   val wiremock = "1.57"
-  val flyway = "4.0"
+  val flyway = "9.22.3"
   val jetty = "9.4.58.v20250814"
   val log4j2 = "2.19.0" // matches Spark 3.4.4; provides log4j-slf4j2-impl for slf4j 2.x (Pekko)
   val amazonS3 = "1.10.16"
@@ -142,8 +143,10 @@ object Library {
   val sprayClient = spray("client")
   val sprayJson = "io.spray" %% "spray-json" % Version.sprayJson
   val h2 = "com.h2database" % "h2" % Version.h2
+  val mysqlConnector = "com.mysql" % "mysql-connector-j" % Version.mysql
   val wiremock = "com.github.tomakehurst" % "wiremock" % Version.wiremock
   val flyway = "org.flywaydb" % "flyway-core" % Version.flyway
+  val flywayMysql = "org.flywaydb" % "flyway-mysql" % Version.flyway
   // to suppress "Nullable" warning, as per
   // http://stackoverflow.com/questions/13162671/missing-dependency-class-javax-annotation-nullable.
   val findBugs = "com.google.code.findbugs" % "jsr305" % "3.0.1"
@@ -239,6 +242,8 @@ object Dependencies {
     h2,
     slick,
     flyway,
+    flywayMysql,
+    mysqlConnector,
     sprayJson,
     scalaz,
     log4jApi,
@@ -259,6 +264,8 @@ object Dependencies {
     h2,
     slick,
     flyway,
+    flywayMysql,
+    mysqlConnector,
     scalaz,
     sprayJson,
     sparkLauncher,
@@ -285,6 +292,8 @@ object Dependencies {
     pekkoHttp, // for org.apache.pekko.http.scaladsl.model.StatusCodes
     h2,
     flyway,
+    flywayMysql,
+    mysqlConnector,
     scalajs,
     scalaz,
     shapeless,
@@ -298,6 +307,8 @@ object Dependencies {
     cronUtils,
     h2,
     flyway,
+    flywayMysql,
+    mysqlConnector,
     scalajs,
     slick,
     quartz

@@ -155,7 +155,8 @@ ThisBuild / dependencyOverrides ++= Seq(
   "com.squareup.okhttp3" % "logging-interceptor" % "4.12.0",
   "org.yaml" % "snakeyaml" % "2.3",
   "com.mchange" % "c3p0" % "0.12.0",
-  "com.mchange" % "mchange-commons-java" % "0.4.0"
+  "com.mchange" % "mchange-commons-java" % "0.4.0",
+  "com.google.protobuf" % "protobuf-java" % "3.25.5"
 )
 
 ThisBuild / excludeDependencies ++= Seq(

@@ -18,17 +18,25 @@ package ai.deepsense.seahorse.datasource.db
 
 import org.flywaydb.core.Flyway
 
+import ai.deepsense.commons.service.db.JdbcVendor
 import ai.deepsense.seahorse.datasource.DatasourceManagerConfig
 
 object FlywayMigration {
 
   private val db = DatasourceManagerConfig.database
+  private val conf = DatasourceManagerConfig.config
 
   def run(): Unit = {
-    val flyway = new Flyway
-    flyway.setLocations("db.migration.datasourcemanager")
-    flyway.setSchemas(db.schema)
-    flyway.setDataSource(DatasourceManagerConfig.config.getString("databaseSlick.db.url"), "", "")
-    flyway.migrate()
+    val url = conf.getString("databaseSlick.db.url")
+    val vendor = JdbcVendor.fromUrl(url)
+    val user = if (conf.hasPath("databaseSlick.db.user")) conf.getString("databaseSlick.db.user") else ""
+    val pass = if (conf.hasPath("databaseSlick.db.password")) conf.getString("databaseSlick.db.password") else ""
+    Flyway.configure()
+      .dataSource(url, user, pass)
+      .schemas(db.schema)
+      .locations(s"classpath:db/migration/${vendor.name}/datasourcemanager")
+      .baselineOnMigrate(true)
+      .load()
+      .migrate()
   }
 }
