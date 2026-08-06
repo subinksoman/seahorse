@@ -152,6 +152,10 @@
 
 .right-panel-resizable {
   .panelsMinWidth();
+  // Anchor the absolutely-positioned resize handle (.o-resizable) to the panel's own left edge.
+  // Without this it escaped to the viewport origin, so the workflow-properties panel had no grabbable
+  // handle until a node was selected (that panel happened to get a positioned ancestor).
+  position: relative;
 }
 
 deepsense-operation-attributes {

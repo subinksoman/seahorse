@@ -221,3 +221,37 @@
     }
   }
 }
+
+// Migration restore: the "Add file / Drag new files here" upload row lost its styling (the file-upload-section
+// component had no stylesheet), leaving the drop zone as bare text. Restore the prominent drop bar.
+.file-upload-section {
+  display: flex;
+  align-items: stretch;
+
+  .add-file {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  .drop-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed @dragzone-border;
+    border-radius: 4px;
+    color: @dark-grey;
+    cursor: pointer;
+    padding: 8px 20px;
+    text-align: center;
+    transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+
+    &:hover,
+    &.drag-over {
+      border-color: @seahorse-light-blue;
+      color: @seahorse-light-blue;
+      background-color: @light-grey;
+    }
+  }
+}

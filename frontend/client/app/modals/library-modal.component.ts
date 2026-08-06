@@ -3,7 +3,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { Component, OnInit, OnDestroy, DoCheck, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, DoCheck, Inject, ChangeDetectorRef } from '@angular/core';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { LibraryService } from '../services/library.service';
 import { DeleteModalService } from '../services/delete-modal.service';
@@ -73,12 +73,11 @@ const TITLE_MAP: { [k: string]: string } = {
     </div>
   `
 })
-export class LibraryModalComponent implements OnInit, OnDestroy, DoCheck {
+export class LibraryModalComponent implements OnInit, DoCheck {
   mode: string;
   private params: any;
   title: string;
   loading = true;
-  private cdInterval: any;
   filterString = '';
   selectedItem = '';
   message: string;
@@ -102,10 +101,6 @@ export class LibraryModalComponent implements OnInit, OnDestroy, DoCheck {
   }
 
   ngOnInit(): void {
-    // CDK dialog overlays are not in appRef.components, so the app's RootScope tick never change-detects
-    // them; without this the browser's folder navigation, breadcrumbs and loading spinner never re-render
-    // after a click. Run a local CD tick while the modal is open (mirrors the app's own tick cadence).
-    this.cdInterval = setInterval(() => { try { this.cdr.detectChanges(); } catch (e) { /* view torn down */ } }, 100);
     (this.libraryService as any).fetchAll().then(() => {
       this.loading = false;
       this.handleDeeplink(this.params);
@@ -117,10 +112,6 @@ export class LibraryModalComponent implements OnInit, OnDestroy, DoCheck {
       this.message = 'There was an error during downloading list of files.';
       this.cdr.detectChanges();
     });
-  }
-
-  ngOnDestroy(): void {
-    if (this.cdInterval) { clearInterval(this.cdInterval); }
   }
 
   ngDoCheck(): void {

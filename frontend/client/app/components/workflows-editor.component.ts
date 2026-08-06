@@ -78,8 +78,7 @@ import { MouseEvent as MouseEventService } from '../services/mouse-event.service
           [disabledMode]="!isEditable()"
           resizable
           resizable-panel-name="rightPanel"
-          resizable-position="left"
-          resizable-add-shift="-10">
+          resizable-position="left">
           <section class="ibox-content o-general-data-panel__content">
             <header>
               <p class="o-general-data-panel__header">Schedules:</p>

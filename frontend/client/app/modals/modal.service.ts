@@ -3,7 +3,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Dialog } from '@angular/cdk/dialog';
 import { firstValueFrom } from 'rxjs';
 
@@ -19,7 +19,7 @@ export interface ModalRef<T = any> {
 // converted onto this service, ui.bootstrap gets closer to removal (which clears the angular high).
 @Injectable({ providedIn: 'root' })
 export class ModalService {
-  constructor(private dialog: Dialog) {}
+  constructor(private dialog: Dialog, private zone: NgZone) {}
 
   open<T = any>(component: any, data?: any, config: any = {}): ModalRef<T> {
     const ref = this.dialog.open<T>(component, {
@@ -31,6 +31,16 @@ export class ModalService {
       panelClass: config.panelClass || 'ds-modal-panel',
       ...config
     });
+    // CDK dialog overlays live outside appRef.components, so the app's RootScope tick never runs change
+    // detection on them. Drive CD on the dialog's own view (same 60ms cadence as the root) while it is
+    // open, so async updates and content-driven layout changes re-render — spinners clearing, library
+    // folder navigation, and modals resizing when fields show/hide. Cleared when the dialog closes.
+    const view: any = (ref as any).componentRef && (ref as any).componentRef.hostView;
+    if (view) {
+      const timer = this.zone.runOutsideAngular(() =>
+        setInterval(() => { try { view.detectChanges(); } catch (e) { /* view destroyed */ } }, 60));
+      ref.closed.subscribe(() => clearInterval(timer));
+    }
     return {
       result: firstValueFrom(ref.closed),
       close: (value?: any) => ref.close(value)
