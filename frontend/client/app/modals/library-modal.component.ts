@@ -3,7 +3,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { Component, OnInit, DoCheck, Inject } from '@angular/core';
+import { Component, OnInit, DoCheck, Inject, ChangeDetectorRef } from '@angular/core';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { LibraryService } from '../services/library.service';
 import { DeleteModalService } from '../services/delete-modal.service';
@@ -92,7 +92,8 @@ export class LibraryModalComponent implements OnInit, DoCheck {
     private dialogRef: DialogRef<any>,
     private libraryService: LibraryService,
     @Inject('LibraryModalService') private libraryModalService: any,
-    private deleteModalService: DeleteModalService
+    private deleteModalService: DeleteModalService,
+    private cdr: ChangeDetectorRef
   ) {
     this.mode = data && data.mode;
     this.params = data && data.params;
@@ -103,9 +104,13 @@ export class LibraryModalComponent implements OnInit, DoCheck {
     (this.libraryService as any).fetchAll().then(() => {
       this.loading = false;
       this.handleDeeplink(this.params);
+      // CDK dialog overlays are not in appRef.components, so the RootScope 60ms tick never reaches
+      // them; force a CD pass here or the spinner (*ngIf="loading") never clears after this async resolve.
+      this.cdr.detectChanges();
     }).catch(() => {
       this.loading = false;
       this.message = 'There was an error during downloading list of files.';
+      this.cdr.detectChanges();
     });
   }
 
