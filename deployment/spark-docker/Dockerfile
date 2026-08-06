@@ -135,11 +135,12 @@ RUN /opt/conda/bin/pip install --timeout 120 --retries 10 -U \
     'jaraco.context>=6.1.0' 'lightgbm>=4.6.0' 'Brotli>=1.2.0'
 
 # T92 security: linux-libc-dev (kernel headers) carries CVEs with no upstream fix, but it is only a
-# build-time artifact — never loaded at runtime (the container uses the host kernel). Remove it so it
-# stops being reported; nothing at runtime depends on it.
-RUN apt-get purge -y linux-libc-dev 2>/dev/null || true; \
-    apt-get autoremove -y 2>/dev/null || true; \
-    rm -rf /var/lib/apt/lists/*
+# build-time artifact — never loaded at runtime (the container uses the host kernel). Remove just this
+# package (and its scannable dpkg footprint) with --force-depends so the C/R build toolchain
+# (build-essential, r-base-dev) stays installed for runtime custom-code compilation. `apt purge` would
+# cascade-remove those dependents, so it is deliberately avoided here.
+RUN dpkg --remove --force-depends linux-libc-dev 2>/dev/null || true; \
+    rm -rf /usr/include/linux /usr/include/asm* /var/lib/apt/lists/*
 
 #COPY paths.py /opt/conda/lib/python3.7/site-packages/jupyter_core/
 ENV PATH=$PATH:/opt/conda/bin
