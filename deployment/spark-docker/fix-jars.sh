@@ -50,4 +50,10 @@ swap commons-io/commons-io commons-io 2.4 2.16.1
 swap org/json json 20210307 20240303
 swap org/slf4j slf4j-ext 1.7.12 1.7.36
 
+# derby is Spark's bundled embedded-Hive-metastore jar (CVE-2022-46337). Seahorse configures no Hive
+# catalog (spark.sql.catalogImplementation defaults to in-memory), so derby is never exercised, and
+# the fixed line (10.17.x) needs JDK 21. Remove it — nothing on the classpath references it.
+echo "== remove unused derby (in-memory catalog; no Hive metastore) =="
+rm -f derby*.jar derbytools*.jar derbyshared*.jar derbyclient*.jar derbynet*.jar && echo "  removed derby jars"
+
 echo "== done =="

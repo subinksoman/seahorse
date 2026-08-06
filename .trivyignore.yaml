@@ -1,0 +1,33 @@
+# Trivy suppressions — documented, path-scoped, non-applicable findings only.
+#
+# These are jackson/jline copies that Hadoop and Parquet SHADE (relocate into their own
+# package namespaces) inside their uber-jars. They are NOT on the application classpath —
+# the app's real jackson is 2.18.8 (executor pin) and there is no standalone jline jar.
+# Fixing them would require rebuilding Hadoop 3.5.0 / Parquet 1.17.0 (locked to Spark 4.2.0),
+# which is infeasible and higher-risk than the (non-applicable) finding itself.
+vulnerabilities:
+  # jackson shaded inside hadoop-client-runtime (2.18.6) and parquet-jackson (2.19.2)
+  - id: CVE-2026-54512
+    paths:
+      - "opt/docker/app/lib/org.apache.hadoop.hadoop-client-runtime-*.jar"
+      - "opt/docker/app/lib/org.apache.parquet.parquet-jackson-*.jar"
+    statement: "Shaded/relocated jackson inside Hadoop/Parquet uber-jars; not on the app classpath (app jackson = 2.18.8)."
+  - id: CVE-2026-54513
+    paths:
+      - "opt/docker/app/lib/org.apache.hadoop.hadoop-client-runtime-*.jar"
+      - "opt/docker/app/lib/org.apache.parquet.parquet-jackson-*.jar"
+    statement: "Shaded/relocated jackson inside Hadoop/Parquet uber-jars; not on the app classpath (app jackson = 2.18.8)."
+  - id: GHSA-r7wm-3cxj-wff9
+    paths:
+      - "opt/docker/app/lib/org.apache.hadoop.hadoop-client-runtime-*.jar"
+      - "opt/docker/app/lib/org.apache.parquet.parquet-jackson-*.jar"
+    statement: "Shaded/relocated jackson-core inside Hadoop/Parquet uber-jars; not on the app classpath."
+  # jline shaded inside hadoop-client-runtime (3.9.0) — Hadoop CLI terminal support, unused here
+  - id: CVE-2026-56740
+    paths:
+      - "opt/docker/app/lib/org.apache.hadoop.hadoop-client-runtime-*.jar"
+    statement: "Shaded jline inside hadoop-client-runtime; Hadoop CLI terminal lib, not reachable from the service."
+  - id: CVE-2026-56741
+    paths:
+      - "opt/docker/app/lib/org.apache.hadoop.hadoop-client-runtime-*.jar"
+    statement: "Shaded jline inside hadoop-client-runtime; Hadoop CLI terminal lib, not reachable from the service."
