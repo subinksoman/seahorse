@@ -99,6 +99,10 @@ RUN set -e \
 
 #COPY rdd.py /opt/spark-2.1.1/python/pyspark/
 
+# T92 security: swap vulnerable jars bundled in the Spark distribution for patched versions.
+COPY fix-jars.sh /tmp/fix-jars.sh
+RUN bash /tmp/fix-jars.sh && rm -f /tmp/fix-jars.sh
+
 # Install Miniconda with Python 3.12
 RUN wget -q -O /tmp/Miniconda3-py312-Linux-x86_64.sh \
     https://repo.anaconda.com/miniconda/Miniconda3-py312_24.9.2-0-Linux-x86_64.sh && \
@@ -124,6 +128,18 @@ COPY spark-defaults.conf $SPARK_HOME/conf/spark-defaults.conf
 # (e.g. tensorflow) and slow mirrors otherwise trip pip's default 15s read timeout.
 RUN /opt/conda/bin/pip install --timeout 120 --retries 10 -r /tmp/requirements.txt && \
     rm /tmp/requirements.txt
+
+# T92 security: upgrade vulnerable Python libraries (Trivy HIGH) to patched versions.
+RUN /opt/conda/bin/pip install --timeout 120 --retries 10 -U \
+    'cryptography>=46.0.5' 'urllib3>=2.6.3' 'setuptools>=78.1.1' 'wheel>=0.46.2' \
+    'jaraco.context>=6.1.0' 'lightgbm>=4.6.0' 'Brotli>=1.2.0'
+
+# T92 security: linux-libc-dev (kernel headers) carries CVEs with no upstream fix, but it is only a
+# build-time artifact — never loaded at runtime (the container uses the host kernel). Remove it so it
+# stops being reported; nothing at runtime depends on it.
+RUN apt-get purge -y linux-libc-dev 2>/dev/null || true; \
+    apt-get autoremove -y 2>/dev/null || true; \
+    rm -rf /var/lib/apt/lists/*
 
 #COPY paths.py /opt/conda/lib/python3.7/site-packages/jupyter_core/
 ENV PATH=$PATH:/opt/conda/bin
