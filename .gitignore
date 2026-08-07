@@ -79,3 +79,7 @@ seahorse-workflow-executor/deeplang/src/main/scala/ai/deepsense/deeplang/doperab
 seahorse-workflow-executor/sparkutils*/
 architecture_remote_kernel.md
 docker-compose.yml
+seahorse-deploy/
+
+# Trivy container vulnerability scan output
+security-reports/
