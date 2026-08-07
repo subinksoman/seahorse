@@ -34,6 +34,7 @@ class RunWorkflowJob extends WorkflowJob {
 
     // TODO Rewrite using queue/db
     // TODO For now, it's not very reliable - if something fails in the middle, whole thing fails to finish.
+    val startedAt = java.time.Instant.now()
     val idToClone = Workflow.Id(UUID.fromString(workflowId))
     for {
       workflowInfo <- WorkflowsApi.getWorkflowInfo(idToClone)
@@ -44,17 +45,46 @@ class RunWorkflowJob extends WorkflowJob {
       () <- SessionsApi.startSession(clonedId, presetClusterDetails)
       () <- SessionsApi.runWorkflow(clonedId)
       () <- SessionsApi.deleteSession(clonedId)
-      () <- sendEmail(clonedId, sendReportToEmail, workflowInfo)
+      () <- sendEmail(clonedId, idToClone, presetId, startedAt, sendReportToEmail, workflowInfo)
     } yield ()
+  }
+
+  private[this] val timeFmt =
+    java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(java.time.ZoneId.of("UTC"))
+  private[this] def fmtTime(i: java.time.Instant): String = timeFmt.format(i) + " UTC"
+  private[this] def fmtDuration(from: java.time.Instant, to: java.time.Instant): String = {
+    val s = math.max(0L, java.time.Duration.between(from, to).getSeconds)
+    if (s >= 3600) f"${s / 3600}h ${(s % 3600) / 60}m ${s % 60}s"
+    else if (s >= 60) s"${s / 60}m ${s % 60}s"
+    else s"${s}s"
+  }
+  private[this] def detailRow(label: String, value: String, mono: Boolean = false): String = {
+    val vStyle = if (mono) "color:#2f4050;font-family:'Courier New',monospace;font-size:12px;word-break:break-all;"
+                 else "color:#2f4050;"
+    s"""<tr><td style="padding:7px 0;color:#a0aec0;width:130px;vertical-align:top;">$label</td>""" +
+      s"""<td style="padding:7px 0;$vStyle">$value</td></tr>"""
   }
 
   private[this] def sendEmail(
       clonedId: Workflow.Id,
+      originalWorkflowId: Workflow.Id,
+      presetId: Long,
+      startedAt: java.time.Instant,
       email: String,
       originalWorkflowInfo: WorkflowInfo): Future[Unit] = {
     logger.info(s"Sending email, cloned workflow id: $clonedId, email: $email.")
+    val finishedAt = java.time.Instant.now()
     val name = originalWorkflowInfo.name
     val url = RunWorkflowJobContext.generateWorkflowUrl(clonedId.value)
+    val details =
+      detailRow("Workflow", s"&quot;$name&quot;") +
+      detailRow("Workflow ID", originalWorkflowId.value.toString, mono = true) +
+      detailRow("Run ID", clonedId.value.toString, mono = true) +
+      detailRow("Cluster preset", s"#$presetId") +
+      detailRow("Started", fmtTime(startedAt)) +
+      detailRow("Finished", fmtTime(finishedAt)) +
+      detailRow("Duration", fmtDuration(startedAt, finishedAt)) +
+      detailRow("Status", """<span style="color:#1ab394;font-weight:bold;">Finished</span>""")
     val subject = s"""Analytical Engine: scheduled run of "$name" finished"""
     val html =
       s"""<!DOCTYPE html>
@@ -68,9 +98,12 @@ class RunWorkflowJob extends WorkflowJob {
         </td></tr>
         <tr><td style="padding:28px;">
           <h2 style="margin:0 0 14px;color:#2f4050;font-size:18px;">Scheduled run finished &#10003;</h2>
-          <p style="margin:0 0 20px;color:#4a5568;font-size:14px;line-height:1.6;">
-            Your scheduled workflow <strong>&quot;$name&quot;</strong> has finished running. The results and report are ready to view.
+          <p style="margin:0 0 18px;color:#4a5568;font-size:14px;line-height:1.6;">
+            Your scheduled workflow <strong>&quot;$name&quot;</strong> has finished running. Execution details:
           </p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:0 0 22px;font-size:13px;border-top:1px solid #edf0f2;border-bottom:1px solid #edf0f2;">
+            $details
+          </table>
           <a href="$url" style="display:inline-block;background:#0197c8;color:#ffffff;text-decoration:none;padding:12px 30px;border-radius:6px;font-size:14px;font-weight:bold;">View report</a>
           <p style="margin:26px 0 0;color:#a0aec0;font-size:12px;line-height:1.6;">
             If the button does not work, copy this link into your browser:<br>
