@@ -45,10 +45,11 @@ const EMAIL_REGEXP = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           <div class="schedule-attribute__label">Send email reports to:</div>
           <div class="schedule-attribute__errors">
             <p *ngIf="error.emailForReports.required || error.emailForReports.email" class="schedule-attribute-error">
-              Valid email address is required
+              A valid email address is required (separate multiple recipients with commas)
             </p>
           </div>
           <input class="form-control schedule-attribute__input"
+                 placeholder="name@example.com, another@example.com"
                  [class.schedule-attribute__input--invalid]="error.emailForReports.required || error.emailForReports.email"
                  [value]="model.executionInfo.emailForReports"
                  (input)="model.executionInfo.emailForReports = $any($event.target).value; validate()">
@@ -94,7 +95,10 @@ export class ScheduleEditComponent implements OnChanges {
     this.error.presetId.required = !(this.clusterPresets || []).find(
       (p: any) => String(p.id) === String(this.model.executionInfo.presetId));
     this.error.emailForReports.required = !this.model.executionInfo.emailForReports;
-    this.error.emailForReports.email = !EMAIL_REGEXP.test(this.model.executionInfo.emailForReports || '');
+    // Accept a comma-separated list of recipients; every entry must be a valid address.
+    const emails = (this.model.executionInfo.emailForReports || '')
+      .split(',').map((e: string) => e.trim()).filter((e: string) => e.length > 0);
+    this.error.emailForReports.email = emails.length === 0 || !emails.every((e: string) => EMAIL_REGEXP.test(e));
     this.valid = !(this.error.presetId.required || this.error.emailForReports.required || this.error.emailForReports.email);
   }
 
