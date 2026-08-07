@@ -3,7 +3,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 // Phase C / deepsense-attributes PROOF-OF-PATTERN leaf: migrated from deepsense-attributes-panel/
 // attribute-types/attribute-string. Edits a string node parameter. Downgraded as directive
@@ -22,23 +22,20 @@ import { Component, Input, OnInit } from '@angular/core';
   template: `
     <input type="text" class="form-control"
            [ngClass]="{ 'invalid-param-value': parameter && !parameter.validate() }"
-           [value]="valueBuffer"
+           [value]="parameter?.value == null ? '' : parameter.value"
            (input)="onInput($event)"
            [placeholder]="parameter?.defaultValue">
   `
 })
-export class AttributeStringTypeComponent implements OnInit {
+export class AttributeStringTypeComponent {
   @Input() parameter: any;
-  valueBuffer: any;
 
-  ngOnInit(): void {
-    this.valueBuffer = this.parameter ? this.parameter.value : '';
-  }
-
+  // Bind the input directly to the live parameter value (no cached buffer): a one-time
+  // ngOnInit snapshot went stale when the parameter model was rebuilt/populated after init
+  // (e.g. reopening a saved workflow), so the field showed null / the wrong value.
   onInput(event: any): void {
-    const newValue = event.target.value;
-    this.valueBuffer = newValue;
     if (this.parameter) {
+      const newValue = event.target.value;
       this.parameter.value = (newValue === '') ? null : newValue;
     }
   }
