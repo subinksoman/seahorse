@@ -78,7 +78,7 @@ streamFut.failed.foreach { t =>
   val trace =
     s"""<pre style="margin:0;background:#f7fafc;border:1px solid #edf0f2;border-radius:6px;padding:12px;font-size:12px;color:#4a5568;overflow:auto;max-height:320px;white-space:pre-wrap;word-break:break-word;">${htmlEscape(stackWriter.toString)}</pre>"""
   sendMail(
-    s"6D Analytical Engine — Notebook execution FAILED · workflow $workflowId · node $nodeId",
+    s"Analytical Engine — Notebook execution FAILED · workflow $workflowId · node $nodeId",
     emailHtml(
       "Notebook execution failed",
       s"Sorry &mdash; the execution of your notebook has failed (workflow <strong>$workflowId</strong>, " +
@@ -96,7 +96,7 @@ streamFut.failed.foreach { t =>
           stream <- streamFut
         } yield {
           sendMail(
-            s"6D Analytical Engine — Notebook result · workflow $workflowId · node $nodeId",
+            s"Analytical Engine — Notebook result · workflow $workflowId · node $nodeId",
             emailHtml(
               "Notebook execution result &#10003;",
               s"Your notebook (workflow <strong>$workflowId</strong>, node <strong>$nodeId</strong>) has " +
@@ -133,7 +133,7 @@ streamFut.failed.foreach { t =>
     }
   }
 
-  // Standard 6D Analytical Engine HTML email (matches the scheduled-run notification style).
+  // Standard Analytical Engine HTML email (matches the scheduled-run notification style).
   private def emailHtml(heading: String, message: String, detailHtml: Option[String]): String =
     s"""<!DOCTYPE html>
 <html>
@@ -142,7 +142,7 @@ streamFut.failed.foreach { t =>
     <tr><td align="center">
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
         <tr><td style="background:#0197c8;padding:20px 28px;">
-          <span style="color:#ffffff;font-size:20px;font-weight:bold;letter-spacing:.3px;">6D Analytical Engine</span>
+          <span style="color:#ffffff;font-size:20px;font-weight:bold;letter-spacing:.3px;">Analytical Engine</span>
         </td></tr>
         <tr><td style="padding:28px;">
           <h2 style="margin:0 0 14px;color:#2f4050;font-size:18px;">$heading</h2>
@@ -150,7 +150,7 @@ streamFut.failed.foreach { t =>
           ${detailHtml.getOrElse("")}
         </td></tr>
         <tr><td style="background:#f4f6f8;padding:16px 28px;color:#a0aec0;font-size:12px;">
-          6D Analytical Engine &middot; automated notification &mdash; please do not reply.
+          Analytical Engine &middot; automated notification &mdash; please do not reply.
         </td></tr>
       </table>
     </td></tr>

@@ -86,7 +86,7 @@ class RunWorkflowJob extends WorkflowJob {
       detailRow("Duration", fmtDuration(startedAt, finishedAt)) +
       detailRow("Status", """<span style="color:#1ab394;font-weight:bold;">Finished</span>""")
     val subject =
-      s"""6D Analytical Engine — scheduled run of "$name" finished · workflow ${originalWorkflowId.value}"""
+      s"""Analytical Engine — scheduled run of "$name" finished · workflow ${originalWorkflowId.value}"""
     val html =
       s"""<!DOCTYPE html>
 <html>
@@ -95,7 +95,7 @@ class RunWorkflowJob extends WorkflowJob {
     <tr><td align="center">
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
         <tr><td style="background:#0197c8;padding:20px 28px;">
-          <span style="color:#ffffff;font-size:20px;font-weight:bold;letter-spacing:.3px;">6D Analytical Engine</span>
+          <span style="color:#ffffff;font-size:20px;font-weight:bold;letter-spacing:.3px;">Analytical Engine</span>
         </td></tr>
         <tr><td style="padding:28px;">
           <h2 style="margin:0 0 14px;color:#2f4050;font-size:18px;">Scheduled run finished &#10003;</h2>
@@ -112,7 +112,7 @@ class RunWorkflowJob extends WorkflowJob {
           </p>
         </td></tr>
         <tr><td style="background:#f4f6f8;padding:16px 28px;color:#a0aec0;font-size:12px;">
-          6D Analytical Engine &middot; automated notification &mdash; please do not reply.
+          Analytical Engine &middot; automated notification &mdash; please do not reply.
         </td></tr>
       </table>
     </td></tr>
