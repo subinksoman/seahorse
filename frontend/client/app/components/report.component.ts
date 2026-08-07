@@ -41,7 +41,13 @@ const SELECT_COLUMN = 'select-column'; // reports.controller EVENTS.SELECT_COLUM
       </div>
 
       <div class="c-report" style="overflow-y: scroll;" *ngIf="currentReport">
-        <div class="report-header"><h2> {{ getReport().name }} </h2></div>
+        <div class="report-header">
+          <h2> {{ getReport().name }} </h2>
+          <a class="c-report__view-more" (click)="viewFullReport()"
+             title="Open the full report in a new tab">
+            For more, view full report <i class="fa fa-external-link"></i>
+          </a>
+        </div>
         <div [ngSwitch]="getReport().reportType">
           <report-dataframe-full *ngSwitchCase="'DataFrameFull'" [report]="getReport()"></report-dataframe-full>
           <report-default *ngSwitchDefault [report]="getReport()"></report-default>
@@ -88,6 +94,12 @@ export class ReportComponent implements OnChanges, OnDestroy {
 
   getReport(): any {
     return this.currentReport;
+  }
+
+  // "For more, view full report": open the currently-shared URL (this workflow/report link, the same
+  // one the scheduled-run email points at) in a new tab so the full report can be viewed/shared.
+  viewFullReport(): void {
+    window.open(window.location.href, '_blank');
   }
 
   getTables(): any {
