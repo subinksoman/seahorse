@@ -53,9 +53,39 @@ class RunWorkflowJob extends WorkflowJob {
       email: String,
       originalWorkflowInfo: WorkflowInfo): Future[Unit] = {
     logger.info(s"Sending email, cloned workflow id: $clonedId, email: $email.")
-    EmailSenderApi.sendEmail(s"""Scheduled execution of workflow "${originalWorkflowInfo.name}"""",
-      s"Scheduled execution of your workflow has just been finished. " +
-        s"You can see the report at ${RunWorkflowJobContext.generateWorkflowUrl(clonedId.value)}", email)
+    val name = originalWorkflowInfo.name
+    val url = RunWorkflowJobContext.generateWorkflowUrl(clonedId.value)
+    val subject = s"""Analytical Engine: scheduled run of "$name" finished"""
+    val html =
+      s"""<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,Helvetica,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:24px 0;">
+    <tr><td align="center">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+        <tr><td style="background:#0197c8;padding:20px 28px;">
+          <span style="color:#ffffff;font-size:20px;font-weight:bold;letter-spacing:.3px;">6D Analytical Engine</span>
+        </td></tr>
+        <tr><td style="padding:28px;">
+          <h2 style="margin:0 0 14px;color:#2f4050;font-size:18px;">Scheduled run finished &#10003;</h2>
+          <p style="margin:0 0 20px;color:#4a5568;font-size:14px;line-height:1.6;">
+            Your scheduled workflow <strong>&quot;$name&quot;</strong> has finished running. The results and report are ready to view.
+          </p>
+          <a href="$url" style="display:inline-block;background:#0197c8;color:#ffffff;text-decoration:none;padding:12px 30px;border-radius:6px;font-size:14px;font-weight:bold;">View report</a>
+          <p style="margin:26px 0 0;color:#a0aec0;font-size:12px;line-height:1.6;">
+            If the button does not work, copy this link into your browser:<br>
+            <a href="$url" style="color:#0197c8;word-break:break-all;">$url</a>
+          </p>
+        </td></tr>
+        <tr><td style="background:#f4f6f8;padding:16px 28px;color:#a0aec0;font-size:12px;">
+          6D Analytical Engine &middot; automated notification &mdash; please do not reply.
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>"""
+    EmailSenderApi.sendEmail(subject, html, email)
     Future.successful(())
   }
 }

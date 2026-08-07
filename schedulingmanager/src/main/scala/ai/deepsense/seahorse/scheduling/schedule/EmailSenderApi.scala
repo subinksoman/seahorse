@@ -23,8 +23,9 @@ import ai.deepsense.seahorse.scheduling.SchedulingManagerConfig
 
 private[schedule] object EmailSenderApi {
   private[this] val sender = EmailSender(SchedulingManagerConfig.emailSender)
-  def sendEmail(title: String, body: String, sendTo: String): Future[Unit] = {
-    val msg = sender.createPlainMessage(title, body, Seq(sendTo))
+  // htmlBody is a full HTML document; send it as text/html so modern clients render the styled template.
+  def sendEmail(title: String, htmlBody: String, sendTo: String): Future[Unit] = {
+    val msg = sender.createTextMessage(title, htmlBody, "html", Seq(sendTo))
     sender.sendEmail(msg).map(throw _)
     Future.successful(())
   }
