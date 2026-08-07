@@ -85,7 +85,8 @@ class RunWorkflowJob extends WorkflowJob {
       detailRow("Finished", fmtTime(finishedAt)) +
       detailRow("Duration", fmtDuration(startedAt, finishedAt)) +
       detailRow("Status", """<span style="color:#1ab394;font-weight:bold;">Finished</span>""")
-    val subject = s"""Analytical Engine: scheduled run of "$name" finished"""
+    val subject =
+      s"""6D Analytical Engine — scheduled run of "$name" finished · workflow ${originalWorkflowId.value}"""
     val html =
       s"""<!DOCTYPE html>
 <html>

@@ -53,6 +53,9 @@ abstract class Notebook()
 
   def headlessExecution(context: ExecutionContext) : Unit = {
 
+    val workflowId = context.dataFrameStorage.workflowId.toString
+    val nodeId = context.dataFrameStorage.nodeId.toString
+
     context.notebooksClient.map(_.as.dispatcher).foreach { implicit ec =>
       for {
         _ <- getShouldExecute
@@ -75,10 +78,11 @@ streamFut.failed.foreach { t =>
   val trace =
     s"""<pre style="margin:0;background:#f7fafc;border:1px solid #edf0f2;border-radius:6px;padding:12px;font-size:12px;color:#4a5568;overflow:auto;max-height:320px;white-space:pre-wrap;word-break:break-word;">${htmlEscape(stackWriter.toString)}</pre>"""
   sendMail(
-    "Notebook execution failed",
+    s"6D Analytical Engine — Notebook execution FAILED · workflow $workflowId · node $nodeId",
     emailHtml(
       "Notebook execution failed",
-      "Sorry &mdash; the execution of your notebook has failed. The error details are below.",
+      s"Sorry &mdash; the execution of your notebook has failed (workflow <strong>$workflowId</strong>, " +
+        s"node <strong>$nodeId</strong>). The error details are below.",
       Some(trace)),
     context,
     None
@@ -91,10 +95,12 @@ streamFut.failed.foreach { t =>
         Await.result(for {
           stream <- streamFut
         } yield {
-          sendMail("Notebook execution result",
+          sendMail(
+            s"6D Analytical Engine — Notebook result · workflow $workflowId · node $nodeId",
             emailHtml(
               "Notebook execution result &#10003;",
-              "Your notebook has finished executing. The result is attached to this email as " +
+              s"Your notebook (workflow <strong>$workflowId</strong>, node <strong>$nodeId</strong>) has " +
+                "finished executing. The result is attached to this email as " +
                 s"<strong>${Notebook.notebookDataFilename}</strong>.",
               None),
             context,
