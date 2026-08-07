@@ -89,8 +89,11 @@ object Linalg {
   type DenseMatrix = linalg.DenseMatrix
   type Vector = linalg.Vector
   val Vectors = linalg.Vectors
-  //type VectorUDT = org.apache.spark.hacks.SparkVectors.VectorUDT
-  type VectorUDT =  org.apache.spark.mllib.linalg.VectorUDT
+  // Spark 4.x ML columns (rawPrediction/probability/features) use ml.linalg.VectorUDT, not the mllib
+  // one — accessed via the org.apache.spark.hacks shim since ml.linalg.VectorUDT is private[spark].
+  // Aliasing mllib here made column-type inference classify those columns as 'other' (breaking the
+  // Evaluate node, which requires a 'vector' rawPrediction column).
+  type VectorUDT = org.apache.spark.hacks.SparkVectors.VectorUDT
 }
 
 object ML {
