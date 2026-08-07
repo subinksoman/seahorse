@@ -72,9 +72,14 @@ abstract class Notebook()
 streamFut.failed.foreach { t =>
   val stackWriter = new StringWriter()
   t.printStackTrace(new PrintWriter(stackWriter))
+  val trace =
+    s"""<pre style="margin:0;background:#f7fafc;border:1px solid #edf0f2;border-radius:6px;padding:12px;font-size:12px;color:#4a5568;overflow:auto;max-height:320px;white-space:pre-wrap;word-break:break-word;">${htmlEscape(stackWriter.toString)}</pre>"""
   sendMail(
     "Notebook execution failed",
-    "Sorry! The execution of your notebook has failed.\n" + stackWriter.toString,
+    emailHtml(
+      "Notebook execution failed",
+      "Sorry &mdash; the execution of your notebook has failed. The error details are below.",
+      Some(trace)),
     context,
     None
   )
@@ -87,7 +92,11 @@ streamFut.failed.foreach { t =>
           stream <- streamFut
         } yield {
           sendMail("Notebook execution result",
-            "Hi, please find the attached file with notebook execution result.",
+            emailHtml(
+              "Notebook execution result &#10003;",
+              "Your notebook has finished executing. The result is attached to this email as " +
+                s"<strong>${Notebook.notebookDataFilename}</strong>.",
+              None),
             context,
             Some((stream, Some(Notebook.notebookDataMimeType)))
           )
@@ -106,8 +115,9 @@ streamFut.failed.foreach { t =>
       shouldExecute <- getShouldExecute
       mailAddress <- shouldExecute.getSendEmail
       sender <- context.emailSender
-      email = mailAddress.getEmailAddress
-      msg = sender.createPlainMessage(subject, body, Seq(email))
+      recipients = mailAddress.getEmailAddress.split(",").map(_.trim).filter(_.nonEmpty).toSeq
+      if recipients.nonEmpty
+      msg = sender.createHtmlMessage(subject, body, recipients)
       msgWithAttachment = attachment.map {
         case (stream, contentTypeOpt) =>
           sender.attachAttachment(msg, stream, Notebook.notebookDataFilename, contentTypeOpt)
@@ -116,6 +126,34 @@ streamFut.failed.foreach { t =>
       sender.sendEmail(msgWithAttachment).foreach(throw _)
     }
   }
+
+  // Standard 6D Analytical Engine HTML email (matches the scheduled-run notification style).
+  private def emailHtml(heading: String, message: String, detailHtml: Option[String]): String =
+    s"""<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,Helvetica,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:24px 0;">
+    <tr><td align="center">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+        <tr><td style="background:#0197c8;padding:20px 28px;">
+          <span style="color:#ffffff;font-size:20px;font-weight:bold;letter-spacing:.3px;">6D Analytical Engine</span>
+        </td></tr>
+        <tr><td style="padding:28px;">
+          <h2 style="margin:0 0 14px;color:#2f4050;font-size:18px;">$heading</h2>
+          <p style="margin:0 0 16px;color:#4a5568;font-size:14px;line-height:1.6;">$message</p>
+          ${detailHtml.getOrElse("")}
+        </td></tr>
+        <tr><td style="background:#f4f6f8;padding:16px 28px;color:#a0aec0;font-size:12px;">
+          6D Analytical Engine &middot; automated notification &mdash; please do not reply.
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>"""
+
+  private def htmlEscape(s: String): String =
+    s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
   @transient
   override lazy val tTagTI_0: ru.TypeTag[DataFrame] = ru.typeTag[DataFrame]
