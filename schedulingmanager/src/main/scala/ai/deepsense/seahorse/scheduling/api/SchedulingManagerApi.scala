@@ -32,7 +32,7 @@ import ai.deepsense.seahorse.scheduling.db.Database
 import ai.deepsense.seahorse.scheduling.db.dbio.WorkflowSchedulesDBIOs
 import ai.deepsense.seahorse.scheduling.db.schema.WorkflowScheduleSchema
 import ai.deepsense.seahorse.scheduling.db.schema.WorkflowScheduleSchema.WorkflowScheduleDB
-import ai.deepsense.seahorse.scheduling.model.{JsonBodyForError, WorkflowSchedule}
+import ai.deepsense.seahorse.scheduling.model.{JsonBodyForError, RunNowResponse, WorkflowExecutionInfo, WorkflowSchedule}
 import ai.deepsense.seahorse.scheduling.schedule.{RunWorkflowJob, WorkflowScheduler}
 
 class SchedulingManagerApi extends DefaultApi {
@@ -69,6 +69,21 @@ class SchedulingManagerApi extends DefaultApi {
     () <- genericDBIOs.delete(scheduleId)
     () <- TryDBIO(scheduler.deactivateSchedule(scheduleId))
   } yield ()).run()
+
+  // Runs a workflow immediately, once, without persisting a schedule. Reuses the same
+  // clone -> session -> run -> email pipeline the scheduler drives, but fires it on demand.
+  // Awaits only the clone step so the caller gets the run id right away; the session/run/email
+  // steps continue in the background. The email report arrives when the run finishes.
+  override def runWorkflowNowImpl(workflowId: UUID, executionInfo: WorkflowExecutionInfo): RunNowResponse = {
+    import scala.concurrent.duration._
+    val runId = Await.result(
+      new RunWorkflowJob().startRun(
+        workflowId.toString,
+        executionInfo.emailForReports,
+        executionInfo.presetId),
+      60.seconds)
+    RunNowResponse(status = "accepted", runId = runId)
+  }
 
   // TODO DRY
   implicit class DBIOOps[T](dbio: DBIO[T]) {

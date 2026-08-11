@@ -19,6 +19,7 @@ package ai.deepsense.seahorse.scheduling.schedule
 import java.util.UUID
 
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 import ai.deepsense.commons.utils.LoggerForCallerClass
 import ai.deepsense.models.workflows.{Workflow, WorkflowInfo}
@@ -39,15 +40,44 @@ class RunWorkflowJob extends WorkflowJob {
     for {
       workflowInfo <- WorkflowsApi.getWorkflowInfo(idToClone)
       clonedId <- WorkflowsApi.cloneWorkflow(idToClone, workflowInfo)
-      presetClusterDetailsOpt <- PresetsApi.fetchPreset(presetId)
-      presetClusterDetails = presetClusterDetailsOpt
-        .getOrElse(throw new IllegalArgumentException(s"Preset $presetId doesn't exist any more."))
-      () <- SessionsApi.startSession(clonedId, presetClusterDetails)
-      () <- SessionsApi.runWorkflow(clonedId)
-      () <- SessionsApi.deleteSession(clonedId)
-      () <- sendEmail(clonedId, idToClone, presetId, startedAt, sendReportToEmail, workflowInfo)
+      () <- executeCloned(clonedId, idToClone, presetId, startedAt, sendReportToEmail, workflowInfo)
     } yield ()
   }
+
+  // Run-now variant: awaits only the clone (so the caller gets the run id right away), then runs the
+  // session/execution/email steps in the background. Returns the cloned workflow id (the "run id").
+  def startRun(workflowId: String, sendReportToEmail: String, presetId: Long): Future[UUID] = {
+    logger.info(s"Starting immediate execution of workflow $workflowId on cluster $presetId with email " +
+      s"to $sendReportToEmail afterwards.")
+    val startedAt = java.time.Instant.now()
+    val idToClone = Workflow.Id(UUID.fromString(workflowId))
+    for {
+      workflowInfo <- WorkflowsApi.getWorkflowInfo(idToClone)
+      clonedId <- WorkflowsApi.cloneWorkflow(idToClone, workflowInfo)
+    } yield {
+      executeCloned(clonedId, idToClone, presetId, startedAt, sendReportToEmail, workflowInfo).onComplete {
+        case Failure(ex) => logger.error(s"Background run of ${clonedId.value} failed.", ex)
+        case Success(_) => logger.info(s"Background run of ${clonedId.value} finished.")
+      }
+      clonedId.value
+    }
+  }
+
+  private[this] def executeCloned(
+      clonedId: Workflow.Id,
+      idToClone: Workflow.Id,
+      presetId: Long,
+      startedAt: java.time.Instant,
+      sendReportToEmail: String,
+      workflowInfo: WorkflowInfo): Future[Unit] = for {
+    presetClusterDetailsOpt <- PresetsApi.fetchPreset(presetId)
+    presetClusterDetails = presetClusterDetailsOpt
+      .getOrElse(throw new IllegalArgumentException(s"Preset $presetId doesn't exist any more."))
+    () <- SessionsApi.startSession(clonedId, presetClusterDetails)
+    () <- SessionsApi.runWorkflow(clonedId)
+    () <- SessionsApi.deleteSession(clonedId)
+    () <- sendEmail(clonedId, idToClone, presetId, startedAt, sendReportToEmail, workflowInfo)
+  } yield ()
 
   private[this] val timeFmt =
     java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(java.time.ZoneId.of("UTC"))
