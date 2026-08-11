@@ -46,6 +46,12 @@ RUN cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
 ENV SPARK_HOME=/opt/spark-$SPARK_VERSION
 ENV PATH=$PATH:$SPARK_HOME/bin
 ENV LOG4J2_VERSION=2.17.2
+# Optional offline install: if a matching Spark tarball sits in the build context it is used instead
+# of downloading (the .tgz is ~550MB and the mirror is slow). The .tgz glob may match nothing, so
+# spark-defaults.conf is listed as a guaranteed source — COPY rejects a glob that resolves to zero
+# files, but with one real source present it does not. Both land in /tmp/spark-local; the RUN below
+# picks the tarball if present (else downloads) and then removes the dir.
+COPY spark-*-bin-hadoop*.tgz* spark-defaults.conf /tmp/spark-local/
 # Install Spark, then in the SAME layer strip the vulnerable Log4j 1.x jars that
 # stock Spark 3.0.0 bundles and replace them with Log4j 2 ($LOG4J2_VERSION, to
 # match the JVM services). The log4j-1.2-api bridge routes Spark's Log4j 1.x API
@@ -57,10 +63,17 @@ RUN set -e \
        4.*) SPARK_PACKAGE="spark-$SPARK_VERSION-bin-hadoop$HADOOP_VERSION" ;; \
        *)   SPARK_PACKAGE="spark-$SPARK_VERSION-bin-hadoop$HADOOP_VERSION-scala2.13" ;; \
      esac \
-  && { wget --continue --timeout=30 --tries=2 -O /tmp/$SPARK_PACKAGE.tgz \
-         "https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/$SPARK_PACKAGE.tgz" \
-       || wget --continue --timeout=30 --tries=2 -O /tmp/$SPARK_PACKAGE.tgz \
-         "https://dlcdn.apache.org/spark/spark-$SPARK_VERSION/$SPARK_PACKAGE.tgz"; } \
+  && if [ -f "/tmp/spark-local/$SPARK_PACKAGE.tgz" ]; then \
+       echo "Using local Spark tarball /tmp/spark-local/$SPARK_PACKAGE.tgz"; \
+       cp "/tmp/spark-local/$SPARK_PACKAGE.tgz" /tmp/$SPARK_PACKAGE.tgz; \
+     else \
+       echo "Local Spark tarball not found; downloading $SPARK_PACKAGE.tgz"; \
+       { wget --continue --timeout=30 --tries=2 -O /tmp/$SPARK_PACKAGE.tgz \
+           "https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/$SPARK_PACKAGE.tgz" \
+         || wget --continue --timeout=30 --tries=2 -O /tmp/$SPARK_PACKAGE.tgz \
+           "https://dlcdn.apache.org/spark/spark-$SPARK_VERSION/$SPARK_PACKAGE.tgz"; }; \
+     fi \
+  && rm -rf /tmp/spark-local \
   && tar -xzf /tmp/$SPARK_PACKAGE.tgz -C /tmp/ \
   && rm -f /tmp/$SPARK_PACKAGE.tgz \
   && mv /tmp/$SPARK_PACKAGE $SPARK_HOME \

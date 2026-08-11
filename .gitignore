@@ -80,6 +80,8 @@ seahorse-workflow-executor/sparkutils*/
 architecture_remote_kernel.md
 docker-compose.yml
 seahorse-deploy/
-
+seahorse-submit/
 # Trivy container vulnerability scan output
 security-reports/
+# Large Spark distribution tarballs dropped into the spark-docker build context for offline builds
+deployment/spark-docker/spark-*-bin-hadoop*.tgz
