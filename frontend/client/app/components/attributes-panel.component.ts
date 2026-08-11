@@ -81,8 +81,8 @@ declare const jQuery: any;
       </header>
       <aside class="c-attributes-tabs clearfix">
         <ul class="nav nav-tabs c-attributes-tabs__container">
-          <li class="o-tab" [ngClass]="{ 'active': selected === 'parameters' }" (click)="selected = 'parameters'"><a href="">Parameters</a></li>
-          <li class="o-tab" [ngClass]="{ 'active': selected === 'ports' }" (click)="selected = 'ports'"><a href="">Ports</a></li>
+          <li class="o-tab" [ngClass]="{ 'active': selected === 'parameters' }" (click)="selected = 'parameters'; $event.preventDefault()"><a href="">Parameters</a></li>
+          <li class="o-tab" [ngClass]="{ 'active': selected === 'ports' }" (click)="selected = 'ports'; $event.preventDefault()"><a href="">Ports</a></li>
         </ul>
       </aside>
       <section class="ibox-content" custom-scroll-bar [ngSwitch]="selected">
