@@ -53,7 +53,7 @@ import { copy } from '../core/ng-compat';
                   <input class="form-control cluster-input {{ field }}-input"
                          [placeholder]="labels[field].placeholder"
                          [value]="preset[field] || ''"
-                         (input)="preset[field] = $any($event.target).value"
+                         (input)="onFieldInput(field, $any($event.target).value)"
                          [disabled]="!isEditingEnabled()"
                          [ngClass]="{'error': errors[field]}"
                          (focus)="focused = field" [type]="labels[field].type || 'text'"/>
@@ -135,6 +135,17 @@ export class PresetModalComponent {
           console.error('Problem with saving preset', error, this.preset);
           this.isSaving = false;
         });
+    }
+  }
+
+  // Number inputs arrive as strings from the DOM, but the preset schema requires integers
+  // (executorCores/totalExecutorCores/numExecutors are type:integer). Coerce so validation passes;
+  // an empty optional field is dropped rather than coerced to 0.
+  onFieldInput(field: string, value: string): void {
+    if (this.labels[field] && this.labels[field].type === 'number') {
+      this.preset[field] = value === '' ? undefined : Number(value);
+    } else {
+      this.preset[field] = value;
     }
   }
 
