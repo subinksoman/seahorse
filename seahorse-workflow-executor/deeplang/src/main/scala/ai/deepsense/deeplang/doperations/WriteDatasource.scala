@@ -99,7 +99,9 @@ class WriteDatasource()
       case DatasourceType.HDFS =>
         FromDatasourceConverters.OutputFileStorageType.get(datasource.getParams.getHdfsParams)
           .setShouldOverwrite(getShouldOverwrite())
-      case DatasourceType.EXTERNALFILE => throw new DeepLangException("Cannot write to external file")
+      case DatasourceType.EXTERNALFILE =>
+        FromDatasourceConverters.OutputFileStorageType.get(datasource.getParams.getExternalFileParams)
+          .setShouldOverwrite(getShouldOverwrite())
       case DatasourceType.LIBRARYFILE =>
         FromDatasourceConverters.OutputFileStorageType.get(datasource.getParams.getLibraryFileParams)
           .setShouldOverwrite(getShouldOverwrite())

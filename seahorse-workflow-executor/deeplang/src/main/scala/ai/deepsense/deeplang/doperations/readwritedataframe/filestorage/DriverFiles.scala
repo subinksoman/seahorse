@@ -26,7 +26,7 @@ import org.apache.spark.sql.{Dataset, Encoders, Row, SaveMode, DataFrame => Spar
 import ai.deepsense.commons.resources.ManagedResource
 import ai.deepsense.deeplang.ExecutionContext
 import ai.deepsense.deeplang.doperables.dataframe.DataFrame
-import ai.deepsense.deeplang.doperations.inout.{InputFileFormatChoice, OutputFileFormatChoice}
+import ai.deepsense.deeplang.doperations.inout.{InputFileFormatChoice, OutputFileFormatChoice, CsvParameters}
 import ai.deepsense.deeplang.doperations.readwritedataframe.filestorage.csv.CsvOptions
 import ai.deepsense.deeplang.doperations.readwritedataframe.{FilePath, FileScheme}
 import ai.deepsense.deeplang.readjsondataset.JsonReader
@@ -147,7 +147,7 @@ private def writeCsv(
     csvChoice: OutputFileFormatChoice.Csv,
     dataFrame: DataFrame
 )(implicit context: ExecutionContext): Unit = {
-  val delimiter = csvChoice.getCsvColumnSeparator().toString
+  val delimiter = CsvParameters.determineColumnSeparatorOf(csvChoice.getCsvColumnSeparator()).toString
   val includeHeader = csvChoice.getNamesIncluded.toString
 
   dataFrame.sparkDataFrame.write
