@@ -104,9 +104,6 @@ abstract class WorkflowApi @Inject() (
   private val WorkflowUploadUnmarshaller: FromEntityUnmarshaller[Workflow] =
     multipartUnmarshaller(s => versionedWorkflowReader.read(JsonParser(s)))
 
-  private val JsObjectUnmarshaller: FromEntityUnmarshaller[JsObject] =
-    multipartUnmarshaller(s => JsonParser(s).asJsObject)
-
   private val versionedWorkflowUnmarashaler: FromEntityUnmarshaller[Workflow] =
     sprayJsonUnmarshaller(versionedWorkflowReader)
 
@@ -306,16 +303,13 @@ abstract class WorkflowApi @Inject() (
                 post {
                   withUserContext {
                     userContext => {
-                      implicit val unmarshaller = JsObjectUnmarshaller
-                      entity(as[JsObject]) { jsObject =>
-                        implicit val unmarshaller = WorkflowUploadUnmarshaller
-                        entity(as[Workflow]) { workflow =>
-                          val futureWorkflowId =
-                            workflowManagerProvider.forContext(userContext).create(workflow)
-                          onSuccess(futureWorkflowId) { workflowId =>
-                            val envelopedWorkflowId = Envelope(workflowId)
-                            complete(StatusCodes.Created, envelopedWorkflowId)
-                          }
+                      implicit val unmarshaller = WorkflowUploadUnmarshaller
+                      entity(as[Workflow]) { workflow =>
+                        val futureWorkflowId =
+                          workflowManagerProvider.forContext(userContext).create(workflow)
+                        onSuccess(futureWorkflowId) { workflowId =>
+                          val envelopedWorkflowId = Envelope(workflowId)
+                          complete(StatusCodes.Created, envelopedWorkflowId)
                         }
                       }
                     }

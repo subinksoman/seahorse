@@ -27,9 +27,13 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import org.apache.pekko.http.scaladsl.model.headers.{BasicHttpCredentials, ContentDispositionTypes, HttpChallenge, RawHeader, `Content-Disposition`, `WWW-Authenticate`}
+import org.apache.pekko.http.scaladsl.model.headers.{Authorization, BasicHttpCredentials, ContentDispositionTypes, HttpChallenge, RawHeader, `Content-Disposition`, `WWW-Authenticate`}
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.testkit.RouteTestTimeout
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.marshalling.Marshal
+import org.apache.pekko.stream.scaladsl.Source
+import org.apache.pekko.util.ByteString
 import spray.json._
 import org.apache.pekko.http.scaladsl.server.Route
 import ai.deepsense.commons.auth.usercontext.{TokenTranslator, UserContext}
@@ -493,6 +497,45 @@ class WorkflowsApiSpec
 
           val resultJs = responseAs[String].parseJson.asJsObject
           resultJs.fields should contain key "workflowId"
+        }
+      }
+
+      // Regression guard for a route consuming the request entity twice. Only a real connection
+      // gives a one-shot EntitySource: the testkit strictifies entities and a locally built Source
+      // can be re-materialized, so both let a double-consuming route pass. Hence a bound server.
+      "workflow file is sent over a real connection as a streamed multipart body" in {
+        val createdWorkflow = newWorkflow()
+        val bytes = ByteString(workflowFormat.write(createdWorkflow).toString())
+
+        val binding = Await.result(
+          Http().newServerAt("127.0.0.1", 0).bind(testRoute), 10.seconds)
+        try {
+          val multipartData = Multipart.FormData(
+            Multipart.FormData.BodyPart(
+              "workflowFile",
+              HttpEntity.IndefiniteLength(
+                ContentTypes.`application/json`,
+                Source.single(bytes))))
+
+          val entity = Await.result(Marshal(multipartData).to[RequestEntity], 5.seconds)
+          entity shouldBe a[HttpEntity.Chunked]
+
+          val request = HttpRequest(
+            HttpMethods.POST,
+            s"http://127.0.0.1:${binding.localAddress.getPort}/$apiPrefix/upload",
+            Authorization(credentials) :: validHeaders(),
+            entity)
+
+          val response = Await.result(Http().singleRequest(request), 20.seconds)
+          val body = Await.result(
+            response.entity.toStrict(10.seconds), 10.seconds).data.utf8String
+
+          withClue(s"body: $body") {
+            response.status should be(StatusCodes.Created)
+          }
+          body.parseJson.asJsObject.fields should contain key "workflowId"
+        } finally {
+          Await.result(binding.terminate(5.seconds), 10.seconds)
         }
       }
     }
