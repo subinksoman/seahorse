@@ -136,6 +136,13 @@ lazy val sdk = project dependsOn (
   deeplang
 ) settings settingsForPublished
 
+// SDK plugin operations. Deliberately outside `rootProject`'s aggregate and not a dependency of
+// `workflowexecutor`: it builds a thin drop-in jar (`sbt customops/package`) for /resources/jars,
+// so the core build and we.jar are untouched.
+lazy val customops = project dependsOn (
+  deeplang
+) settings settingsForNotPublished
+
 lazy val workflowexecutor = project dependsOn (commons % "test->test",
 deeplang,
 deeplang % "test->test",
