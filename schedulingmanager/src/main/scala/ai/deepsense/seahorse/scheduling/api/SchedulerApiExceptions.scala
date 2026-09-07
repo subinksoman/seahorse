@@ -24,4 +24,10 @@ object SchedulerApiExceptions {
     message = "Unexpected Quartz error occured",
     errorCode = 500
   )
+
+  def runNotFound(runId: java.util.UUID) = ApiException(
+    message = s"No run with id $runId is known. It may have never started, or the service was " +
+      "restarted (run status is kept in memory).",
+    errorCode = 404
+  )
 }

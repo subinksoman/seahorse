@@ -32,8 +32,8 @@ import ai.deepsense.seahorse.scheduling.db.Database
 import ai.deepsense.seahorse.scheduling.db.dbio.WorkflowSchedulesDBIOs
 import ai.deepsense.seahorse.scheduling.db.schema.WorkflowScheduleSchema
 import ai.deepsense.seahorse.scheduling.db.schema.WorkflowScheduleSchema.WorkflowScheduleDB
-import ai.deepsense.seahorse.scheduling.model.{JsonBodyForError, RunNowResponse, WorkflowExecutionInfo, WorkflowSchedule}
-import ai.deepsense.seahorse.scheduling.schedule.{RunWorkflowJob, WorkflowScheduler}
+import ai.deepsense.seahorse.scheduling.model.{JsonBodyForError, RunNowResponse, RunStatusResponse, WorkflowExecutionInfo, WorkflowSchedule}
+import ai.deepsense.seahorse.scheduling.schedule.{RunStatusRegistry, RunWorkflowJob, WorkflowScheduler}
 
 class SchedulingManagerApi extends DefaultApi {
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -69,6 +69,22 @@ class SchedulingManagerApi extends DefaultApi {
     () <- genericDBIOs.delete(scheduleId)
     () <- TryDBIO(scheduler.deactivateSchedule(scheduleId))
   } yield ()).run()
+
+  // Status of an on-demand or scheduled run, by its run id (the cloned workflow id). Backed by the
+  // in-memory RunStatusRegistry, so it stays queryable after the session is torn down. 404 if unknown.
+  override def getRunStatusImpl(runId: UUID): RunStatusResponse =
+    RunStatusRegistry.get(runId) match {
+      case Some(i) =>
+        RunStatusResponse(
+          runId = i.runId,
+          workflowId = i.workflowId,
+          status = i.status,
+          startedAt = i.startedAt,
+          finishedAt = i.finishedAt,
+          error = i.error)
+      case None =>
+        throw ApiExceptionFromCommon(SchedulerApiExceptions.runNotFound(runId))
+    }
 
   // Runs a workflow immediately, once, without persisting a schedule. Reuses the same
   // clone -> session -> run -> email pipeline the scheduler drives, but fires it on demand.

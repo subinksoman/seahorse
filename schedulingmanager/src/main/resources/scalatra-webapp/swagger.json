@@ -44,6 +44,35 @@
         }
       }
     },
+    "/runs/{runId}/status": {
+      "get": {
+        "description": "Status of an on-demand (run-now) or scheduled run, by its run id (the cloned workflow id returned from the run endpoint).",
+        "operationId": "getRunStatus",
+        "parameters": [
+          {
+            "name": "runId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uuid"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current status of the run.",
+            "schema": {
+              "$ref": "#/definitions/RunStatusResponse"
+            }
+          },
+          "404": {
+            "description": "No run with this id is known.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/workflow/{workflowId}/schedules": {
       "get": {
         "description": "Returns list of schedules for a workflow.",
@@ -208,6 +237,35 @@
           "description": "Id of a preset which should be used to execute the workflow.",
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "RunStatusResponse": {
+      "description": "Status of a run identified by its run id.",
+      "type": "object",
+      "required": ["runId", "workflowId", "status", "startedAt"],
+      "properties": {
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workflowId": {
+          "description": "The original workflow that was run (the run id is a clone of it).",
+          "type": "string",
+          "format": "uuid"
+        },
+        "status": {
+          "description": "RUNNING, FINISHED, or FAILED.",
+          "type": "string"
+        },
+        "startedAt": {
+          "type": "string"
+        },
+        "finishedAt": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string"
         }
       }
     },

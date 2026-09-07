@@ -74,28 +74,29 @@ private[schedule] object SessionsApi {
     sessionManagerClient.deleteSession(id).map(_ => ())
   }
 
-  def runWorkflow(id: Workflow.Id): Future[Unit] = {
+  // Returns the final per-node status counts once the run settles, so the caller can tell a
+  // successful run from a failed one (nodes ending in Failed/Aborted).
+  def runWorkflow(id: Workflow.Id): Future[Map[NodeStatusName, Int]] = {
     val notFinishedStatuses = Set[NodeStatusName](NodeStatusName.Draft, NodeStatusName.Running, NodeStatusName.Queued)
-    def isFinished(): Future[Boolean] = sessionManagerClient.queryNodeStatuses(id).map { response =>
-      logger.info(s"Running status of workflow $id: $response")
-      response.nodeStatuses.exists { statusesMap =>
-        statusesMap
-          .filterKeys(notFinishedStatuses.contains)
-          .values
-          .sum == 0
-      }
-    }
 
-    def retryUntilFinished(): Future[Unit] = isFinished().flatMap { finished =>
-      if (finished) {
-        logger.info(s"Workflow $id finished running.")
-        Future.successful(())
-      } else {
-        Thread.sleep(5000)
-        logger.info(s"Workflow $id didn't finish running yet; asking for status again.")
-        retryUntilFinished()
+    def retryUntilFinished(): Future[Map[NodeStatusName, Int]] =
+      sessionManagerClient.queryNodeStatuses(id).flatMap { response =>
+        logger.info(s"Running status of workflow $id: $response")
+        // Finished only once the executor has reported statuses AND none remain Draft/Running/Queued.
+        // nodeStatuses is None until the executor reports — keep polling in that case.
+        val finishedStatuses = response.nodeStatuses.filter { statusesMap =>
+          statusesMap.filterKeys(notFinishedStatuses.contains).values.sum == 0
+        }
+        finishedStatuses match {
+          case Some(statuses) =>
+            logger.info(s"Workflow $id finished running. Final node statuses: $statuses")
+            Future.successful(statuses)
+          case None =>
+            Thread.sleep(5000)
+            logger.info(s"Workflow $id didn't finish running yet; asking for status again.")
+            retryUntilFinished()
+        }
       }
-    }
 
     logger.info(s"Running workflow $id.")
     sessionManagerClient.launchSession(id).flatMap(_ => retryUntilFinished())
