@@ -117,7 +117,6 @@ class Proxy(Service):
     def environment(self):
         return Env(
             ENABLE_AUTHORIZATION=self.services.Authorization.enable_authorization(),
-            FORCE_HTTPS='false',
             WORKFLOW_MANAGER_HOST=self._service_address(WorkflowManager),
             SCHEDULING_MANAGER_HOST=self._service_address(SchedulingManager),
             DATASOURCE_MANAGER_HOST=self._service_address(DataSourceManager),

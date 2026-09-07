@@ -30,7 +30,8 @@ module.exports = {
 function init(app) {
   app.use(session({
     name: 'JSESSIONID',
-    secret: crypto.randomBytes(16).toString('hex'),
+    // stable across restarts so existing session cookies stay valid (was random per start)
+    secret: config.get('SESSION_SECRET') || 'seahorse-proxy-stable-session-secret',
     resave: false,
     saveUninitialized: false
   }));
@@ -66,6 +67,9 @@ function login(req, res, next) {
     // passport >= 0.6 made req.logout async (callback required).
     req.logout(function () {
       strategy.reset();
+      // drop stale cookies client-side so a returning browser self-heals (no manual delete)
+      res.clearCookie('JSESSIONID');
+      res.clearCookie('seahorse_user');
       res.redirect('/oauth');
     });
   } else {

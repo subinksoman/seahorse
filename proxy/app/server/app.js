@@ -15,6 +15,7 @@
  */
 
 const express = require('express');
+const fs = require('fs');
 const path = require('path');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
@@ -33,8 +34,17 @@ app.use(internalErrorMiddleware);
 app.use(compression());
 app.disable('x-powered-by');
 
-if (config.get('FORCE_HTTPS') === "true") {
-  app.use(httpsRedirectHandler);
+// ALLOWED_DOMAINS lists the origins allowed to embed this app in a frame; '*' (or unset) leaves
+// framing unrestricted, as it was before.
+// With specific origins listed the app also becomes embed-only: a browser tab pointed straight at it
+// is refused, so the only way in is through one of those parents.
+const frameAncestors = parseFrameAncestors(config.get('ALLOWED_DOMAINS'));
+let noPermissionPage;
+if (frameAncestors) {
+  console.log('Framing restricted to: ' + frameAncestors + ' (direct access refused)');
+  noPermissionPage = renderNoPermissionPage(frameAncestors);
+  app.use(frameAncestorsMiddleware);
+  app.use(embedOnlyMiddleware);
 }
 
 app.use(express.static('app/server/html'));
@@ -45,21 +55,92 @@ app.all("/authorization/**",
 );
 
 let auth;
-if (config.get('ENABLE_AUTHORIZATION') === "true") {
+// "true" = UAA OAuth, "sixdee" = portal handoff verified against AUTHORIZATION_HOST; else no-auth stub
+const authMode = String(config.get('ENABLE_AUTHORIZATION') || '').toLowerCase();
+const authEnabled = authMode === "true" || authMode === "sixdee";
+if (authMode === "sixdee") {
+  auth = require('./auth/sixdeeauth');
+} else if (authMode === "true") {
   auth = require('./auth/auth');
 } else {
   auth = require('./auth/stub');
 }
 auth.init(app);
 app.use(auth.login);
+if (!authEnabled) {
+  app.use(clearStaleSessionCookie);
+}
 app.use(userCookieMiddleware);
 
 app.get('/', reverseProxy.forward);
 app.all('/**', reverseProxy.forward);
 
-function httpsRedirectHandler(req, res, next) {
-  if (req.headers['x-forwarded-proto'] !== 'https' && !req.headers.host.startsWith("localhost:")) {
-    return res.redirect(301, 'https://' + req.headers.host + req.url);
+function parseFrameAncestors(value) {
+  const origins = String(value || '').split(/[\s,]+/).filter((o) => o && o !== '*');
+  if (origins.length === 0) {
+    return null;
+  }
+  // 'self' must stay in the list: the notebook modal frames /jupyter from this very origin, and a
+  // frame-ancestors listing only the embedder would block it.
+  return ["'self'"].concat(origins).join(' ');
+}
+
+function frameAncestorsMiddleware(req, res, next) {
+  res.setHeader('Content-Security-Policy', 'frame-ancestors ' + frameAncestors);
+  next();
+}
+
+// frame-ancestors stops other sites from embedding us, but says nothing about someone typing the URL
+// into a tab. This refuses that too: only frame/iframe navigations get a document, and everything the
+// already-loaded page fetches (scripts, XHR, websockets, downloads) passes through untouched.
+function embedOnlyMiddleware(req, res, next) {
+  const dest = req.headers['sec-fetch-dest'];
+  const navigation = dest ?
+    (dest === 'document' || dest === 'iframe' || dest === 'frame') :
+    (req.method === 'GET' && String(req.headers.accept || '').indexOf('text/html') !== -1);
+
+  if (!navigation) {
+    return next();
+  }
+  if (dest === 'iframe' || dest === 'frame') {
+    // the browser already enforced frame-ancestors before issuing this request
+    return next();
+  }
+  // No Sec-Fetch-Dest (pre-2020 browsers, curl): fall back to the referrer's origin. A framed load
+  // carries the parent's origin, a typed URL carries nothing.
+  if (!dest && originAllowed(req.headers.referer)) {
+    return next();
+  }
+
+  console.warn('[embed-only] refused ' + req.method + ' ' + req.url +
+    ' (sec-fetch-dest=' + (dest || 'absent') + ', referer=' + (req.headers.referer || 'none') + ')');
+  res.status(403).type('html').send(noPermissionPage);
+}
+
+function renderNoPermissionPage(ancestors) {
+  const origins = ancestors.split(' ').filter((o) => o !== "'self'").join(', ');
+  const escaped = origins.replace(/[&<>"]/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+  return fs.readFileSync(path.join(__dirname, 'html', 'no-permission.html'), 'utf8')
+           .replace('{{ALLOWED}}', escaped);
+}
+
+function originAllowed(referer) {
+  if (!referer) {
+    return false;
+  }
+  let origin;
+  try {
+    origin = new URL(referer).origin;
+  } catch (e) {
+    return false;
+  }
+  return frameAncestors.split(' ').indexOf(origin) !== -1;
+}
+
+function clearStaleSessionCookie(req, res, next) {
+  // no-auth mode issues no JSESSIONID; clear any left over from a prior real-auth run
+  if (req.cookies && req.cookies.JSESSIONID) {
+    res.clearCookie('JSESSIONID');
   }
   next();
 }
