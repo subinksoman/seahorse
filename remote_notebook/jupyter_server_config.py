@@ -26,7 +26,11 @@ c.ServerApp.port = int(os.environ.get('JUPYTER_LISTENING_PORT', 8888))
 c.ServerApp.ip = os.environ.get('JUPYTER_LISTENING_IP', '127.0.0.1')
 # Jupyter Server 2 binds 0.0.0.0 directly; the classic '*' wildcard IP is no longer accepted.
 c.ServerApp.allow_origin = '*'
-c.ServerApp.base_url = '/jupyter/'
+# Jupyter rewrites every URL it emits from base_url, so it must be the externally visible path.
+# The proxy forwards /jupyter with the context path still attached (service-mapping preservePrefix),
+# so this has to match the proxy's CONTEXT_PATH: '/ae' -> '/ae/jupyter/'.
+c.ServerApp.base_url = os.environ.get('JUPYTER_BASE_URL') or \
+    (os.environ.get('CONTEXT_PATH', '').rstrip('/') + '/jupyter/')
 c.ServerApp.tornado_settings = {
     'headers': {
         'Content-Security-Policy': "frame-ancestors 'self' *"

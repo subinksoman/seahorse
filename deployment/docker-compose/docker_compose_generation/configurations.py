@@ -14,8 +14,14 @@
 
 
 import json
+import os
 
 from docker_compose_generation.docker_compose_utils import *
+
+# Mount point for the whole application; empty (the default) serves it at the root. The proxy strips
+# it off incoming requests, so only the proxy and the notebooks (whose base_url must be the
+# externally visible path) need to know it.
+CONTEXT_PATH = os.environ.get('CONTEXT_PATH', '').rstrip('/')
 
 
 class Directories(object):
@@ -127,6 +133,7 @@ class Proxy(Service):
             DOCUMENTATION_HOST=self._service_address(Documentation),
             AUTHORIZATION_HOST=self._service_address(Authorization),
             RABBITMQ_HOST=self._service_address(RabbitMQ, 'websocket'),
+            CONTEXT_PATH=CONTEXT_PATH,
             PORT=33321) + \
                self.services.WorkflowManager.credentials().as_env()
 
@@ -156,7 +163,7 @@ class SchedulingManager(Service):
         return super(SchedulingManager, self).environment() + \
                Env(
                    PORT=self.port_mapping().get().internal,
-                   SEAHORSE_EXTERNAL_URL="http://localhost:33321/",
+                   SEAHORSE_EXTERNAL_URL="http://localhost:33321{}/".format(CONTEXT_PATH),
                    JDBC_URL=self.services.Database.internal_jdbc_url(db='schedulingmanager'),
                    SM_URL='http://{}'.format(self.services.SessionManager.internal_address()),
                    WM_URL='http://{}'.format(self.services.WorkflowManager.internal_address())) + \
@@ -351,6 +358,7 @@ class Notebooks(Service):
             WM_URL='http://{}'.format(self.services.WorkflowManager.internal_address().as_string()),
             JUPYTER_LISTENING_IP='0.0.0.0',
             JUPYTER_LISTENING_PORT=self.port_mapping().get().internal,
+            JUPYTER_BASE_URL='{}/jupyter/'.format(CONTEXT_PATH),
             HEARTBEAT_INTERVAL=2.0) \
                + self.services.WorkflowManager.credentials().as_env() \
                + self.services.RabbitMQ.credentials().as_env() \
