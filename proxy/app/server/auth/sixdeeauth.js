@@ -46,6 +46,7 @@ const fs = require('fs');
 const session = require('express-session');
 const config = require('../config/config');
 const serviceMapping = require('../config/service-mapping');
+const { clearSessionCookies } = require('../utils/context-path');
 
 const AUTH_HOST = serviceMapping.authorization.host || '';
 const TIMEOUT = Number(config.get('timeout')) || 30000;
@@ -81,6 +82,7 @@ function init(app) {
     resave: false,
     saveUninitialized: false,
     cookie: {
+      path: config.cookiePath,
       httpOnly: true,
       sameSite: SECURE_COOKIE ? 'none' : 'lax',
       secure: SECURE_COOKIE,
@@ -94,8 +96,8 @@ function init(app) {
   app.post(EMBED_PATH, express.urlencoded({ extended: false }), handoff);
 
   app.get('/logout', function (req, res) {
-    res.clearCookie('JSESSIONID');
-    res.clearCookie('seahorse_user');
+    clearSessionCookies(res, 'JSESSIONID');
+    clearSessionCookies(res, 'seahorse_user');
     if (!req.session) {
       return res.redirect('/');
     }

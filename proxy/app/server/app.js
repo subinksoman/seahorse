@@ -23,8 +23,15 @@ const compression = require('compression');
 const timeout = require('connect-timeout');
 const reverseProxy = require('./reverse-proxy');
 const config = require('./config/config');
+const { withContextPath, clearSessionCookies } = require('./utils/context-path');
 
 const app = express();
+
+const contextPath = config.contextPath;
+if (contextPath) {
+  console.log('Serving under context path ' + contextPath);
+  app.use(contextPathMiddleware);
+}
 
 app.use(logger('dev'));
 app.use(timeout(config.get('timeout')));
@@ -74,6 +81,35 @@ app.use(userCookieMiddleware);
 
 app.get('/', reverseProxy.forward);
 app.all('/**', reverseProxy.forward);
+
+// Everything downstream — routes, express.static, the auth strategies — is written against the root,
+// so strip the context path on the way in and put it back on anything that leaves as a URL.
+// req.originalUrl keeps the full path, which is what passport resolves its relative callbackURL
+// against.
+function contextPathMiddleware(req, res, next) {
+  const redirect = res.redirect.bind(res);
+  res.redirect = function (statusOrUrl, maybeUrl) {
+    return maybeUrl === undefined ?
+      redirect(withContextPath(statusOrUrl)) :
+      redirect(statusOrUrl, withContextPath(maybeUrl));
+  };
+
+  const queryAt = req.url.indexOf('?');
+  const path = queryAt === -1 ? req.url : req.url.slice(0, queryAt);
+  const query = queryAt === -1 ? '' : req.url.slice(queryAt);
+
+  if (path === contextPath) {
+    // index.html pulls docker-config.js relatively; without the trailing slash it would resolve
+    // outside the context path
+    return res.redirect(301, contextPath + '/' + query);
+  }
+  if (path.indexOf(contextPath + '/') !== 0) {
+    return res.status(404).type('text').send('Not found. This application is served under ' +
+      contextPath + '/');
+  }
+  req.url = req.url.slice(contextPath.length);
+  next();
+}
 
 function parseFrameAncestors(value) {
   const origins = String(value || '').split(/[\s,]+/).filter((o) => o && o !== '*');
@@ -140,7 +176,7 @@ function originAllowed(referer) {
 function clearStaleSessionCookie(req, res, next) {
   // no-auth mode issues no JSESSIONID; clear any left over from a prior real-auth run
   if (req.cookies && req.cookies.JSESSIONID) {
-    res.clearCookie('JSESSIONID');
+    clearSessionCookies(res, 'JSESSIONID');
   }
   next();
 }
@@ -150,9 +186,9 @@ function userCookieMiddleware(req, res, next) {
     res.cookie('seahorse_user', JSON.stringify({
       'id': req.user.user_id,
       'name': req.user.user_name
-    }));
+    }), { path: config.cookiePath });
   } else {
-    res.clearCookie('seahorse_user');
+    clearSessionCookies(res, 'seahorse_user');
   }
   next();
 }

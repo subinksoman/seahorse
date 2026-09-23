@@ -18,6 +18,7 @@ var session = require('express-session');
 var crypto = require('crypto');
 var url = require('url');
 var oauth2 = require('./oauth2');
+var { clearSessionCookies } = require('../utils/context-path');
 var config = require('../config/config');
 var passport = oauth2.passport;
 var strategy = oauth2.strategy;
@@ -33,7 +34,8 @@ function init(app) {
     // stable across restarts so existing session cookies stay valid (was random per start)
     secret: config.get('SESSION_SECRET') || 'seahorse-proxy-stable-session-secret',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: { path: config.cookiePath }
   }));
   app.use(passport.initialize());
   app.use(passport.session());
@@ -68,8 +70,8 @@ function login(req, res, next) {
     req.logout(function () {
       strategy.reset();
       // drop stale cookies client-side so a returning browser self-heals (no manual delete)
-      res.clearCookie('JSESSIONID');
-      res.clearCookie('seahorse_user');
+      clearSessionCookies(res, 'JSESSIONID');
+      clearSessionCookies(res, 'seahorse_user');
       res.redirect('/oauth');
     });
   } else {

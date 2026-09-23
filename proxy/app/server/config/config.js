@@ -34,6 +34,16 @@ function getMandatory(name) {
   return getVariable(name) || thr(`${name} must be defined.`);
 }
 
+// CONTEXT_PATH mounts the whole app under a sub-path ('/ae'). Empty (the default) keeps everything
+// at the root, so existing deployments are unaffected.
+function normalizeContextPath(raw) {
+  const trimmed = String(raw || '').trim().replace(/\/{2,}/g, '/').replace(/\/+$/, '');
+  if (!trimmed || trimmed === '/') {
+    return '';
+  }
+  return trimmed.charAt(0) === '/' ? trimmed : '/' + trimmed;
+}
+
 function getVariable(name) {
   if(!name || !_.isString(name)) {
     return null;
@@ -48,8 +58,14 @@ function getVariable(name) {
 
 
 
+const contextPath = normalizeContextPath(getVariable('CONTEXT_PATH'));
+
 module.exports = {
   oauth,
   getMandatory,
   get: getVariable,
+  contextPath,
+  // cookies are scoped to the mount point so a sibling app on the same host neither receives them
+  // nor bloats the jar sent back here
+  cookiePath: contextPath + '/',
 };

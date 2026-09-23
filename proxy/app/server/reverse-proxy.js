@@ -21,7 +21,8 @@ const _ = require('underscore'),
     serviceMapping = require('./config/service-mapping'),
     config = require('./config/config'),
     httpException = require('./utils/http-exception'),
-    gatewayErrors = require('./gateway-errors');
+    gatewayErrors = require('./gateway-errors'),
+    contextPath = require('./utils/context-path');
 
 const basicAuthCredentials = Buffer.from(
       config.get('WM_AUTH_USER') + ':' + config.get('WM_AUTH_PASS')
@@ -45,6 +46,15 @@ function logProxyError(err, context) {
 
 proxy.on('error', function(err, req) {
   logProxyError(err, req && req.url);
+});
+
+// Upstreams answer with root-absolute Location headers because they are unaware of the context
+// path; re-anchor them so a redirect does not escape the mount point.
+proxy.on('proxyRes', function(proxyRes) {
+  const location = proxyRes.headers && proxyRes.headers.location;
+  if (location) {
+    proxyRes.headers.location = contextPath.withContextPath(location);
+  }
 });
 
 function getTargetHost(req, res) {
@@ -77,6 +87,10 @@ function forward(req, res) {
     delete req.headers['x-seahorse-username'];
   }
 
+  if (service.preservePrefix) {
+    req.url = contextPath.withContextPath(req.url);
+  }
+
   req.headers['x-forwarded-host'] = req.headers['host'];
   req.headers['x-forwarded-proto'] = req.headers['x-forwarded-proto'] || (req.secure ? 'https' : 'http');
   req.clearTimeout();
@@ -93,7 +107,7 @@ function forward(req, res) {
   proxy.web(req, res, options, function (e) {
         logProxyError(e, req && req.url);
         if (!_.isUndefined(service.timeoutRedirectionPage)) {
-          const waitPage = url.format({protocol: req.protocol, host: req.get("host"), pathname: service.timeoutRedirectionPage});
+          const waitPage = url.format({protocol: req.protocol, host: req.get("host"), pathname: contextPath.withContextPath('/' + service.timeoutRedirectionPage)});
           res.writeHead(302, {'Location': waitPage});
           res.end();
         }
@@ -101,6 +115,14 @@ function forward(req, res) {
 }
 
 function forwardWebSocket(req, socket, head) {
+  // server.on('upgrade') bypasses the express chain, so the context path is still on req.url and
+  // has to be stripped (and selectively restored) here as well — Jupyter's kernel channels are
+  // WebSockets under its base_url.
+  req.url = contextPath.stripContextPath(req.url);
+  const service = serviceMapping.getServiceForRequest(req.url);
+  if (service && service.preservePrefix) {
+    req.url = contextPath.withContextPath(req.url);
+  }
   proxy.ws(req, socket, head, {
     target: getTargetHost(req, socket),
     timeout: 0

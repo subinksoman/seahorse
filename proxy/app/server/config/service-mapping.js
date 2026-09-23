@@ -55,7 +55,11 @@ const serviceMapping = [authorization, {
 }, {
     "path": "/jupyter",
     "host": process.env["JUPYTER_HOST"],
-    "name": "jupyter"
+    "name": "jupyter",
+    // Jupyter rewrites every URL in its own HTML from ServerApp.base_url, so it has to be told the
+    // externally visible path: forward the context path instead of stripping it (JUPYTER_BASE_URL
+    // must match).
+    "preservePrefix": true
 }, {
     "path": "/library",
     "host": process.env["LIBRARY_HOST"],
