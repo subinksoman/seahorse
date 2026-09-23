@@ -25,9 +25,8 @@ export class BaseApiClient {
     protected $http: HttpService,
     @Inject('config') protected config: any
   ) {
-    this.API_URL = config.apiPort
-      ? `${config.apiHost}:${config.apiPort}/${config.urlApiVersion}`
-      : `${config.apiHost}/${config.urlApiVersion}`;
+    const base = config.apiPort ? `${config.apiHost}:${config.apiPort}` : `${config.apiHost}`;
+    this.API_URL = `${base}${config.contextPath || ''}/${config.urlApiVersion}`;
   }
 
   makeRequest(method: string, url: string, data: any = {}, timeout?: number): any {

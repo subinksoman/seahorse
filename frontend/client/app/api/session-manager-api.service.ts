@@ -18,9 +18,8 @@ export class SessionManagerApi {
     private $http: HttpService,
     @Inject('config') config: any
   ) {
-    this.URL = config.sessionApiPort
-      ? `${config.apiHost}:${config.sessionApiPort}/${config.urlApiVersion}/sessions`
-      : `${config.apiHost}/${config.urlApiVersion}/sessions`;
+    const base = config.sessionApiPort ? `${config.apiHost}:${config.sessionApiPort}` : `${config.apiHost}`;
+    this.URL = `${base}${config.contextPath || ''}/${config.urlApiVersion}/sessions`;
   }
 
   downloadSessions(config?: any): any {

@@ -22,7 +22,7 @@ export default class ApiBaseClass {
     'ngInject';
 
     this.$http = $http;
-    this.apiUrl = `${config.apiHost}:${config.apiPort}`;
+    this.apiUrl = `${config.apiHost}:${config.apiPort}${config.contextPath || ''}`;
     this.servicePath = '';
   }
 

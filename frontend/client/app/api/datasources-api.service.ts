@@ -16,7 +16,7 @@ export class DatasourcesApiService {
   private readonly apiUrl: string;
 
   constructor(private $http: HttpService, @Inject('config') config: any) {
-    this.apiUrl = `${config.apiHost}:${config.apiPort}`;
+    this.apiUrl = `${config.apiHost}:${config.apiPort}${config.contextPath || ''}`;
   }
 
   private makeEndpointUrl(endpointPath = ''): string {

@@ -26,7 +26,7 @@ module.exports = function (_path) {
     output: {
       path: path.join(_path, 'dist'),
       filename: '[name].js',
-      publicPath: '/'
+      publicPath: 'auto'
     },
 
     resolve: {

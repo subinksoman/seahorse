@@ -20,7 +20,7 @@ export class LibraryApi {
     private $http: HttpService,
     @Inject('config') config: any
   ) {
-    this.url = `${config.apiHost}:${config.apiPort}/library`;
+    this.url = `${config.apiHost}:${config.apiPort}${config.contextPath || ''}/library`;
     this.libraryPrefix = config.libraryPrefix;
   }
 

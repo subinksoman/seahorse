@@ -70,7 +70,7 @@ export class ErrorViewComponent implements OnInit {
   getErrorDescription(): string { return this.errorMessage; }
   getAPIVersion(): string { return this.config.apiVersion; }
   getLink(): string {
-    return this.config.apiHost + '/' + this.config.urlApiVersion + '/' + this.type + 's/' + this.id + '/download';
+    return this.config.apiHost + (this.config.contextPath || '') + '/' + this.config.urlApiVersion + '/' + this.type + 's/' + this.id + '/download';
   }
 
   goHome(): void { this.router.navigate(['/']); }

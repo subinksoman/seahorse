@@ -11,7 +11,7 @@ module.exports = function (_path) {
     context: _path,
     devtool: 'source-map',
     output: {
-      publicPath: '/',
+      publicPath: 'auto',
       filename: '[name].[contenthash].js',
       clean: true // webpack 5 native; replaces clean-webpack-plugin
     }

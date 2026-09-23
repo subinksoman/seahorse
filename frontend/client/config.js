@@ -16,11 +16,17 @@
 
 'use strict';
 
+// Where the app is mounted ('' at the root, '/ae' behind the proxy's CONTEXT_PATH). The router is
+// hash-based, so navigation only ever changes the fragment and location.pathname stays the mount
+// point — deriving it here keeps the built image free of any deploy-time base URL.
+const contextPath = window.location.pathname.replace(/\/[^/]*\.html?$/, '').replace(/\/+$/, '');
+
 const config = {
   // localhost - from docker compose
   'apiHost': window.location.protocol + '//' + window.location.hostname,
-  'docsHost': window.location.protocol + '//' + window.location.host,
-  'notebookHost': window.location.protocol + '//' + window.location.host + '/jupyter',
+  'contextPath': contextPath,
+  'docsHost': window.location.protocol + '//' + window.location.host + contextPath,
+  'notebookHost': window.location.protocol + '//' + window.location.host + contextPath + '/jupyter',
   'sessionApiPort': window.location.port,
   'sessionPollingInterval': 1000,
   'apiPort': window.location.port,
@@ -28,7 +34,7 @@ const config = {
   'editorVersion': '1.4.0',
   'urlApiVersion': 'v1',
   'resultsRefreshInterval': 10000,
-  'socketConnectionHost': window.location.protocol + '//' + window.location.host + '/',
+  'socketConnectionHost': window.location.protocol + '//' + window.location.host + contextPath + '/',
   'socketReconnectionInterval': 1000,
   'mqUser': 'yNNp7VJS',
   'mqPass': '1ElYfGNW',

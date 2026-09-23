@@ -26,7 +26,7 @@ export class PresetService {
     private workflowService: WorkflowService,
     @Inject('config') config: any
   ) {
-    this.apiUrl = `${config.apiHost}:${config.apiPort}`;
+    this.apiUrl = `${config.apiHost}:${config.apiPort}${config.contextPath || ''}`;
     this.servicePath = `/${config.urlApiVersion}/presets`;
     // Parity with the legacy service, which fetched on first instantiation. Swallow here — every
     // consumer re-fetches with its own error handling (choose-cluster ngOnInit).
