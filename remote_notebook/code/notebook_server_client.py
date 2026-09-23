@@ -14,6 +14,7 @@
 
 import base64
 import json
+import os
 
 try:
     from urllib.request import urlopen, Request
@@ -24,6 +25,17 @@ from utils import Logging
 from seahorse_notebook_path import SeahorseNotebookPath
 
 
+def _notebook_base_path():
+    """Jupyter's base_url without the trailing slash ('/jupyter', '/ae/jupyter').
+
+    Must resolve the same way as jupyter_server_config.py: the server serves its REST API under
+    base_url, so a kernel calling /jupyter/api/... gets a 404 once a context path is configured.
+    """
+    base = os.environ.get('JUPYTER_BASE_URL') or \
+        (os.environ.get('CONTEXT_PATH', '').rstrip('/') + '/jupyter/')
+    return '/' + base.strip('/')
+
+
 class NotebookServerClient(Logging):
     def __init__(self, nb_host, nb_port, kernel_id, seahorse_notebook_path=None):
         super().__init__()
@@ -31,7 +43,9 @@ class NotebookServerClient(Logging):
         self._nb_port = nb_port
         self._kernel_id = kernel_id
         self._notebook_server_location = "{}:{}".format(self._nb_host, self._nb_port)
-        self._api_url = "http://{}/jupyter/api/sessions".format(self._notebook_server_location)
+        self._base_path = _notebook_base_path()
+        self._api_url = "http://{}{}/api/sessions".format(
+            self._notebook_server_location, self._base_path)
         self.seahorse_notebook_path = seahorse_notebook_path
 
     def _get_path(self):
@@ -59,7 +73,8 @@ class NotebookServerClient(Logging):
         try:
             # POST data must be bytes on Python 3 (was "" -> "POST data should be bytes ... not str");
             # b"" makes an empty-body POST to the kernel restart endpoint.
-            urlopen("http://{}/jupyter/api/kernels/{}/restart".format(self._notebook_server_location, self._kernel_id), b"")
+            urlopen("http://{}{}/api/kernels/{}/restart".format(
+                self._notebook_server_location, self._base_path, self._kernel_id), b"")
         except Exception as e:
             self.logger.error("Error restarting kernel: {}".format(e))
             raise
