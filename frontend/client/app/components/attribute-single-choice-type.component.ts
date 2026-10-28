@@ -8,13 +8,16 @@ import { Component, Input, OnInit, DoCheck } from '@angular/core';
 // Phase C / deepsense-attributes recursive core: migrated from attribute-types/attribute-single-choice.
 // A dropdown choosing one option; the chosen option's sub-parameters render via a nested <attributes-list>.
 // The legacy $compile of the nested list becomes a real Angular <attributes-list> recursion.
+// The selection lives on the <option>, never as [value] on the <select>: the select's property
+// binding is applied before *ngFor has created the options, so the browser drops it and falls
+// back to the first one, and the binding is clean from then on.
 @Component({
   standalone: false,
   selector: 'attribute-single-choice-type',
   template: `
     <div>
-      <select class="form-control" [value]="choice" (change)="onChoiceChange($any($event.target).value)">
-        <option *ngFor="let cn of choiceNames" [value]="cn">{{ cn }}</option>
+      <select class="form-control" (change)="onChoiceChange($any($event.target).value)">
+        <option *ngFor="let cn of choiceNames" [value]="cn" [selected]="cn === choice">{{ cn }}</option>
       </select>
       <div class="nested-attributes-view">
         <ng-container *ngFor="let cn of choiceNames">

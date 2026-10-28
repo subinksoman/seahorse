@@ -158,9 +158,10 @@ export class ColumnPlotComponent implements AfterViewInit, OnChanges, OnDestroy 
         </div>
         <div class="modal-body">
           <div class="row">
-            <select class="form-control" [value]="selectedColumn"
+            <select class="form-control"
                     (change)="onColumnChange($any($event.target).value)">
-              <option *ngFor="let c of columnNames" [value]="c">{{ c }}</option>
+              <option *ngFor="let c of columnNames" [value]="c"
+                      [selected]="c === selectedColumn">{{ c }}</option>
             </select>
             <dl class="dl-horizontal">
               <dt>Missing values</dt>
