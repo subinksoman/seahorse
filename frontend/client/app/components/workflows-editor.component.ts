@@ -40,7 +40,12 @@ import { MouseEvent as MouseEventService } from '../services/mouse-event.service
     <div class="c-workflow-container">
       <section class="c-workflow-container__content" resizable-listener="height">
 
-        <div [ngClass]="{'active': isDatasourcesOpened}" class="datasources-component__mask"></div>
+        <!-- The mask takes pointer events while the datasources panel is open, so without this it
+             silently swallows every click on the canvas: nodes stop responding and the properties
+             panel looks frozen on whichever node was last selected. Dismiss on click, as an overlay
+             should — the small X is no longer the only way out. -->
+        <div [ngClass]="{'active': isDatasourcesOpened}" class="datasources-component__mask"
+             (click)="closeDatasources()"></div>
 
         <div class="datasources-component__wrapper" [ngClass]="{'active': isDatasourcesOpened}">
           <div (click)="closeDatasources()" class="cross">X</div>
