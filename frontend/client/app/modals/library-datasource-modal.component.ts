@@ -90,7 +90,7 @@ export class LibraryDatasourceModalComponent extends DatasourceModalBase impleme
     const editedDatasource = data.editedDatasource;
     if (editedDatasource) {
       this.originalDatasource = editedDatasource;
-      this.datasourceParams = editedDatasource.params;
+      this.datasourceParams = this.editableParams(editedDatasource);
     } else {
       this.isNew = true;
       this.datasourceParams = {

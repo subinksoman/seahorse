@@ -124,7 +124,7 @@ export class DatabaseModalComponent extends DatasourceModalBase implements DoChe
     const editedDatasource = data.editedDatasource;
     if (editedDatasource) {
       this.originalDatasource = editedDatasource;
-      this.datasourceParams = editedDatasource.params;
+      this.datasourceParams = this.editableParams(editedDatasource);
       this.copyFromQueryInput = false;
       if (editedDatasource.params.jdbcParams.query) {
         this.type = 'query';

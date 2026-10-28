@@ -91,7 +91,7 @@ export class ExternalFileModalComponent extends DatasourceModalBase implements D
     const editedDatasource = data.editedDatasource;
     if (editedDatasource) {
       this.originalDatasource = editedDatasource;
-      this.datasourceParams = editedDatasource.params;
+      this.datasourceParams = this.editableParams(editedDatasource);
       this.validateUrl();
     } else {
       this.datasourceParams = {

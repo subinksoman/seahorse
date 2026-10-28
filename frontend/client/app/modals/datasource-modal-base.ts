@@ -12,21 +12,26 @@ import { copy } from '../core/ng-compat';
 export abstract class DatasourceModalBase {
   datasourceParams: any;
   originalDatasource: any;   // the (uncopied) edited datasource — used by ok() + the status icons
-  editedDatasource: any;     // angular.copy — used by doesNameExists()
   previewMode: boolean;
   canAddNewDatasource = false;
   nameDirty = false;
 
   constructor(protected datasourcesService: any, protected dialogRef: DialogRef<any>, data: any) {
     this.previewMode = data.mode === 'VIEW';
-    this.editedDatasource = data.editedDatasource ? copy(data.editedDatasource) : null;
   }
 
+  // The form must never edit the object the datasources list holds: typing into it would rename
+  // the list entry live, so the name-uniqueness check would find the datasource being edited and
+  // report its own new name as taken — and Cancel would leave the edits behind.
+  protected editableParams(datasource: any): any {
+    return copy(datasource.params);
+  }
+
+  // A name clashes only when some OTHER datasource has it, so the edited one is excluded by id.
   doesNameExists(): boolean {
-    if (this.editedDatasource && this.editedDatasource.params.name === this.datasourceParams.name) {
-      return false;
-    }
-    return this.datasourcesService.isNameUsed(this.datasourceParams.name);
+    return this.datasourcesService.isNameUsed(
+      this.datasourceParams.name,
+      this.originalDatasource ? this.originalDatasource.id : undefined);
   }
 
   canAddDatasource(): boolean {
@@ -46,7 +51,7 @@ export abstract class DatasourceModalBase {
 
   ok(): void {
     if (this.originalDatasource) {
-      const updated = Object.assign({}, this.originalDatasource, this.datasourceParams);
+      const updated = Object.assign({}, this.originalDatasource, { params: this.datasourceParams });
       this.datasourcesService.updateDatasource(updated).then(() => this.dialogRef.close(true)).catch(() => {});
     } else {
       this.datasourcesService.addDatasource(this.datasourceParams).then(() => this.dialogRef.close(true)).catch(() => {});

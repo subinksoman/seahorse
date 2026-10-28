@@ -95,7 +95,7 @@ export class HdfsModalComponent extends DatasourceModalBase implements DoCheck {
     const editedDatasource = data.editedDatasource;
     if (editedDatasource) {
       this.originalDatasource = editedDatasource;
-      this.datasourceParams = editedDatasource.params;
+      this.datasourceParams = this.editableParams(editedDatasource);
       this.hdfsPathBuffer = this.datasourceParams.hdfsParams.hdfsPath.replace(HDFS_PREFIX, '');
       this.validateHdfsPath();
     } else {

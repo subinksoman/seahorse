@@ -47,7 +47,8 @@ export class DatasourcesService {
     return this.userService.getSeahorseUser().id === datasource.ownerId;
   }
 
-  isNameUsed(datasourceName: string): boolean {
-    return !!this.datasources.find((datasource) => datasource.params.name === datasourceName);
+  isNameUsed(datasourceName: string, exceptDatasourceId?: string): boolean {
+    return this.datasources.some(
+      (datasource) => datasource.params.name === datasourceName && datasource.id !== exceptDatasourceId);
   }
 }
