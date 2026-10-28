@@ -25,6 +25,8 @@ object CatalogSmokeTest {
     new PythonTransformation2To1(),
     new PythonTransformation2To2(),
     new PushToMlflow(),
+    new PushToMlflowWithSignature(),
+    new PushMetricsToMlflow(),
     new MlflowPredict()).map(op => (op.id, op.name))
 
   def main(args: Array[String]): Unit = {

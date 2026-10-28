@@ -54,9 +54,26 @@ sys.modules["pyspark"], sys.modules["pyspark.sql"] = pyspark, sql
 pyspark.sql = sql
 
 
+class PandasBackedDF:
+    """A Spark DataFrame as far as the signature script is concerned: limit() and toPandas()."""
+
+    def __init__(self, frame):
+        self.frame, self.view = frame, None
+
+    def limit(self, n):
+        return PandasBackedDF(self.frame.head(n))
+
+    def toPandas(self):
+        return self.frame
+
+    def createOrReplaceGlobalTempView(self, name):
+        self.view = name
+
+
 class FakeSpark:
-    def __init__(self):
+    def __init__(self, tables=None):
         self.created = []            # the published frame is a local in the shim, not a global
+        self.tables = dict(tables or {})
 
     def createDataFrame(self, rows, schema=None):
         df = SparkDF(list(rows))
@@ -64,12 +81,14 @@ class FakeSpark:
         return df
 
     def table(self, name):
-        raise AssertionError("this check does not use input views")
+        if name not in self.tables:
+            raise AssertionError("no such view: %s" % name)
+        return self.tables[name]
 
 
-def load(path, overrides=None):
+def load(path, overrides=None, spark=None):
     code = io.open(path, encoding="utf-8").read()
-    g = {"spark": FakeSpark()}
+    g = {"spark": spark or FakeSpark()}
     exec(compile(code, path, "exec"), g)
     g.update(overrides or {})
     return g
@@ -149,6 +168,62 @@ def main():
         loaded = mlflow.pyfunc.load_model(out["model_uri"])
         preds = loaded.predict(frame)
         print("  loaded via pyfunc and predicted:", list(preds))
+        assert len(preds) == 4
+
+        # ---- half 3: Push To MLflow With Signature, over the same unsigned model ----
+        mlmodel = io.open(os.path.join(row["model_path"], "MLmodel")).read()
+        assert "signature:" not in mlmodel, "this half needs a model saved WITHOUT a signature"
+
+        scored = pd.DataFrame({"prediction": model.predict(frame)})
+        view = "global_temp.seahorse_py_in1_aa_bb_11"
+        sig_spark = FakeSpark({view: PandasBackedDF(scored)})
+        sig = load(os.path.join(gen, "gen_mlflow_push_signature.py"), spark=sig_spark, overrides={
+            "_SH_REGISTER_AS": "e2e-churn-signed",
+            "_SH_MODEL_PATH": row["model_path"],
+            "_SH_MODEL_FLAVOR": row["flavor"],
+            "_SH_METRICS_JSON": row["metrics_json"],
+            "_SH_PARAMS_JSON": row["params_json"],
+            "_SH_INPUT_FILE": None,
+            "_SH_SAMPLE_ROWS": 100,
+            "_sh_right_view": view,
+        })
+        signed = sig["transform"](PandasBackedDF(frame)).dicts()[0]
+        print()
+        print("Push To MLflow With Signature returned:")
+        for key in ("run_id", "model_uri", "model_version",
+                    "signature_inputs", "signature_outputs", "input_file"):
+            print("  %-18s %s" % (key, signed[key]))
+
+        info = mlflow.models.get_model_info(signed["model_uri"])
+        assert info.signature is not None, "the logged model still has no signature"
+        declared = [c["name"] for c in json.loads(info.signature.inputs.to_json())]
+        outputs = json.loads(info.signature.outputs.to_json())
+        print()
+        print("read back from MLflow:")
+        print("  signature inputs ", declared)
+        print("  signature outputs", outputs)
+        assert declared == list(frame.columns), declared
+        assert len(outputs) == 1, outputs
+
+        assert io.open(os.path.join(row["model_path"], "MLmodel")).read() == mlmodel, \
+            "the model under SEAHORSE_MODEL_DIR must not have been modified"
+        print("  on-disk model unchanged (the signature went on the uploaded copy only)")
+
+        root = [f.path for f in client.list_artifacts(signed["run_id"])]
+        data = [f.path for f in client.list_artifacts(signed["run_id"], "data")]
+        print("  run artifacts     ", sorted(root), "+", sorted(data))
+        assert "data" in root and "model" in root, root
+        assert signed["input_file"] in data, data
+        pulled = mlflow.artifacts.download_artifacts(
+            run_id=signed["run_id"], artifact_path=signed["input_file"])
+        assert list(pd.read_csv(pulled).columns) == list(frame.columns), pulled
+        print("  input sample downloaded and re-read:", signed["input_file"])
+
+        # The point of the signature: scoring now tolerates columns the model never saw.
+        noisy = frame.copy()
+        noisy["customer_id"] = ["a", "b", "c", "d"]
+        preds = mlflow.pyfunc.load_model(signed["model_uri"]).predict(noisy)
+        print("  scored a frame carrying extra columns:", list(preds))
         assert len(preds) == 4
 
         print()

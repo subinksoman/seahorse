@@ -7,7 +7,7 @@ name := "seahorse-custom-ops"
 // /resources/jars. Delete the old one. Two versions side by side both register the same operation
 // ids, and DOperationsCatalog.registerDOperation throws on a duplicate id — which takes down the
 // entire operations catalog, not just this plugin.
-version := "1.3.0"
+version := "1.3.3"
 
 // Thin plugin jar: deeplang and Spark are already on the executor / workflowmanager classpath, so
 // nothing is bundled. Spark stays Provided (sbt still puts it on the test classpath, which the

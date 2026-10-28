@@ -161,6 +161,137 @@ private[customops] object PythonShim {
       |    return "The model could not score this DataFrame (" + str(error) + ")."
       |""".stripMargin
 
+  /**
+   * Resolving a registered model by name and version-or-alias, shared by every node that takes
+   * those two parameters. The registry is queried through `MlflowClient` rather than a `models:/`
+   * URI, because these nodes need the version object itself — its run and its source.
+   */
+  val registryHelpers: String =
+    """
+      |def _sh_registry_mlflow():
+      |    try:
+      |        import mlflow
+      |    except ImportError as error:
+      |        raise Exception(
+      |            "MLflow is not installed in the session's Python interpreter ("
+      |            + str(error) + ").")
+      |    return mlflow
+      |
+      |
+      |def _sh_registry_not_found(error, what):
+      |    return Exception(
+      |        "MLflow has no " + what + " (" + str(error).splitlines()[0] + "). Check the model "
+      |        "name, the version or alias, and that MLFLOW_TRACKING_URI in the executor's "
+      |        "environment points at the registry holding it.")
+      |
+      |
+      |def _sh_registry_version(client):
+      |    selector = _SH_MODEL_VERSION
+      |    if not selector:
+      |        try:
+      |            found = client.search_model_versions(
+      |                "name='" + _SH_MODEL_NAME.replace("'", "\\'") + "'")
+      |        except Exception as error:
+      |            raise _sh_registry_not_found(error, "model named '" + _SH_MODEL_NAME + "'")
+      |        if not found:
+      |            raise Exception(
+      |                "The registered model '" + _SH_MODEL_NAME + "' has no versions yet.")
+      |        return max(found, key=lambda version: int(version.version))
+      |    try:
+      |        if str(selector).isdigit():
+      |            return client.get_model_version(_SH_MODEL_NAME, str(selector))
+      |        return client.get_model_version_by_alias(_SH_MODEL_NAME, str(selector))
+      |    except Exception as error:
+      |        raise _sh_registry_not_found(
+      |            error, "'" + _SH_MODEL_NAME + "' version or alias '" + str(selector) + "'")
+      |""".stripMargin
+
+  /**
+   * Building an MLflow signature out of two example DataFrames, and the CSV of the input sample
+   * that goes with it. Shared by the two nodes that record a signature.
+   */
+  val signatureHelpers: String =
+    """
+      |_SH_INPUT_DIR = "data"
+      |
+      |
+      |def _sh_sig_sample(frame, limit, what):
+      |    try:
+      |        return frame.limit(limit).toPandas()
+      |    except Exception as error:
+      |        raise Exception(
+      |            "Could not read " + what + " to infer the model signature ("
+      |            + str(error) + ").")
+      |
+      |
+      |def _sh_sig_infer(inputs, outputs):
+      |    try:
+      |        from mlflow.models import infer_signature
+      |    except ImportError as error:
+      |        raise Exception(
+      |            "This MLflow install has no mlflow.models.infer_signature ("
+      |            + str(error) + "), so a signature cannot be built.")
+      |    try:
+      |        return infer_signature(inputs, outputs)
+      |    except Exception as error:
+      |        raise Exception(
+      |            "MLflow could not infer a signature from these two DataFrames ("
+      |            + str(error) + "). Every column of both frames has to hold a type MLflow can "
+      |            "map; a struct, a map or an array of structs cannot go into a signature, so "
+      |            "project those away before this node.")
+      |
+      |
+      |def _sh_sig_set_signature():
+      |    try:
+      |        from mlflow.models import set_signature
+      |    except ImportError:
+      |        return None
+      |    return set_signature
+      |
+      |
+      |def _sh_sig_write(path, signature):
+      |    import os
+      |    set_signature = _sh_sig_set_signature()
+      |    if set_signature is not None:
+      |        set_signature(path, signature)
+      |        return
+      |    # set_signature landed in MLflow 2.10; older installs get the same edit by hand.
+      |    import yaml
+      |    mlmodel = os.path.join(path, "MLmodel")
+      |    with open(mlmodel) as handle:
+      |        spec = yaml.safe_load(handle) or {}
+      |    spec["signature"] = signature.to_dict()
+      |    with open(mlmodel, "w") as handle:
+      |        yaml.safe_dump(spec, handle, default_flow_style=False)
+      |
+      |
+      |def _sh_sig_filename(configured, fallback):
+      |    name = configured or (fallback + ".csv")
+      |    safe = "".join(
+      |        c if (c.isalnum() or c in "-_.") else "_" for c in name).strip("._") or "input"
+      |    return safe if safe.lower().endswith(".csv") else safe + ".csv"
+      |
+      |
+      |def _sh_sig_write_csv(frame, directory, name):
+      |    import os
+      |    target = os.path.join(directory, name)
+      |    try:
+      |        frame.to_csv(target, index=False)
+      |    except Exception as error:
+      |        raise Exception(
+      |            "Could not write the input sample to '" + name + "' (" + str(error) + ").")
+      |    return target
+      |
+      |
+      |def _sh_sig_describe(schema):
+      |    if schema is None:
+      |        return ""
+      |    try:
+      |        return schema.to_json()
+      |    except Exception:
+      |        return str(schema)
+      |""".stripMargin
+
   /** Captures and arity-checks the user's `transform`; only for operations that take code. */
   val userCodeGuards: String =
     """

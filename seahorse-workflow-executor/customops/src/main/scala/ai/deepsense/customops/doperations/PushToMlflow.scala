@@ -107,46 +107,53 @@ object PushToMlflow {
     StructType(OutputColumns.map(StructField(_, StringType, nullable = false)))
 
   /**
-   * Generated in full, so the node hides MLflow entirely. Every value is a string: a column that
-   * were absent would otherwise be all-null and unschemable.
+   * The push itself, shared with [[PushToMlflowWithSignature]]: both nodes log the same run, the
+   * same tags and the same result row, and differ only in which directory is uploaded.
+   *
+   * `artifact_dir` defaults to the model's own directory. A caller that has staged a modified
+   * copy passes that instead, and may add its own tags, result columns and
+   * `(local path, artifact folder)` uploads.
    */
-  private[customops] val pushScript: String =
+  private[customops] val pushHelpers: String =
     """
-      |def transform(dataframe):
-      |    import json
-      |    import os
-      |    import time
-      |
+      |def _sh_push_mlflow():
       |    try:
       |        import mlflow
       |    except ImportError as error:
       |        raise Exception(
       |            "MLflow is not installed in the session's Python interpreter ("
       |            + str(error) + "). Install mlflow in the image that runs the executor.")
+      |    return mlflow
       |
-      |    if not os.path.isdir(_SH_MODEL_PATH):
+      |
+      |def _sh_push_require_model(path):
+      |    import os
+      |    if not os.path.isdir(path):
       |        raise Exception(
-      |            "The model directory '" + _SH_MODEL_PATH + "' is not visible to the executor. "
+      |            "The model directory '" + path + "' is not visible to the executor. "
       |            "It must be somewhere shared and persistent - SEAHORSE_MODEL_DIR defaults to "
       |            "/library/seahorse-models, which is mounted read-write in the session "
       |            "container.")
-      |    if not os.path.isfile(os.path.join(_SH_MODEL_PATH, "MLmodel")):
+      |    if not os.path.isfile(os.path.join(path, "MLmodel")):
       |        raise Exception(
-      |            "'" + _SH_MODEL_PATH + "' has no MLmodel file, so MLflow cannot load it back as "
+      |            "'" + path + "' has no MLmodel file, so MLflow cannot load it back as "
       |            "a model. save_model() writes one; a bare pickle does not.")
       |
       |
-      |    def _as_dict(raw):
-      |        if not raw:
-      |            return {}
-      |        try:
-      |            value = json.loads(raw)
-      |        except ValueError:
-      |            return {}
-      |        return value if isinstance(value, dict) else {}
+      |def _sh_push_as_dict(raw):
+      |    import json
+      |    if not raw:
+      |        return {}
+      |    try:
+      |        value = json.loads(raw)
+      |    except ValueError:
+      |        return {}
+      |    return value if isinstance(value, dict) else {}
       |
+      |
+      |def _sh_push_metrics(raw):
       |    metrics, bad_metrics = {}, []
-      |    for key, value in _as_dict(_SH_METRICS_JSON).items():
+      |    for key, value in _sh_push_as_dict(raw).items():
       |        try:
       |            metrics[str(key)] = float(value)
       |        except (TypeError, ValueError):
@@ -156,13 +163,33 @@ object PushToMlflow {
       |            "These metrics are not numeric, so MLflow cannot log them: "
       |            + ", ".join(sorted(bad_metrics))
       |            + ". Pass numbers to save_model(metrics=...), or move them to params.")
+      |    return metrics
       |
-      |    params = dict(
-      |        (str(k), str(v)) for k, v in _as_dict(_SH_PARAMS_JSON).items())
       |
-      |    # The experiment groups every run of one model; the run carries the timestamp, so
-      |    # successive pushes stay comparable in a single experiment view.
-      |    experiment = _SH_REGISTER_AS or "seahorse"
+      |def _sh_push_params(raw):
+      |    return dict((str(k), str(v)) for k, v in _sh_push_as_dict(raw).items())
+      |
+      |
+      |def _sh_push_experiment():
+      |    # The experiment groups every run of one model, and names the artifacts that belong
+      |    # to it, so both sides agree on what this model is called.
+      |    return _SH_REGISTER_AS or "seahorse"
+      |
+      |
+      |def _sh_push_to_mlflow(artifact_dir=None, extra_tags=None, extra_columns=None,
+      |                       extra_artifacts=None):
+      |    import os
+      |    import time
+      |
+      |    mlflow = _sh_push_mlflow()
+      |    _sh_push_require_model(_SH_MODEL_PATH)
+      |    metrics = _sh_push_metrics(_SH_METRICS_JSON)
+      |    params = _sh_push_params(_SH_PARAMS_JSON)
+      |    source = artifact_dir or _SH_MODEL_PATH
+      |
+      |    # The run carries the timestamp, so successive pushes of one model stay comparable
+      |    # in a single experiment view.
+      |    experiment = _sh_push_experiment()
       |    mlflow.set_experiment(experiment)
       |    run_name = experiment + "-" + time.strftime("%Y%m%d-%H%M%S")
       |
@@ -174,10 +201,18 @@ object PushToMlflow {
       |        if _SH_MODEL_FLAVOR:
       |            mlflow.set_tag("seahorse.flavor", _SH_MODEL_FLAVOR)
       |        mlflow.set_tag("seahorse.model_path", _SH_MODEL_PATH)
+      |        for key, value in (extra_tags or {}).items():
+      |            mlflow.set_tag(key, value)
       |        try:
-      |            mlflow.log_artifacts(_SH_MODEL_PATH, artifact_path="model")
+      |            mlflow.log_artifacts(source, artifact_path="model")
       |        except Exception as error:
       |            raise Exception(_sh_artifact_error(error, "uploading the model"))
+      |        for artifact, where in (extra_artifacts or []):
+      |            try:
+      |                mlflow.log_artifact(artifact, artifact_path=where)
+      |            except Exception as error:
+      |                raise Exception(_sh_artifact_error(
+      |                    error, "uploading " + os.path.basename(artifact)))
       |        run_id = run.info.run_id
       |        experiment_id = run.info.experiment_id
       |
@@ -193,7 +228,7 @@ object PushToMlflow {
       |                "needs a database-backed or HTTP tracking URI; a plain file store cannot "
       |                "register models.")
       |
-      |    return _sh_to_dataframe([{
+      |    row = {
       |        "run_id": run_id,
       |        "experiment": experiment,
       |        "run_name": run_name,
@@ -202,6 +237,18 @@ object PushToMlflow {
       |        "registered_model": _SH_REGISTER_AS or "",
       |        "model_version": version,
       |        "tracking_uri": mlflow.get_tracking_uri(),
-      |    }], spark, "the MLflow result")
+      |    }
+      |    row.update(extra_columns or {})
+      |    return _sh_to_dataframe([row], spark, "the MLflow result")
+      |""".stripMargin
+
+  /**
+   * Generated in full, so the node hides MLflow entirely. Every value is a string: a column that
+   * were absent would otherwise be all-null and unschemable.
+   */
+  private[customops] val pushScript: String = pushHelpers +
+    """
+      |def transform(dataframe):
+      |    return _sh_push_to_mlflow()
       |""".stripMargin
 }

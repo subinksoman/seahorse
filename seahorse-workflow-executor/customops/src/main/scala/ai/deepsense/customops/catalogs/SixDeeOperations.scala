@@ -55,6 +55,10 @@ class SixDeeOperations extends CatalogRegistrant {
     registrar.registerOperation(
       SixDeeCategory, () => new PushToMlflow(), priority.next())
     registrar.registerOperation(
+      SixDeeCategory, () => new PushToMlflowWithSignature(), priority.next())
+    registrar.registerOperation(
+      SixDeeCategory, () => new PushMetricsToMlflow(), priority.next())
+    registrar.registerOperation(
       SixDeeCategory, () => new MlflowPredict(), priority.next())
   }
 }

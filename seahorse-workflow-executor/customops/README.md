@@ -10,6 +10,8 @@ in `/resources/jars`. Nothing in the core (`deeplang`, `we.jar`, `code_executor.
 | **Transformation 2 To 1** | 2 DataFrames → 1 DataFrame + `MlflowModel` | `def transform(df1, df2)` → `return one_dataframe` |
 | **Transformation 2 To 2** | 2 DataFrames → 2 DataFrames + `MlflowModel` | `def transform(df1, df2)` → `return first, second` |
 | **Push To MLflow** | `MlflowModel` → 1 DataFrame | no code — typed parameters only |
+| **Push To MLflow With Signature** | `MlflowModel` + 2 DataFrames → 1 DataFrame | no code — typed parameters only |
+| **MLFLOWPUSH metrics** | 1 DataFrame → 1 DataFrame | no code — typed parameters only |
 
 All three appear in the palette under the **sixdee** category (the display name is one string in
 [SixDeeOperations.scala](src/main/scala/ai/deepsense/customops/SixDeeOperations.scala)).
@@ -22,7 +24,8 @@ Mirrors `deeplang`'s own, so the plugin reads like the code it extends:
 ai.deepsense.customops
 ├── catalogs/     SixDeeCategory, SixDeeOperations   - the CatalogRegistrant entry point
 ├── doperables/   MlflowModel                        - the typed port value
-├── doperations/  Transformation{1To2,2To1,2To2}, PushToMlflow
+├── doperations/  Transformation{1To2,2To1,2To2}, PushToMlflow,
+│                PushToMlflowWithSignature, PushMetricsToMlflow, MlflowPredict
 └── python/       PythonShim, PythonOperationRunner  - shared internals
 ```
 
@@ -69,13 +72,90 @@ MLflow script is generated from four parameters.
 
 | Parameter | |
 |---|---|
-| `tracking uri` | empty → `MLFLOW_TRACKING_URI`, else MLflow's own default |
-| `experiment name` | created if absent (default `seahorse`) |
-| `run name` | optional |
-| `registered model name` | empty → log without registering |
+| `registered model name` | empty → log without registering; otherwise also names the experiment |
+
+The tracking store comes from `MLFLOW_TRACKING_URI`. The experiment is the registered model name
+(or `seahorse`), and the run name is that plus a timestamp, so successive pushes of one model stay
+comparable in a single experiment view.
 
 It logs params, metrics and the artifacts, then optionally registers, and outputs one row:
-`run_id`, `experiment_id`, `model_uri`, `registered_model`, `model_version`, `tracking_uri`.
+`run_id`, `run_name`, `experiment`, `experiment_id`, `model_uri`, `registered_model`,
+`model_version`, `tracking_uri`.
+
+## Push To MLflow With Signature
+
+Same push, plus the `signature:` block that MLflow's **Schema → Inputs / Outputs** panel is
+rendered from. `save_model()` only writes one when the training code passed `input_example=`;
+without it the panel is blank, and the model is also intolerant of extra columns at scoring time,
+because MLflow has no declared input list to select by.
+
+| Port | |
+|---|---|
+| 0 | the `MlflowModel` |
+| 1 | the model's **inputs** — one row per observation, the feature columns |
+| 2 | the model's **outputs** — the predictions or labels |
+
+| Parameter | |
+|---|---|
+| `registered model name` | as above |
+| `input file name` | the CSV the port-1 sample is logged as, under the run's `data/` folder; empty → the registered model name. A `.csv` suffix is added if missing, and anything but letters, digits, `-`, `_` and `.` becomes `_` |
+| `sample rows` | rows read from each frame (default 1000). A signature records names and types, not data |
+
+**Every column of both frames goes into the signature.** Port 1 is what the model will demand when
+it scores, so drop label and id columns from it; port 2 wants the predictions on their own, so
+project a `Transform` node's output down before wiring it in — it carries the features alongside
+the predictions and would declare those as outputs too.
+
+The port-1 sample is also logged to the run as `data/<input file name>` — beside `model/`, so the
+data the signature was built from can be read next to the model it describes. It is the same
+`sample rows` the signature came from, not the whole input.
+
+Both DataFrame ports are **required** — Seahorse has no optional input ports, which is why this is
+a separate node rather than two extra ports on `Push To MLflow`.
+
+The signature is written onto a **copy** of the model directory, so the artifact the training node
+wrote under `SEAHORSE_MODEL_DIR` is read and never modified; only what goes to MLflow carries it.
+The run is tagged `seahorse.signature=inferred`, and the output row adds `signature_inputs`,
+`signature_outputs` and `input_file` to the columns above.
+
+## MLFLOWPUSH metrics
+
+Logs metrics against a model **already in the registry**, selected the way `MLflow Predict`
+selects one — by name and version or alias — so the training node need not be in this workflow.
+The single input port carries the metrics; the model is named by parameters, not wired in.
+(The class behind it is `PushMetricsToMlflow`.)
+
+| Parameter | |
+|---|---|
+| `model name` | registered model name, e.g. `churn` |
+| `version or alias` | a number (`3`), an alias (`champion`), or empty for the latest version |
+
+MLflow attaches metrics to **runs**, not to model versions, so the version is resolved to the run
+that produced it and the metrics go there — which is what the version's page displays. The run is
+written through `MlflowClient.log_metric`, which does not reopen it, so a `FINISHED` run stays
+finished and no new run appears. A version registered straight from a path has no source run and
+is refused with that as the reason.
+
+The input is read in whichever of the two shapes it is in, with nothing to configure:
+
+| Shape | |
+|---|---|
+| **long** | a name column (`metric`, `metric_name`, `name` or `key`) and a value column (`value` or `metric_value`), one row per metric. Matched case-insensitively |
+| **wide** | one row; every numeric column is a metric named after the column. Non-numeric columns are skipped and reported, not fatal |
+
+Logging a key that is already there appends to its history; the page shows the latest.
+
+Every push is **read back off the run** before the node reports success: the run is fetched and
+each metric compared against what was sent, so a tracking store that accepts a write without
+keeping it — read-only, or pointing somewhere other than the registry the model came from — fails
+here rather than silently leaving a dashboard wrong.
+
+Output is one row: `model_name`, `model_version`, `run_id`, `experiment_id`, `metrics` (JSON of
+what was logged), `metric_count`, `skipped_columns`, `validated`, `tracking_uri`.
+
+Prefer `save_model(model, input_example=X)` in the training code when you can — that puts the
+signature on the model everywhere, including the on-disk copy that `Transform` and `MLflow Predict`
+load. This node is for models already trained without one.
 
 > **Before this is useful, settle the tracking store.** With `tracking uri` empty and no
 > `MLFLOW_TRACKING_URI`, MLflow 3 defaults to a SQLite file in the driver's *working directory* —

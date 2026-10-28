@@ -51,14 +51,22 @@ class Row(tuple):
 class FakeDataFrame:
     """Stands in for a Spark DataFrame: remembers its rows, schema and published view name."""
 
-    def __init__(self, rows=(), schema=None, n=0):
+    def __init__(self, rows=(), schema=None, n=0, columns=()):
         self.rows = list(rows)
         self.schema = schema
         self.view = None
         self._n = n
+        self.columns = list(columns)
 
     def count(self):
         return self._n or len(self.rows)
+
+    def limit(self, n):
+        self.limited = n
+        return FakeDataFrame(self.rows[:n], self.schema, self._n, self.columns)
+
+    def toPandas(self):
+        return FakePandasDataFrame(self.columns, self.dicts())
 
     def createOrReplaceGlobalTempView(self, name):
         self.view = name
@@ -70,8 +78,22 @@ class FakeDataFrame:
 class FakePandasDataFrame:
     """Only needs to be distinguishable; real pandas frames are accepted by createDataFrame."""
 
-    def __init__(self, columns=()):
+    def __init__(self, columns=(), rows=()):
         self.columns = list(columns)
+        self.rows = [dict(r) for r in rows]
+
+    def __len__(self):
+        return len(self.rows)
+
+    @property
+    def iloc(self):
+        return self.rows
+
+    def __getitem__(self, names):
+        return FakePandasDataFrame(names, [{n: r.get(n) for n in names} for r in self.rows])
+
+    def to_csv(self, path, index=True):
+        io.open(path, "w").write(",".join(str(c) for c in self.columns) + "\n")
 
 
 class FakePandasSeries:
@@ -141,9 +163,9 @@ class FakePyfunc:
 
 
 class FakeRun:
-    class info:
-        run_id = "run-abc123"
-        experiment_id = "7"
+    def __init__(self, run_id="run-abc123", metrics=None):
+        self.info = type("Info", (), {"run_id": run_id, "experiment_id": "7"})()
+        self.data = type("Data", (), {"metrics": dict(metrics or {})})()
 
     def __enter__(self):
         return self
@@ -164,6 +186,13 @@ class FakeMlflowModule(types.ModuleType):
         for flavor in ("sklearn", "xgboost", "lightgbm", "pytorch", "tensorflow", "spark"):
             setattr(self, flavor, FakeMlflowFlavor(flavor, self.saved, self.signatures))
         self.pyfunc = FakePyfunc(self.saved, self.signatures)
+        self.versions = [
+            FakeModelVersion("churn", 1, "run-one"),
+            FakeModelVersion("churn", 2, "run-two"),
+            FakeModelVersion("churn", 3, "run-three"),
+        ]
+        self.aliases = {"champion": "2"}
+        self.run_metrics = {}
 
     def set_tracking_uri(self, uri):
         self.tracking_uri = uri
@@ -194,14 +223,90 @@ class FakeMlflowModule(types.ModuleType):
     def log_artifacts(self, path, artifact_path=None):
         self.calls.append(("log_artifacts", path, artifact_path))
 
+    def log_artifact(self, path, artifact_path=None):
+        assert os.path.isfile(path), path
+        self.calls.append(("log_artifact", path, artifact_path))
+
     def register_model(self, uri, name):
         self.calls.append(("register_model", uri, name))
         return type("MV", (), {"version": 3})()
 
 
+class FakeSchema:
+    def __init__(self, columns):
+        self.columns = list(columns)
+
+    def to_json(self):
+        return json.dumps([{"name": c, "type": "double"} for c in self.columns])
+
+
+class FakeSignature:
+    def __init__(self, inputs, outputs):
+        self.inputs = FakeSchema(getattr(inputs, "columns", inputs))
+        self.outputs = FakeSchema(getattr(outputs, "columns", outputs))
+
+    def to_dict(self):
+        return {"inputs": self.inputs.to_json(), "outputs": self.outputs.to_json()}
+
+
+class FakeModelVersion:
+    def __init__(self, name, version, run_id):
+        self.name, self.version, self.run_id = name, str(version), run_id
+
+
+class FakeMlflowClient:
+    """Enough of MlflowClient for the metrics node: resolve a version, log into its run."""
+
+    def __init__(self, module):
+        self.module = module
+
+    def search_model_versions(self, filter_string):
+        self.module.calls.append(("search_model_versions", filter_string))
+        return list(self.module.versions)
+
+    def get_model_version(self, name, version):
+        self.module.calls.append(("get_model_version", name, version))
+        for candidate in self.module.versions:
+            if candidate.version == str(version):
+                return candidate
+        raise Exception("Registered model version not found: %s/%s" % (name, version))
+
+    def get_model_version_by_alias(self, name, alias):
+        self.module.calls.append(("get_model_version_by_alias", name, alias))
+        if alias not in self.module.aliases:
+            raise Exception("Registered model alias not found: %s@%s" % (name, alias))
+        return self.get_model_version(name, self.module.aliases[alias])
+
+    def log_metric(self, run_id, key, value):
+        self.module.calls.append(("log_metric", run_id, key, value))
+        self.module.run_metrics.setdefault(run_id, {})[key] = value
+
+    def get_run(self, run_id):
+        self.module.calls.append(("get_run", run_id))
+        return FakeRun(run_id, self.module.run_metrics.get(run_id, {}))
+
+
 def install_fake_mlflow():
     module = FakeMlflowModule()
+    models = types.ModuleType("mlflow.models")
+
+    def infer_signature(inputs, outputs=None):
+        signature = FakeSignature(inputs, outputs if outputs is not None else [])
+        module.calls.append(
+            ("infer_signature", signature.inputs.columns, signature.outputs.columns))
+        return signature
+
+    def set_signature(path, signature):
+        module.calls.append(("set_signature", path, signature.to_dict()))
+        with io.open(os.path.join(path, "MLmodel"), "a") as handle:
+            handle.write("signature: %s\n" % json.dumps(signature.to_dict()))
+
+    models.infer_signature = infer_signature
+    models.set_signature = set_signature
+    module.models = models
+    module.MlflowClient = lambda *a, **k: FakeMlflowClient(module)
     sys.modules["mlflow"] = module
+    sys.modules["mlflow.models"] = models
     return module
 
 
@@ -547,6 +652,186 @@ def check_mlflow_push(path):
         shutil.rmtree(workdir, ignore_errors=True)
 
 
+def check_mlflow_push_signature(path):
+    """The signature node must infer from the two frames and log a *copy* carrying it."""
+    print("== %s" % os.path.basename(path))
+    mlflow = install_fake_mlflow()
+    g, spark, _ = load(path)
+    print("  OK  syntax + code_executor.isValid() accepts")
+
+    workdir = tempfile.mkdtemp()
+    try:
+        model_dir = os.path.join(workdir, "m")
+        os.makedirs(model_dir)
+        io.open(os.path.join(model_dir, "MLmodel"), "w").write("flavor: sklearn\n")
+        original = io.open(os.path.join(model_dir, "MLmodel")).read()
+        g["_SH_MODEL_PATH"] = model_dir
+
+        features = ["tenure", "charges"]
+        inputs = FakeDataFrame(columns=features)
+        spark.tables["global_temp.seahorse_py_in1_aa_bb_11"] = FakeDataFrame(
+            columns=["prediction"])
+
+        out = g["transform"](inputs)
+        row = out.dicts()[0]
+        assert row["run_id"] == "run-abc123", row
+        assert row["registered_model"] == "churn" and row["model_version"] == "3", row
+
+        inferred = [c for c in mlflow.calls if c[0] == "infer_signature"][0]
+        assert inferred[1] == features, inferred
+        assert inferred[2] == ["prediction"], inferred
+        print("  OK  every column of both frames went into the signature ->",
+              inferred[1], "->", inferred[2])
+
+        assert inputs.limited == 100, inputs.limited
+        print("  OK  both frames read with limit(sample rows) =", inputs.limited)
+
+        staged = [c for c in mlflow.calls if c[0] == "set_signature"][0][1]
+        uploaded = [c for c in mlflow.calls if c[0] == "log_artifacts"][0]
+        assert staged != model_dir, staged
+        assert uploaded[1] == staged and uploaded[2] == "model", uploaded
+        print("  OK  the signature went on a staged copy, and that copy is what was uploaded")
+
+        assert io.open(os.path.join(model_dir, "MLmodel")).read() == original, \
+            "the saved model under SEAHORSE_MODEL_DIR must not be touched"
+        print("  OK  the model the training node wrote is byte-for-byte unchanged")
+
+        assert not os.path.isdir(staged), staged
+        print("  OK  the staging directory is removed, including on the success path")
+
+        assert json.loads(row["signature_inputs"])[0]["name"] == "tenure", row
+        assert json.loads(row["signature_outputs"])[0]["name"] == "prediction", row
+        tags = dict((c[1], c[2]) for c in mlflow.calls if c[0] == "set_tag")
+        assert tags.get("seahorse.signature") == "inferred", tags
+        print("  OK  result row reports the signature; run tagged seahorse.signature=inferred")
+
+        # The input sample is logged as its own artifact, named for the model by default.
+        logged = [c for c in mlflow.calls if c[0] == "log_artifact"]
+        assert len(logged) == 1, logged
+        assert os.path.basename(logged[0][1]) == "churn.csv", logged
+        assert os.path.dirname(logged[0][1]) == os.path.dirname(staged), logged
+        assert logged[0][2] == "data", logged
+        assert row["input_file"] == "data/churn.csv", row
+        print("  OK  input sample logged under data/ as", row["input_file"])
+
+        # An explicit name wins; the .csv suffix and path separators are not the caller's
+        # problem.
+        g["_SH_INPUT_FILE"] = "train/sample set"
+        out = g["transform"](FakeDataFrame(columns=features))
+        assert out.dicts()[0]["input_file"] == "data/train_sample_set.csv", out.dicts()[0]
+        print("  OK  'input file name' honoured, sanitised and suffixed ->",
+              out.dicts()[0]["input_file"])
+        g["_SH_INPUT_FILE"] = None
+
+        # Staging must not survive a failure either.
+        before = set(os.listdir(tempfile.gettempdir()))
+        g["_SH_MODEL_PATH"] = os.path.join(workdir, "gone")
+        expect_error(lambda: g["transform"](FakeDataFrame(columns=features)),
+                     "not visible to the executor", path)
+        leaked = [d for d in set(os.listdir(tempfile.gettempdir())) - before
+                  if d.startswith("sh-mlflow-signature-")]
+        assert not leaked, leaked
+        print("  OK  a missing model directory fails before anything is staged")
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
+
+
+def check_mlflow_metrics(path):
+    """Resolve a registered version, then log into the run behind it - in either input shape."""
+    print("== %s" % os.path.basename(path))
+    mlflow = install_fake_mlflow()
+    g, spark, _ = load(path)
+    print("  OK  syntax + code_executor.isValid() accepts")
+
+    def logged():
+        return dict((c[2], c[3]) for c in mlflow.calls if c[0] == "log_metric")
+
+    def runs():
+        return set(c[1] for c in mlflow.calls if c[0] == "log_metric")
+
+    # Wide: one row, every numeric column a metric; the rest are reported, not fatal.
+    wide = FakeDataFrame(
+        rows=[{"accuracy": 0.91, "rmse": 0.21, "scored_on": "2026-10-15"}],
+        columns=["accuracy", "rmse", "scored_on"])
+    row = g["transform"](wide).dicts()[0]
+    assert logged() == {"accuracy": 0.91, "rmse": 0.21}, logged()
+    assert row["skipped_columns"] == "scored_on", row
+    assert row["metric_count"] == "2", row
+    assert row["validated"] == "read back 2 of 2 from run run-three", row
+    print("  OK  wide input ->", json.loads(row["metrics"]),
+          "| non-numeric reported:", row["skipped_columns"])
+
+    # No version given means the highest, and the metrics land on ITS run, not a new one.
+    assert runs() == {"run-three"}, mlflow.calls
+    assert row["model_version"] == "3" and row["run_id"] == "run-three", row
+    assert not [c for c in mlflow.calls if c[0] == "start_run"], mlflow.calls
+    print("  OK  empty version -> latest (v3), logged into run-three, no new run started")
+
+    # Long: a name/value column pair, one row per metric.
+    mlflow.calls[:] = []
+    long_form = FakeDataFrame(
+        rows=[{"metric": "precision", "value": 0.77}, {"metric": "recall", "value": 0.64}],
+        columns=["metric", "value"])
+    row = g["transform"](long_form).dicts()[0]
+    assert logged() == {"precision": 0.77, "recall": 0.64}, logged()
+    assert row["skipped_columns"] == "", row
+    print("  OK  long input ->", json.loads(row["metrics"]))
+
+    # The pair is found by name, whatever the case and whichever synonym.
+    mlflow.calls[:] = []
+    g["transform"](FakeDataFrame(
+        rows=[{"Key": "f1", "Metric_Value": 0.70}], columns=["Key", "Metric_Value"]))
+    assert logged() == {"f1": 0.70}, logged()
+    print("  OK  'key' / 'metric_value' recognised too, case-insensitively")
+
+    # Explicit version and alias both resolve through the registry.
+    mlflow.calls[:] = []
+    g["_SH_MODEL_VERSION"] = "1"
+    row = g["transform"](long_form).dicts()[0]
+    assert row["run_id"] == "run-one" and row["model_version"] == "1", row
+    g["_SH_MODEL_VERSION"] = "champion"
+    row = g["transform"](long_form).dicts()[0]
+    assert row["run_id"] == "run-two" and row["model_version"] == "2", row
+    print("  OK  numeric version -> get_model_version; alias -> get_model_version_by_alias")
+
+    g["_SH_MODEL_VERSION"] = "nope"
+    expect_error(lambda: g["transform"](long_form), "MLflow has no", path)
+    g["_SH_MODEL_VERSION"] = None
+    print("  OK  an unknown alias names the tracking URI as the thing to check")
+
+    # Input the node cannot turn into metrics.
+    expect_error(lambda: g["transform"](FakeDataFrame(rows=[], columns=["accuracy"])),
+                 "is empty", path)
+    expect_error(
+        lambda: g["transform"](FakeDataFrame(
+            rows=[{"metric": "auc", "value": "high"}], columns=["metric", "value"])),
+        "non-numeric", path)
+    expect_error(
+        lambda: g["transform"](FakeDataFrame(
+            rows=[{"model": "a"}, {"model": "b"}], columns=["model"])),
+        "rows and no metric-name/value column pair", path)
+    expect_error(
+        lambda: g["transform"](FakeDataFrame(rows=[{"note": "hi"}], columns=["note"])),
+        "No column of the input holds a number", path)
+    print("  OK  empty / non-numeric / many-row-wide / no-numeric-column all refused clearly")
+
+    # A store that accepts the write but does not keep it must not be reported as success.
+    mlflow.calls[:] = []
+    swallow = FakeMlflowClient(mlflow)
+    swallow.log_metric = lambda run_id, key, value: mlflow.calls.append(
+        ("log_metric", run_id, key, value))
+    mlflow.MlflowClient = lambda *a, **k: swallow
+    mlflow.run_metrics.clear()
+    expect_error(lambda: g["transform"](long_form), "does not report them back", path)
+    mlflow.MlflowClient = lambda *a, **k: FakeMlflowClient(mlflow)
+    print("  OK  metrics are read back off the run; a silent drop fails the node")
+
+    # A version registered from a path has no run to log against.
+    mlflow.versions = [FakeModelVersion("churn", 4, None)]
+    expect_error(lambda: g["transform"](long_form), "was not produced by a run", path)
+    print("  OK  a version with no source run says so instead of failing obscurely")
+
+
 def main():
     install_fake_pyspark()
     d = sys.argv[1]
@@ -555,6 +840,8 @@ def main():
     check_two_outputs(os.path.join(d, "gen_1to2.py"), arity=1)
     check_save_model(os.path.join(d, "gen_1to2.py"))
     check_mlflow_push(os.path.join(d, "gen_mlflow_push.py"))
+    check_mlflow_push_signature(os.path.join(d, "gen_mlflow_push_signature.py"))
+    check_mlflow_metrics(os.path.join(d, "gen_mlflow_metrics.py"))
     print("\nALL CHECKS PASSED")
 
 

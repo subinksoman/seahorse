@@ -41,10 +41,24 @@ object DumpGeneratedCode {
       metricsJson = """{"auc": 0.83}""",
       paramsJson = """{"n_estimators": "100"}""")))
 
+    val pushWithSignature = new PushToMlflowWithSignature()
+      .setRegisteredModelName("churn")
+      .setSampleRows(100)
+    write(outDir.resolve("gen_mlflow_push_signature.py"), pushWithSignature.renderCode(
+      MlflowModel(
+        modelPath = "/library/seahorse-models/wf-42/aa-bb-11",
+        flavor = "sklearn",
+        metricsJson = """{"auc": 0.83}""",
+        paramsJson = """{"n_estimators": "100"}"""),
+      PythonShim.rightInputView(NodeId)))
+
+    val pushMetrics = new PushMetricsToMlflow().setModelName("churn").setModelVersion("")
+    write(outDir.resolve("gen_mlflow_metrics.py"), pushMetrics.renderCode())
+
     val predict = new MlflowPredict().setModelName("churn").setModelVersion("")
     write(outDir.resolve("gen_mlflow_predict.py"), predict.renderCode())
 
-    println(s"wrote 5 scripts to $outDir")
+    println(s"wrote 7 scripts to $outDir")
   }
 
   private def write(path: java.nio.file.Path, code: String): Unit =
