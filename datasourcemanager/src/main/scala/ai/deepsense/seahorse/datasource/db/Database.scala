@@ -18,20 +18,17 @@ package ai.deepsense.seahorse.datasource.db
 
 import slick.jdbc.JdbcProfile
 
-import ai.deepsense.commons.service.db.JdbcVendor
+import ai.deepsense.commons.service.db.{JdbcVendor, PooledDatabase}
 import ai.deepsense.seahorse.datasource.DatasourceManagerConfig
 
 object Database {
 
   private val conf = DatasourceManagerConfig.config.getConfig("databaseSlick.db")
-  private val url = conf.getString("url")
-  private val vendor = JdbcVendor.fromUrl(url)
-  private val user = if (conf.hasPath("user")) conf.getString("user") else ""
-  private val pass = if (conf.hasPath("password")) conf.getString("password") else ""
+  private val vendor = JdbcVendor.fromUrl(conf.getString("url"))
 
   val driver: JdbcProfile = vendor.profile
   val api = driver.api
-  val db = driver.api.Database.forURL(url, user = user, password = pass, driver = vendor.driver)
+  val db = PooledDatabase.fromConfig(conf, vendor, "datasourcemanager")
 
   def forceInitialization(): Unit = {
     // Force initialization here to work around bug https://github.com/slick/slick/issues/1400

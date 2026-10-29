@@ -131,6 +131,9 @@ object Library {
   val scoverage = "org.scoverage" %% "scalac-scoverage-runtime" % Version.scoverage
   val stampy = "asia.stampy" % "stampy-core" % "1.0-RELEASE"
   val slick = "com.typesafe.slick" %% "slick" % Version.slick
+  // Supplies the HikariCP pool that `connectionPool = "HikariCP"` selects; without it on the
+  // classpath Slick silently falls back to an unpooled DataSource.
+  val slickHikaricp = "com.typesafe.slick" %% "slick-hikaricp" % Version.slick
   //val sparkCore = spark("core") excludeAll ExclusionRule("com.chuusai", "shapeless_2.11", "2.0.0")
   //val sparkMLLib = spark("mllib") excludeAll ExclusionRule("com.chuusai", "shapeless_2.11", "2.0.0")
   //val sparkLauncher = spark("launcher") excludeAll ExclusionRule("com.chuusai", "shapeless_2.11", "2.0.0")
@@ -221,6 +224,7 @@ object Dependencies {
     metricsScala,
     nscalaTime,
     slick,
+    slickHikaricp,
     sprayJson,
     shapeless,
 
@@ -241,6 +245,7 @@ object Dependencies {
     guiceAssistedInject,
     h2,
     slick,
+    slickHikaricp,
     flyway,
     flywayMysql,
     mysqlConnector,
@@ -291,6 +296,7 @@ object Dependencies {
   val datasourcemanager = scalatraAndJetty ++ json4s ++ Seq(
     pekkoHttp, // for org.apache.pekko.http.scaladsl.model.StatusCodes
     h2,
+    slickHikaricp,
     flyway,
     flywayMysql,
     mysqlConnector,
@@ -311,6 +317,7 @@ object Dependencies {
     mysqlConnector,
     scalajs,
     slick,
+    slickHikaricp,
     quartz
   ) ++ Seq(scalatest).map(_ % Test)
 
